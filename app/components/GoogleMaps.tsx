@@ -36,21 +36,15 @@ export default function GoogleMaps() {
       };
 
       const map = new Map(mapRef.current as HTMLDivElement, options);
-	  new google.maps.Marker({
-		position: { lat: -8.7932639, lng: 115.1499561 },
-		map: map,
-	  });
+	
 
-	  new google.maps.Marker({
-		position: { lat: -8.7932639, lng: 115.1499561 },
-		map: map,
-	  });
-
-
-	  new google.maps.Marker({
-		position: { lat: -8.7932639, lng: 115.1499561 },
-		map: map,
-	  });
+      // Loop through the locations and add a marker for each one
+      locations.forEach((location) => {
+        new google.maps.Marker({
+          position: location,
+          map: map,
+        });
+      });
     };
 
     initializeMap();
