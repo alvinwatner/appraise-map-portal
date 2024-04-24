@@ -9,8 +9,6 @@ import {
 } from "@react-google-maps/api";
 
 import { Autocomplete } from "@react-google-maps/api";
-
-import type { NextPage } from "next";
 import { useMemo, useState, useRef } from "react";
 import { AiOutlineMenu } from "react-icons/ai"; // Hamburger menu icon
 
@@ -35,7 +33,7 @@ export default function Home() {
 
   const { isLoaded } = useLoadScript({
     // googleMapsApiKey: '',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
+    googleMapsApiKey:  process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
     libraries: libraries as any,
   });
 
@@ -47,8 +45,10 @@ export default function Home() {
   };
 
   const onPlaceChanged = () => {
+    console.log("sedang terjadi")
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
+      console.log('place = ' + place)  
       if (place && place.geometry && place.geometry.location) {
         const location = place.geometry.location;
         setMapCenter({ lat: location.lat(), lng: location.lng() });
@@ -88,7 +88,9 @@ export default function Home() {
           />
         </div>
         <div className="absolute top-0 left-14 z-10 p-4 w-1/3">
-          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+          <Autocomplete onLoad={onLoad} 
+          onPlaceChanged={onPlaceChanged}   
+          options={{ types: ['address'] }} >
             <input
               className="w-full p-2"
               type="text"
