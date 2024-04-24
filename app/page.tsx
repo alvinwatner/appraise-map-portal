@@ -7,13 +7,22 @@ import {
   MarkerF,
   InfoWindow,
 } from "@react-google-maps/api";
+
+import { Autocomplete } from "@react-google-maps/api";
+
 import type { NextPage } from "next";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { AiOutlineMenu } from "react-icons/ai"; // Hamburger menu icon
 
 export default function Home() {
   const libraries = useMemo(() => ["places"], []);
-  const mapCenter = useMemo(() => ({ lat: -8.7932639, lng: 115.1499561 }), []);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [mapCenter, setMapCenter] = useState({
+    lat: -8.7932639,
+    lng: 115.1499561,
+  });
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -25,13 +34,33 @@ export default function Home() {
   );
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
+    // googleMapsApiKey: '',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
     libraries: libraries as any,
   });
 
   const [activeMarker, setActiveMarker] =
     useState<null | google.maps.LatLngLiteral>(null);
-  const [isNavOpen, setIsNavOpen] = useState(false); // State to handle nav visibility
+
+    const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
+      autocompleteRef.current = autocomplete;
+  };
+
+  const onPlaceChanged = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place && place.geometry && place.geometry.location) {
+        const location = place.geometry.location;
+        setMapCenter({ lat: location.lat(), lng: location.lng() });
+        if (map) {
+          map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
+        }
+      } else {
+        console.log("No geometry found for this place, cannot navigate to location.");
+        // Optionally, handle the lack of geometry (e.g., show an error message to the user)
+      }
+    }
+  }; 
 
   if (!isLoaded) {
     return <p>Loading...</p>;
@@ -59,13 +88,13 @@ export default function Home() {
           />
         </div>
         <div className="absolute top-0 left-14 z-10 p-4 w-1/3">
-          {" "}
-          {/* Adjusted search bar */}
-          <input
-            className="w-full p-2"
-            type="text"
-            placeholder="Search places..."
-          />
+          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+            <input
+              className="w-full p-2"
+              type="text"
+              placeholder="Search places..."
+            />
+          </Autocomplete>
         </div>
         <GoogleMap
           options={mapOptions}
