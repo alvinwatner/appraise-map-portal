@@ -1,153 +1,78 @@
-// pages/index.tsx
-"use client";
-
-import {
-  useLoadScript,
-  GoogleMap,
-  MarkerF,
-  InfoWindow,
-} from "@react-google-maps/api";
-
-import { Autocomplete } from "@react-google-maps/api";
-import { useMemo, useState, useRef } from "react";
-import { AiOutlineMenu } from "react-icons/ai"; // Hamburger menu icon
+import Head from 'next/head';
 
 export default function Home() {
-  const libraries = useMemo(() => ["places"], []);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapCenter, setMapCenter] = useState({
-    lat: -8.7932639,
-    lng: 115.1499561,
-  });
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-
-  const mapOptions = useMemo<google.maps.MapOptions>(
-    () => ({
-      disableDefaultUI: true,
-      clickableIcons: true,
-      scrollwheel: false,
-    }),
-    []
-  );
-
-  const { isLoaded } = useLoadScript({
-    // googleMapsApiKey: '',
-    googleMapsApiKey:  process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
-    libraries: libraries as any,
-  });
-
-  const [activeMarker, setActiveMarker] =
-    useState<null | google.maps.LatLngLiteral>(null);
-
-    const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
-      autocompleteRef.current = autocomplete;
-  };
-
-  const onPlaceChanged = () => {
-    console.log("sedang terjadi")
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-      console.log('place = ' + place)  
-      if (place && place.geometry && place.geometry.location) {
-        const location = place.geometry.location;
-        setMapCenter({ lat: location.lat(), lng: location.lng() });
-        if (map) {
-          map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
-        }
-      } else {
-        console.log("No geometry found for this place, cannot navigate to location.");
-        // Optionally, handle the lack of geometry (e.g., show an error message to the user)
-      }
-    }
-  }; 
-
-  if (!isLoaded) {
-    return <p>Loading...</p>;
-  }
-
   return (
-    <div className="flex flex-col w-screen h-screen">
-      {isNavOpen && (
-        <div
-          className={`absolute z-20 bg-white w-64 h-full shadow-md transition-transform duration-1000 ease-in-out transform ${
-            isNavOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <p className="p-4">Navigation Content Here</p>
-        </div>
-      )}
-      <div className="relative flex-grow">
-        <div className="absolute top-0 left-0 z-30 p-4">
-          {" "}
-          {/* Hamburger menu */}
-          <AiOutlineMenu
-            className="text-3xl cursor-pointer"
-            color="white"
-            onClick={() => setIsNavOpen(!isNavOpen)}
-          />
-        </div>
-        <div className="absolute top-0 left-14 z-10 p-4 w-1/3">
-          <Autocomplete onLoad={onLoad} 
-          onPlaceChanged={onPlaceChanged}   
-          options={{ types: ['address'] }} >
-            <input
-              className="w-full p-2"
-              type="text"
-              placeholder="Search places..."
-            />
-          </Autocomplete>
-        </div>
-        <GoogleMap
-          options={mapOptions}
-          zoom={14}
-          center={mapCenter}
-          mapTypeId={google.maps.MapTypeId.ROADMAP}
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          onLoad={(map) => console.log("Map Loaded")}
-        >
-          {/* Marker with InfoWindow */}
-          <MarkerF
-            position={{ lat: -8.7902898, lng: 115.1539977 }}
-            onClick={() =>
-              setActiveMarker({ lat: -8.7902898, lng: 115.1539977 })
-            }
-            onLoad={() => console.log("Marker Loaded")}
-            icon={
-              "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
-            }
-          >
-            {activeMarker &&
-              activeMarker.lat === -8.7902898 &&
-              activeMarker.lng === 115.1539977 && (
-                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <div>
-                    <h1>Marker Title</h1>
-                    <p>This is marker content.</p>
-                  </div>
-                </InfoWindow>
-              )}
-          </MarkerF>
+    <div>
+      <Head>
+        <title>Profil Perusahaan Properti</title>
+        <meta name="description" content="Profil perusahaan spesialis di bidang aset properti" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-          {/* Second Marker */}
-          <MarkerF
-            position={{ lat: -8.789535, lng: 115.163359 }}
-            onClick={() => setActiveMarker({ lat: -8.789535, lng: 115.163359 })}
-            onLoad={() => console.log("Marker Loaded")}
-          >
-            {activeMarker &&
-              activeMarker.lat === -8.789535 &&
-              activeMarker.lng === 115.163359 && (
-                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <div>
-                    <h1>Another Marker</h1>
-                    <p>Details about this location.</p>
-                  </div>
-                </InfoWindow>
-              )}
-          </MarkerF>
-        </GoogleMap>
-      </div>
+      <nav className="bg-slate-400 py-4 shadow-md">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold ">Properti XYZ</h1>
+          <div className="flex items-center">
+            <a href="#home" className="mx-2  hover:text-blue-300 font-medium">Home</a>
+            <a href="#about" className="mx-2  hover:text-blue-300 font-medium">Tentang Kami</a>
+            <a href="#services" className="mx-2  hover:text-blue-300 font-medium">Layanan Kami</a>
+            <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Login
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        <section id="home" className="relative min-h-screen bg-cover bg-center flex flex-col justify-center items-center text-center" style={{ backgroundImage: 'url(/background.jpg)' }}>
+          <h2 className="text-4xl font-bold text-white shadow-lg">
+            Selamat Datang di Properti XYZ
+          </h2>
+          <p className="mt-3 text-xl text-white shadow-lg">
+            Kami adalah perusahaan yang bergerak di bidang aset properti dengan pengalaman lebih dari 20 tahun.
+          </p>
+          <p className="text-white mt-2">
+            Menyediakan solusi properti terbaik, mengelola lebih dari 300 unit properti di seluruh negeri, dan berkomitmen pada kepuasan pelanggan.
+          </p>
+        </section>
+
+        <section id="about" className="container mx-auto px-4 py-16">
+          <h2 className="text-2xl font-semibold">Tentang Kami</h2>
+          <p className="text-md mt-2">
+            Properti XYZ berkomitmen untuk mengembangkan aset properti yang menguntungkan dan berkelanjutan.
+          </p>
+        </section>
+
+        <section id="services" className="py-16 bg-gray-100">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-semibold text-center mb-10">Layanan Kami</h2>
+            <div className="flex flex-wrap justify-center">
+              <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-4">
+                <div className="bg-white rounded-lg shadow-lg p-5 flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                  <h3 className="text-lg font-semibold mb-2">Manajemen Properti</h3>
+                  <p className="text-sm text-gray-600">Mengelola aset properti dengan efisien dan profesional.</p>
+                </div>
+              </div>
+              <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-4">
+                <div className="bg-white rounded-lg shadow-lg p-5 flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                  <h3 className="text-lg font-semibold mb-2">Penjualan dan Sewa Properti</h3>
+                  <p className="text-sm text-gray-600">Menawarkan berbagai pilihan properti untuk dijual atau disewa.</p>
+                </div>
+              </div>
+              <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-4">
+                <div className="bg-white rounded-lg shadow-lg p-5 flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                  <h3 className="text-lg font-semibold mb-2">Konsultasi Investasi Properti</h3>
+                  <p className="text-sm text-gray-600">Memberikan nasihat terbaik untuk investasi properti Anda.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="w-full h-12 flex justify-center items-center border-t">
+        <p>© 2024 Properti XYZ. All rights reserved.</p>
+      </footer>
     </div>
-  );
+  )
 }
