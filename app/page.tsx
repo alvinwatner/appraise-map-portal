@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -16,9 +17,11 @@ export default function Home() {
             <a href="#home" className="mx-2  hover:text-blue-300 font-medium">Home</a>
             <a href="#about" className="mx-2  hover:text-blue-300 font-medium">Tentang Kami</a>
             <a href="#services" className="mx-2  hover:text-blue-300 font-medium">Layanan Kami</a>
-            <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Login
-            </button>
+            <Link href="/login">
+              <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Login
+              </button>
+            </Link>
           </div>
         </div>
       </nav>
