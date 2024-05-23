@@ -13,11 +13,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* SideNav with toggling state passed down */}
         <SideNav isOpen={isOpen} setIsOpen={setIsOpen} />
   
-        {/* Main content area including header, dynamically adjusting based on SideNav width */}
         <div className={`flex-grow flex flex-col w-full`}>
-          {/* Header receives isWide to adjust its styling if needed */}
           <Header/>
-          <div className="flex-grow p-6 md:overflow-y-auto md:p-12">
+          <div className="flex-grow p-6 md:overflow-y-auto md:p-0">
             {children}
           </div>
         </div>

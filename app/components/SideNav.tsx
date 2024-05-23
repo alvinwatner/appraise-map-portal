@@ -29,7 +29,10 @@ const NavLink = ({
   const minimizeStyle = !isOpen ? "flex justify-center" : "";
 
   return (
-    <Link href={href} className={`${linkStyle} ${activeStyle} ${minimizeStyle}`}>
+    <Link
+      href={href}
+      className={`${linkStyle} ${activeStyle} ${minimizeStyle}`}
+    >
       {isOpen ? (
         <span className={icon.props.className + " mr-2"}>{icon}</span>
       ) : (
@@ -69,35 +72,29 @@ export default function SideNav({ isOpen, setIsOpen }: SideNavProps) {
         {!isOpen && <div className="h-20"></div>}
       </div>
 
-      <ul className="space-y-4 p-2 pt-5">
-        <li title="Dashboard">
-          <NavLink
-            href="/dashboard"
-            icon={<FiHome size={18} />}
-            label="Dashboard"
-            isOpen={isOpen}
-            isActive={pathname === "/dashboard"}
-          />
-        </li>
-        <li title="Data">
-          <NavLink
-            href="/dashboard/data-management"
-            icon={<FiDatabase size={18} />}
-            label="Data"
-            isOpen={isOpen}
-            isActive={pathname === "/dashboard/data-management"}
-          />
-        </li>
-        <li title="Maps">
-          <NavLink
-            href="/dashboard/maps"
-            icon={<FiMap size={18} />}
-            label="Map"
-            isOpen={isOpen}
-            isActive={pathname === "/dashboard/maps"}
-          />
-        </li>
-      </ul>
+      <div className="space-y-4 p-2 pt-5">
+        <NavLink
+          href="/dashboard"
+          icon={<FiHome size={18} />}
+          label="Dashboard"
+          isOpen={isOpen}
+          isActive={pathname === "/dashboard"}
+        />
+        <NavLink
+          href="/dashboard/data-management"
+          icon={<FiDatabase size={18} />}
+          label="Data"
+          isOpen={isOpen}
+          isActive={pathname === "/dashboard/data-management"}
+        />
+        <NavLink
+          href="/dashboard/maps"
+          icon={<FiMap size={18} />}
+          label="Map"
+          isOpen={isOpen}
+          isActive={pathname === "/dashboard/maps"}
+        />
+      </div>
     </div>
   );
 }
