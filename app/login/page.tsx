@@ -51,7 +51,7 @@ const Login = () => {
       </nav>
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded shadow">
-          <div className="text-center" style={{ textAlign: "-webkit-center" }}>
+          <div className="text-center" >
             <Image src={logo} alt="Logo" width={80} height={80} />
             <h5 className="mt-3 text-l font-bold">GRAHA PARAMITA KONSULTAN</h5>
             <p className="mt-7 text-lg">Log in</p>
