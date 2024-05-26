@@ -6,17 +6,10 @@ import { IoSearchOutline } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
-import { TbReportAnalytics } from "react-icons/tb";
-import { IoCalendarOutline } from "react-icons/io5";
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import { RiDeleteBin5Line } from "react-icons/ri";
-import { PiPencilSimpleLight } from "react-icons/pi";
-
+import { MarkerDetailContent } from "@/app/components/MarkerDetailContent";
 import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
-import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
-import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
 
 export default function Page() {
   const libraries = useMemo(() => ["places"], []);
@@ -100,74 +93,7 @@ export default function Page() {
 
       {isShowMarkerDetail && (
         <div className="absolute top-0 h-full overflow-auto bg-white w-[380px] z-20 pt-20 px-12">
-          <div className="relative  h-[100%] w-full z-10">
-            <h3 className="text-lg font-medium">Tanah Kosong</h3>
-            <h3 className="text-sm font-thin mb-2">Shasya Agita</h3>
-            <PropertyChip type={PropertyType.DATA} className="mb-5" />
-            <PropertyRowItem
-              icon={TbReportAnalytics}
-              title="No Laporan :"
-              body="00240/2.0113-02/PI/07/0518/1/V/2023"
-              className="mb-1"
-            />
-            <PropertyRowItem
-              icon={IoCalendarOutline}
-              title="Tanggal Pembelian :"
-              body="10/05/2022"
-              className="mb-1"
-            />
-            <PropertyRowItem
-              icon={HiOutlineLocationMarker}
-              title="Lokasi :"
-              body="Jalan Setia Budi,Tanjung Sari, Medan Selayang, Kota Medan, Provinsi Sumatera Utara"
-              className="mb-6"
-            />
-            <PropertyRowItem
-              icon={HiOutlineLocationMarker}
-              title="Luas Tanah :"
-              body="10.000 m2"
-              className="mb-1"
-            />
-            <PropertyRowItem
-              icon={HiOutlineLocationMarker}
-              title="Luas Bangunan :"
-              body="-"
-              className="mb-1"
-            />
-            <PropertyRowItem
-              icon={HiOutlineLocationMarker}
-              title="Nilai Tanah/meter :"
-              body="Rp. 5.000.000,-"
-              className="mb-1"
-            />
-            <PropertyRowItem
-              icon={HiOutlineLocationMarker}
-              title="Nilai Bangunan/meter :"
-              body="Rp. 5.000.000,-"
-              className="mb-1"
-            />
-
-            <div className="grid grid-cols-10 grid-rows-2 bg-[#FFEBBF] py-2  rounded-lg mb-10">
-              <div className="col-span-2 row-span-2 items-center  flex justify-center">
-                <HiOutlineLocationMarker className="text-gray-500" size={20} />
-              </div>
-              <div className="col-span-8 row-span-1 text-sm ">
-                Total Nilai :
-              </div>
-              <div className="col-span-8 row-span-1 text-xs font-thin">
-                Rp. 5.000.000.000,-
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 ">
-              <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">
-                Edit <PiPencilSimpleLight className="ml-2" />
-              </button>
-              <button className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Delete <RiDeleteBin5Line className="ml-2" />
-              </button>
-            </div>
-          </div>
+          <MarkerDetailContent/>
         </div>
       )}
 
