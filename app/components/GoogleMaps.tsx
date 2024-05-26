@@ -3,13 +3,13 @@ import { Loader } from "@googlemaps/js-api-loader";
 
 interface GoogleMapProps {
   isAdding: boolean;
+  onMarkerClick: (location: google.maps.LatLngLiteral) => void;
 }
 
-export default function GoogleMaps({ isAdding }: GoogleMapProps) {
+export default function GoogleMaps({ isAdding, onMarkerClick }: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
   console.log("Component render or rerender");
-
 
   // Load and initialize the map
   useEffect(() => {
@@ -38,9 +38,14 @@ export default function GoogleMaps({ isAdding }: GoogleMapProps) {
         });
 
         locations.forEach((location) => {
-          new google.maps.Marker({
+          const marker = new google.maps.Marker({
             position: location,
             map: mapInstance.current,
+          });
+
+          marker.addListener("click", () => {
+            console.log("is this executeed mapss")
+            onMarkerClick(location);
           });
         });
       }
@@ -58,15 +63,18 @@ export default function GoogleMaps({ isAdding }: GoogleMapProps) {
     // };
     const handleMapClick = () => {
       console.log("Test"); // Log "Test" when the map is clicked
-    };    
+    };
 
-    console.log("Checking map instance and isAdding", !!mapInstance.current, isAdding);
-
+    console.log(
+      "Checking map instance and isAdding",
+      !!mapInstance.current,
+      isAdding
+    );
 
     if (mapInstance.current) {
       mapInstance.current.setOptions({
-        draggableCursor: isAdding ? 'pointer' : null,
-        draggable: !isAdding
+        draggableCursor: isAdding ? "pointer" : null,
+        draggable: !isAdding,
       });
 
       if (isAdding) {
@@ -78,17 +86,17 @@ export default function GoogleMaps({ isAdding }: GoogleMapProps) {
         console.log("Removing event listener");
 
         // Remove all click listeners when isAdding is false
-        google.maps.event.clearListeners(mapInstance.current, 'click');
+        google.maps.event.clearListeners(mapInstance.current, "click");
       }
     }
 
     // Clean up listener on unmount or when isAdding changes
     return () => {
       if (mapInstance.current) {
-        google.maps.event.clearListeners(mapInstance.current, 'click');
+        google.maps.event.clearListeners(mapInstance.current, "click");
       }
     };
   }, [isAdding]);
 
-  return <div className="h-[950px]" ref={mapRef} />;
+  return <div className="h-full" ref={mapRef} />;
 }
