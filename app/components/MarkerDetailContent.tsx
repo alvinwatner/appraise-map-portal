@@ -8,7 +8,7 @@ import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
 
 export const MarkerDetailContent: React.FC = () => {
   return (
-    <div className="relative w-full z-10">
+    <div className="relative w-full z-10 px-12">
       <h3 className="text-lg font-medium">Tanah Kosong</h3>
       <h3 className="text-sm font-thin mb-2">Shasya Agita</h3>
       <PropertyChip type={PropertyType.DATA} className="mb-5" />
