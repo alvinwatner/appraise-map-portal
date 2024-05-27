@@ -7,17 +7,14 @@ import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { MarkerDetailContent } from "@/app/components/MarkerDetailContent";
-import { HiAdjustmentsHorizontal } from "react-icons/hi2";
-import { IoIosMore } from "react-icons/io";
-import { GoArrowRight } from "react-icons/go";
 
 import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
-import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import { SearchResult } from "@/app/components/SearchResult";
+import { AddMarkerForm } from "@/app/components/AddMarkerForm";
 
-enum SearchWhiteSheetComponent {
+enum LeftWhiteSheetComponent {
   markerDetail,
   searchResult,
   hide,
@@ -39,9 +36,9 @@ export default function Page() {
   });
 
   const [isAdding, setIsAdding] = useState(false);
-  const [isShowSearchWhiteSheet, setSearchWhiteSheet] = useState(false);
-  const [searchWhiteSheetComponent, setSearchWhiteSheetComponent] = useState(
-    SearchWhiteSheetComponent.hide
+  const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
+  const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
+    LeftWhiteSheetComponent.hide
   );
 
   const [markerDetail, setMarkerDetail] =
@@ -57,8 +54,8 @@ export default function Page() {
   const handleMarkerClick = (location: google.maps.LatLngLiteral) => {
     console.log("is this executeed");
     setMarkerDetail(location);
-    setSearchWhiteSheet(true);
-    setSearchWhiteSheetComponent(SearchWhiteSheetComponent.markerDetail);
+    setLeftWhiteSheet(true);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
   };
 
   useEffect(() => {
@@ -78,12 +75,25 @@ export default function Page() {
     autocompleteRef.current = autocomplete;
   };
 
-  const renderSearchWhiteSheetComponent = () => {
-    switch (searchWhiteSheetComponent) {
-      case SearchWhiteSheetComponent.markerDetail:
-        return <MarkerDetailContent />;
-      case SearchWhiteSheetComponent.searchResult:
-        return <SearchResult/>       
+  const renderLeftWhiteSheetComponent = () => {
+    switch (leftWhiteSheetComponent) {
+      case LeftWhiteSheetComponent.markerDetail:
+        return (
+          <AddMarkerForm
+            onClose={() => {
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+            }}
+          />          
+          // <MarkerDetailContent
+          //   onClose={() => {
+          //     setLeftWhiteSheet(false);
+          //     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+          //   }}
+          // />
+        );
+      case LeftWhiteSheetComponent.searchResult:
+        return <SearchResult />;
       default:
         return null;
     }
@@ -120,27 +130,31 @@ export default function Page() {
         <div className="fixed inset-0 bg-black bg-opacity-25 z-40"></div>
       )}
 
-      {isShowSearchWhiteSheet && (
-        <div className="absolute top-0 h-full overflow-auto bg-white w-[380px] z-20 pt-20 ">
-          {renderSearchWhiteSheetComponent()}
+      {isShowLeftWhiteSheet && (
+        <div
+          className={`absolute top-0 h-full overflow-auto bg-white w-[380px] ${
+            leftWhiteSheetComponent == LeftWhiteSheetComponent.searchResult
+              ? "z-20 pt-20"
+              : "z-50 pt-0"
+          }   `}
+        >
+          {renderLeftWhiteSheetComponent()}
         </div>
       )}
 
       <div
         className={`absolute top-0 left-8 z-30 p-4 ${
-          isShowSearchWhiteSheet && "bg-white"
+          isShowLeftWhiteSheet && "bg-white"
         }`}
       >
-        <div className="relative  w-72 h-10">
+        <div className="relative w-72 h-10">
           <div className=""></div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               console.log("keluarkan sesuatu");
-              setSearchWhiteSheet(true);
-              setSearchWhiteSheetComponent(
-                SearchWhiteSheetComponent.searchResult
-              );
+              setLeftWhiteSheet(true);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.searchResult);
             }}
           >
             <input
@@ -152,11 +166,12 @@ export default function Page() {
           <IoSearchOutline className="absolute left-2 top-2" color="grey" />
           <button
             onClick={() => {
-              setSearchWhiteSheet(false);
-              setSearchWhiteSheetComponent(SearchWhiteSheetComponent.hide);
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
           >
-            {isShowSearchWhiteSheet && (
+            {leftWhiteSheetComponent ==
+              LeftWhiteSheetComponent.searchResult && (
               <IoClose
                 className="absolute right-3 top-2 "
                 color="grey"

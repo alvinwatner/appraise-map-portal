@@ -1,14 +1,28 @@
 import { TbReportAnalytics } from "react-icons/tb";
-import { IoCalendarOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoClose } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { PiPencilSimpleLight } from "react-icons/pi";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
 
-export const MarkerDetailContent: React.FC = () => {
+interface MarkerDetailContentProps {
+  onClose: () => void;
+}
+
+export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
+  onClose,
+}: MarkerDetailContentProps) => {
   return (
-    <div className="relative w-full z-10 px-12">
+    <div className="relative w-full z-10 px-12 ">
+      <button onClick={onClose}>
+        <IoClose
+          className="absolute right-5 top-6 z-0 "
+          color="grey"
+          size={25}
+        />
+      </button>
+
       <h3 className="text-lg font-medium">Tanah Kosong</h3>
       <h3 className="text-sm font-thin mb-2">Shasya Agita</h3>
       <PropertyChip type={PropertyType.DATA} className="mb-5" />
@@ -65,7 +79,7 @@ export const MarkerDetailContent: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 ">
+      <div className="grid grid-cols-2 gap-2 mb-10">
         <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">
           Edit <PiPencilSimpleLight className="ml-2" />
         </button>
