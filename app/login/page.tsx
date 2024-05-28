@@ -1,36 +1,39 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import logo from '/public/logo.png' // Pastikan Anda memiliki logo ini di folder public
+import { supabase } from '../lib/supabaseClient' // Make sure this path is correct
+import logo from '/public/logo.png' // Ensure this path is correct
 
-const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (data.session) {
+      const { data, error } = await supabase.auth.getSession()
+      if (data?.session) {
         router.push('/maps')
+      }
+      if (error) {
+        console.error(error.message)
       }
     }
 
     checkSession()
   }, [router])
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       alert(error.message)
     } else {
-      router.push('/maps')
+      router.push('/dashboard')
     }
   }
 
@@ -51,7 +54,7 @@ const Login = () => {
       </nav>
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded shadow">
-          <div className="text-center" style={{ textAlign: "-webkit-center" }}>
+          <div className="flex flex-col items-center text-center">
             <Image src={logo} alt="Logo" width={80} height={80} />
             <h5 className="mt-3 text-l font-bold">GRAHA PARAMITA KONSULTAN</h5>
             <p className="mt-7 text-lg">Log in</p>
