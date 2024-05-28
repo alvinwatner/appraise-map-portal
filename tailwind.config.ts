@@ -15,7 +15,7 @@ const config: Config = {
       },
       colors: {
         'c-blue': '#0A61A6',
-        'c-grey': '#5C5D64',
+        'c-gray': '#5C5D64',
         'c-golden': '#D1AF65',
         'c-light-blue': '#C7D3E6',
         'c-light-golden': '#E7CA85'
