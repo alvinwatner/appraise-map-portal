@@ -17,6 +17,7 @@ import { AddMarkerForm } from "@/app/components/AddMarkerForm";
 enum LeftWhiteSheetComponent {
   markerDetail,
   searchResult,
+  add,
   hide,
 }
 
@@ -40,6 +41,8 @@ export default function Page() {
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
   );
+  const [clickCoordinates, setClickCoordinates] =
+    useState<null | google.maps.LatLngLiteral>(null);
 
   const [markerDetail, setMarkerDetail] =
     useState<null | google.maps.LatLngLiteral>(null);
@@ -49,6 +52,11 @@ export default function Page() {
 
   const toggleAddingMode = () => {
     setIsAdding(!isAdding);
+    setClickCoordinates(null);
+    if (isAdding) {
+      setLeftWhiteSheet(false);
+      setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+    }
   };
 
   const handleMarkerClick = (location: google.maps.LatLngLiteral) => {
@@ -56,12 +64,22 @@ export default function Page() {
     setMarkerDetail(location);
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
+    setClickCoordinates(null);
+  };
+
+  const handleMapClick = (location: google.maps.LatLngLiteral) => {
+    console.log("eeehh dikasdkakd");
+    setLeftWhiteSheet(true);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
   };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        setLeftWhiteSheet(false);
+        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);        
         setIsAdding(false);
+        setClickCoordinates(null);
       }
     };
 
@@ -79,21 +97,34 @@ export default function Page() {
     switch (leftWhiteSheetComponent) {
       case LeftWhiteSheetComponent.markerDetail:
         return (
+          <MarkerDetailContent
+            onClose={() => {
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+            }}
+          />
+        );
+      case LeftWhiteSheetComponent.markerDetail:
+        return (
           <AddMarkerForm
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
-          />          
-          // <MarkerDetailContent
-          //   onClose={() => {
-          //     setLeftWhiteSheet(false);
-          //     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-          //   }}
-          // />
+          />
         );
       case LeftWhiteSheetComponent.searchResult:
         return <SearchResult />;
+      case LeftWhiteSheetComponent.add:
+        return (
+          <AddMarkerForm
+            onClose={() => {
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+            }}
+          />
+        );
+
       default:
         return null;
     }
@@ -125,9 +156,9 @@ export default function Page() {
   }
 
   return (
-    <div className="relative h-full bg-blue-500">
+    <div className="relative h-full">
       {isAdding && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 z-40"></div>
+        <div className="fixed inset-0 bg-black bg-opacity-25 pointer-events-none z-10"></div>
       )}
 
       {isShowLeftWhiteSheet && (
@@ -210,7 +241,11 @@ export default function Page() {
       </div>
 
       {/* Google Maps component */}
-      <GoogleMaps isAdding={isAdding} onMarkerClick={handleMarkerClick} />
+      <GoogleMaps
+        isAdding={isAdding}
+        onMarkerClick={handleMarkerClick}
+        onMapClick={handleMapClick}
+      />
 
       {/* Floating action button */}
       <button
