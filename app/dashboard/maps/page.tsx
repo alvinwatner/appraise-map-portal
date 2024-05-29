@@ -2,6 +2,8 @@
 import GoogleMaps from "@/app/components/GoogleMaps";
 import { Autocomplete } from "@react-google-maps/api";
 import { useMemo, useState, useRef } from "react";
+import { fetchProperties } from "@/app/services/dataManagement.service";
+
 import { IoSearchOutline } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
@@ -13,6 +15,7 @@ import React, { useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { SearchResult } from "@/app/components/SearchResult";
 import { AddMarkerForm } from "@/app/components/AddMarkerForm";
+import { Property } from "@/app/types/types";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -28,6 +31,9 @@ export default function Page() {
     lat: -8.7932639,
     lng: 115.1499561,
   });
+
+  const [properties, setProperties] = useState<Property[]>([]);
+
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useLoadScript({
@@ -36,11 +42,22 @@ export default function Page() {
     libraries: libraries as any,
   });
 
+  useEffect(() => {
+    if (isLoaded) {
+      fetchProperties().then(setProperties).catch(console.error);
+    }
+  }, [isLoaded]);
+
   const [isAdding, setIsAdding] = useState(false);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
   );
+
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null
+  );
+
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
 
@@ -59,9 +76,9 @@ export default function Page() {
     }
   };
 
-  const handleMarkerClick = (location: google.maps.LatLngLiteral) => {
+  const handleMarkerClick = (property: Property) => {
     console.log("is this executeed");
-    setMarkerDetail(location);
+    setSelectedProperty(property);
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
     setClickCoordinates(null);
@@ -77,7 +94,7 @@ export default function Page() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setLeftWhiteSheet(false);
-        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);        
+        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
         setIsAdding(false);
         setClickCoordinates(null);
       }
@@ -98,6 +115,7 @@ export default function Page() {
       case LeftWhiteSheetComponent.markerDetail:
         return (
           <MarkerDetailContent
+            property={selectedProperty!}
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -242,6 +260,8 @@ export default function Page() {
 
       {/* Google Maps component */}
       <GoogleMaps
+
+        properties={properties}
         isAdding={isAdding}
         onMarkerClick={handleMarkerClick}
         onMapClick={handleMapClick}

@@ -5,12 +5,16 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { PiPencilSimpleLight } from "react-icons/pi";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
+import { Property } from "../types/types";
 
 interface MarkerDetailContentProps {
   onClose: () => void;
+  property: Property;
+
 }
 
 export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
+  property,
   onClose,
 }: MarkerDetailContentProps) => {
   return (
@@ -23,9 +27,9 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         />
       </button>
 
-      <h3 className="text-lg font-medium">Tanah Kosong</h3>
-      <h3 className="text-sm font-thin mb-2">Shasya Agita</h3>
-      <PropertyChip type={PropertyType.DATA} className="mb-5" />
+      <h3 className="text-lg font-medium">{property.name}</h3>
+      <h3 className="text-sm font-thin mb-2">{property.users.username}</h3>
+      <PropertyChip type={(property.propertiesType == 'data') ? PropertyType.DATA : PropertyType.ASSET} className="mb-5" />
       <PropertyRowItem
         icon={TbReportAnalytics}
         title="No Laporan :"
@@ -47,7 +51,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       <PropertyRowItem
         icon={HiOutlineLocationMarker}
         title="Luas Tanah :"
-        body="10.000 m2"
+        body={property.landArea.toString()}
         className="mb-1"
       />
       <PropertyRowItem
