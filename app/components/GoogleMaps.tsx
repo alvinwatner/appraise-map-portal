@@ -4,17 +4,20 @@ import { Loader } from "@googlemaps/js-api-loader";
 interface GoogleMapProps {
   isAdding: boolean;
   onMarkerClick: (location: google.maps.LatLngLiteral) => void;
+  onMapClick: (location: google.maps.LatLngLiteral) => void;
 }
 
-export default function GoogleMaps({ isAdding, onMarkerClick }: GoogleMapProps) {
+export default function GoogleMaps({
+  isAdding,
+  onMarkerClick,
+  onMapClick,
+}: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
-  console.log("Component render or rerender");
 
-  // Load and initialize the map
   useEffect(() => {
     const loader = new Loader({
-      apiKey: "",
+      apiKey: "", // Add your Google Maps API key here
       version: "quarterly",
     });
 
@@ -28,14 +31,14 @@ export default function GoogleMaps({ isAdding, onMarkerClick }: GoogleMapProps) 
       ];
 
       if (!mapInstance.current) {
-        console.log("Map initialized");
-
         mapInstance.current = new Map(mapRef.current as HTMLDivElement, {
           center: locations[0],
           zoom: 15,
           mapId: "NEXT_MAPS_TUTS",
           disableDefaultUI: true,
         });
+
+        // Add a click listener on the map
 
         locations.forEach((location) => {
           const marker = new google.maps.Marker({
@@ -44,59 +47,38 @@ export default function GoogleMaps({ isAdding, onMarkerClick }: GoogleMapProps) 
           });
 
           marker.addListener("click", () => {
-            console.log("is this executeed mapss")
             onMarkerClick(location);
           });
         });
       }
+
+      if (mapInstance.current) {
+        mapInstance.current.setOptions({
+          draggableCursor: isAdding ? "pointer" : null,
+          draggable: !isAdding,
+        });
+
+        mapInstance.current.addListener(
+          "click",
+          (event: google.maps.MapMouseEvent) => {
+            const lat = event.latLng?.lat();
+            const lng = event.latLng?.lng();
+            if (lat && lng) {
+              console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+              if (isAdding) {
+                onMapClick({
+                  lat: lat,
+                  lng: lng,
+                });
+              }
+            }
+          }
+        );
+      }
     };
 
     initializeMap();
-  }, []);
+  }, [onMarkerClick, isAdding]);
 
-  // Update map options and manage click events
-  useEffect(() => {
-    // const handleMapClick = (event: google.maps.MapMouseEvent) => {
-    //   if (event.latLng) {
-    //     console.log(`Clicked Lat: ${event.latLng.lat()}, Lng: ${event.latLng.lng()}`);
-    //   }
-    // };
-    const handleMapClick = () => {
-      console.log("Test"); // Log "Test" when the map is clicked
-    };
-
-    console.log(
-      "Checking map instance and isAdding",
-      !!mapInstance.current,
-      isAdding
-    );
-
-    if (mapInstance.current) {
-      mapInstance.current.setOptions({
-        draggableCursor: isAdding ? "pointer" : null,
-        draggable: !isAdding,
-      });
-
-      if (isAdding) {
-        console.log("Adding event listener");
-
-        // Add click listener when isAdding is true
-        mapInstance.current.addListener("click", handleMapClick);
-      } else {
-        console.log("Removing event listener");
-
-        // Remove all click listeners when isAdding is false
-        google.maps.event.clearListeners(mapInstance.current, "click");
-      }
-    }
-
-    // Clean up listener on unmount or when isAdding changes
-    return () => {
-      if (mapInstance.current) {
-        google.maps.event.clearListeners(mapInstance.current, "click");
-      }
-    };
-  }, [isAdding]);
-
-  return <div className="h-full" ref={mapRef} />;
+  return <div className="h-full  " ref={mapRef} />;
 }
