@@ -6,11 +6,18 @@ import { PiPencilSimpleLight } from "react-icons/pi";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
 import { Property } from "../types/types";
+import { MdPhone } from "react-icons/md";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { RiMoneyDollarBoxLine } from "react-icons/ri";
+import { PiMapPinArea } from "react-icons/pi";
+import { LuBuilding2 } from "react-icons/lu";
+import { ValuationCard } from "../dashboard/maps/components/ValuationCard";
+
+
 
 interface MarkerDetailContentProps {
   onClose: () => void;
   property: Property;
-
 }
 
 export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
@@ -29,59 +36,47 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
 
       <h3 className="text-lg font-medium">{property.name}</h3>
       <h3 className="text-sm font-thin mb-2">{property.users.username}</h3>
-      <PropertyChip type={(property.propertiesType == 'data') ? PropertyType.DATA : PropertyType.ASSET} className="mb-5" />
-      <PropertyRowItem
-        icon={TbReportAnalytics}
-        title="No Laporan :"
-        body="00240/2.0113-02/PI/07/0518/1/V/2023"
-        className="mb-1"
-      />
-      <PropertyRowItem
-        icon={IoCalendarOutline}
-        title="Tanggal Pembelian :"
-        body="10/05/2022"
-        className="mb-1"
+      <PropertyChip
+        type={
+          property.propertiesType == "data"
+            ? PropertyType.DATA
+            : PropertyType.ASSET
+        }
+        className="mb-5"
       />
       <PropertyRowItem
         icon={HiOutlineLocationMarker}
         title="Lokasi :"
-        body="Jalan Setia Budi,Tanjung Sari, Medan Selayang, Kota Medan, Provinsi Sumatera Utara"
+        body={property.locations.address}
         className="mb-6"
       />
       <PropertyRowItem
-        icon={HiOutlineLocationMarker}
+        icon={MdPhone}
+        title="Nomor HP :"
+        body={property.phoneNumber}
+        className="mb-1"
+      />
+      <PropertyRowItem
+        icon={PiMapPinArea}
         title="Luas Tanah :"
-        body={property.landArea.toString()}
+        body={`${property.landArea.toString()} m2`}
         className="mb-1"
       />
       <PropertyRowItem
-        icon={HiOutlineLocationMarker}
+        icon={IoCalendarOutline}
         title="Luas Bangunan :"
-        body="-"
-        className="mb-1"
-      />
-      <PropertyRowItem
-        icon={HiOutlineLocationMarker}
-        title="Nilai Tanah/meter :"
-        body="Rp. 5.000.000,-"
-        className="mb-1"
-      />
-      <PropertyRowItem
-        icon={HiOutlineLocationMarker}
-        title="Nilai Bangunan/meter :"
-        body="Rp. 5.000.000,-"
+        body={`${property.buildingArea.toString()} m2`}
         className="mb-1"
       />
 
-      <div className="grid grid-cols-10 grid-rows-2 bg-[#FFEBBF] py-2  rounded-lg mb-10">
-        <div className="col-span-2 row-span-2 items-center  flex justify-center">
-          <HiOutlineLocationMarker className="text-gray-500" size={20} />
+      <div className="grid grid-cols-12 grid-rows-1 mb-5 ">
+        <div className=" col-span-2 row-span-1 items-center  flex justify-start">
+          <RiMoneyDollarBoxLine className="text-gray-500" size={24} />
         </div>
-        <div className="col-span-8 row-span-1 text-sm ">Total Nilai :</div>
-        <div className="col-span-8 row-span-1 text-xs font-thin">
-          Rp. 5.000.000.000,-
-        </div>
-      </div>
+        <div className=" col-span-10 row-span-1 text-sm "> Nilai :</div>
+      </div>      
+
+      <ValuationCard/>
 
       <div className="grid grid-cols-2 gap-2 mb-10">
         <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">

@@ -4,7 +4,7 @@ export interface User {
   email: string;
   username: string;
   lastLogin: Date;
-  isActive: boolean;
+  isActive: boolean;  
 }
 
 export interface Location {

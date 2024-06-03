@@ -34,6 +34,7 @@ export default function Page() {
 
   const [properties, setProperties] = useState<Property[]>([]);
 
+  
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useLoadScript({
