@@ -8,7 +8,8 @@ import { Property } from "../types/types";
 import { MdPhone } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { PiMapPinArea } from "react-icons/pi";
-import { ValuationCard } from "../dashboard/maps/components/ValuationCard";
+import { ValuationCardAsset } from "../dashboard/maps/components/ValuationCardAsset";
+import { ValuationCardData } from "../dashboard/maps/components/ValuationCardData";
 
 interface MarkerDetailContentProps {
   onClose: () => void;
@@ -29,8 +30,10 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         />
       </button>
 
-      <h3 className="text-lg font-medium">{property.name}</h3>
-      <h3 className="text-sm font-thin mb-2">{property.users.username}</h3>
+      <h3 className="text-lg font-medium mb-2">{property.object_type.name}</h3>
+      {property.propertiesType == "asset" && (
+        <h3 className="text-sm font-thin mb-2">{property.name}</h3>
+      )}
       <PropertyChip
         type={
           property.propertiesType == "data"
@@ -71,11 +74,14 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
           <RiMoneyDollarBoxLine className="text-gray-500" size={24} />
         </div>
         <div className=" col-span-10 row-span-1 text-sm ">
-          {property.propertiesType == "data" ? "Indikasi Penawaran :" : "Nilai :"}
+          {property.propertiesType == "data"
+            ? "Indikasi Penawaran :"
+            : "Nilai :"}
         </div>
       </div>
 
-      <ValuationCard />
+      {property.propertiesType == "asset" && <ValuationCardAsset />}
+      {property.propertiesType == "data" && <ValuationCardData />}
 
       <div className="grid grid-cols-2 gap-2 mb-10">
         <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">

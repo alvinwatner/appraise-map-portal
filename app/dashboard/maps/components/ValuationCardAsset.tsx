@@ -1,6 +1,6 @@
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
-export const ValuationCard: React.FC = () => {
+export const ValuationCardAsset: React.FC = () => {
   return (
     <div className="relative flex flex-col bg-[#FFEBBF] py-2 pl-3 rounded-lg mb-10 shadow-lg">
       <p className="text-base mb-1">Rp. 5.000.000.000,-</p>
