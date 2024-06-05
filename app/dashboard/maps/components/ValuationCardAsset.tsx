@@ -14,6 +14,7 @@ import { TbReportAnalytics, TbReportMoney } from "react-icons/tb";
 import { IoPersonSharp } from "react-icons/io5";
 import { BsBuildingCheck } from "react-icons/bs";
 import { TiChartAreaOutline } from "react-icons/ti";
+import { formatRupiah } from "@/app/utils/helper";
 
 interface ValuationCardAssetProps {
   valuation: Valuation;
@@ -22,14 +23,8 @@ interface ValuationCardAssetProps {
 export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
   valuation,
 }: ValuationCardAssetProps) => {
-  const formatRupiah = (value: number | undefined) => {
-    if (value === undefined) return "";
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-    }).format(value);
-  };
-  const [isExpand, setIsExpand] = useState<boolean>(true);
+
+  const [isExpand, setIsExpand] = useState<boolean>(false);
 
   return (
     <div className="mb-10">

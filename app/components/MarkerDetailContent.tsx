@@ -61,9 +61,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       <PropertyRowItem
         icon={PiMapPinArea}
         title="Luas Tanah :"
-        body={
-          property.landArea ? `${property.landArea.toString()} m2` : "-"
-        }
+        body={property.landArea ? `${property.landArea.toString()} m2` : "-"}
         className="mb-1"
       />
       <PropertyRowItem
@@ -91,10 +89,12 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
           {property.propertiesType == "asset" && (
             <ValuationCardAsset valuation={valuation} />
           )}
+
+          {property.propertiesType == "data" && (
+            <ValuationCardData valuation={valuation} />
+          )}
         </>
       ))}
-
-      {property.propertiesType == "data" && <ValuationCardData />}
 
       <div className="grid grid-cols-2 gap-2 mb-10">
         <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">
