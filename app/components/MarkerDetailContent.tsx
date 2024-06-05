@@ -8,6 +8,8 @@ import { Property } from "../types/types";
 import { MdPhone } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { PiMapPinArea } from "react-icons/pi";
+import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
+
 import { ValuationCardAsset } from "../dashboard/maps/components/ValuationCardAsset";
 import { ValuationCardData } from "../dashboard/maps/components/ValuationCardData";
 
@@ -59,13 +61,17 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       <PropertyRowItem
         icon={PiMapPinArea}
         title="Luas Tanah :"
-        body={`${property.landArea?.toString()} m2`}
+        body={
+          property.landArea ? `${property.landArea.toString()} m2` : "-"
+        }
         className="mb-1"
       />
       <PropertyRowItem
-        icon={IoCalendarOutline}
+        icon={HiOutlineBuildingOffice2}
         title="Luas Bangunan :"
-        body={`${property.buildingArea?.toString()} m2`}
+        body={
+          property.buildingArea ? `${property.buildingArea.toString()} m2` : "-"
+        }
         className="mb-1"
       />
 
@@ -80,7 +86,14 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         </div>
       </div>
 
-      {property.propertiesType == "asset" && <ValuationCardAsset />}
+      {property.valuations.map((valuation) => (
+        <>
+          {property.propertiesType == "asset" && (
+            <ValuationCardAsset valuation={valuation} />
+          )}
+        </>
+      ))}
+
       {property.propertiesType == "data" && <ValuationCardData />}
 
       <div className="grid grid-cols-2 gap-2 mb-10">
