@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Property } from "../types/types";
+import { GoStarFill } from "react-icons/go";
 
 interface GoogleMapProps {
   properties: Property[];
   isAdding: boolean;
-  onMarkerClick:(property: Property) => void;
+  onMarkerClick: (property: Property) => void;
   onMapClick: (location: google.maps.LatLngLiteral) => void;
 }
 
@@ -61,9 +62,21 @@ export default function GoogleMaps({
 
           const location = { lat: latitude, lng: longitude };
 
+          var url = "/marker_aset.png";
+
+          if (property.propertiesType == "data"){
+            url = "/marker_data.png"
+          }
+
           const marker = new google.maps.Marker({
             position: location,
             map: mapInstance.current,
+            icon: {
+              url: url,
+              // url: `{ ${property.propertiesType == "data" ?  "/marker_data.png" : "/marker_aset.png"}}`,
+              scaledSize: new google.maps.Size(52, 52) 
+              
+            },
           });
 
           marker.addListener("click", () => {
