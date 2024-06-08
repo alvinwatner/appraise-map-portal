@@ -1,5 +1,12 @@
 import { IoClose } from "react-icons/io5";
 import Dropdown from "./Dropdown";
+import { useState } from "react";
+import { AssetValuationForm } from "./AssetValuationForm";
+import { DataValuationForm } from "./DataValuationForm";
+import { TbMeterSquare } from "react-icons/tb";
+
+import DropdownInput from "./DropdownInput";
+import { AreaInput } from "./AreaInput";
 
 interface AddMarkerFormProps {
   onClose: () => void;
@@ -8,10 +15,22 @@ interface AddMarkerFormProps {
 export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
   onClose,
 }: AddMarkerFormProps) => {
-  const options = ["Aset", "Pembanding"];
+  const propertyTypes = ["Aset", "Pembanding"];
+  const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
 
-  const handleDropdownChange = (selectedOption: string) => {
-    console.log("Selected option:", selectedOption);
+  const [selectedProperty, selectProperty] = useState<string>("");
+  const [selectedObjectType, selectObjectType] = useState<string>("");
+  const [luasTanah, setLuasTanah] = useState<string>("");
+  const [luasBangunan, setLuasBangunan] = useState<string>("");
+
+  const onChangePropertyType = (propertyType: string) => {
+    selectProperty(propertyType);
+    console.log("Selected option:", propertyType);
+  };
+
+  const onChangeObjectType = (objectType: string) => {
+    selectObjectType(objectType);
+    console.log("Selected option:", objectType);
   };
 
   return (
@@ -29,32 +48,18 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       <p className="text-2sm font-thin mb-2">Jenis Data :</p>
       <Dropdown
         placeholder="Jenis Objek"
-        options={options}
-        onChange={handleDropdownChange}
+        options={propertyTypes}
+        onChange={onChangePropertyType}
       />
 
       <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek :</p>
-      <Dropdown
+      <DropdownInput
         placeholder="Jenis Objek"
-        options={options}
-        onChange={handleDropdownChange}
+        options={objectTypes}
+        onChange={onChangeObjectType}
       />
 
       <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
-      />
-
-      <p className="text-2sm font-thin mb-2 mt-5">No Laporan :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
-      />
-
-      <p className="text-2sm font-thin mb-2 mt-5">Tanggal Penilaian :</p>
       <input
         className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
         type="text"
@@ -69,39 +74,25 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       ></textarea>
 
       <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
+      <AreaInput
+        onChange={(value) => {
+          setLuasTanah(value);
+        }}
       />
+    
 
       <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
+      <AreaInput
+        onChange={(value) => {
+          setLuasBangunan(value);
+        }}
       />
 
-      <p className="text-2sm font-thin mb-2 mt-5">Nilai Tanah/meter :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
-      />
-
-      <p className="text-2sm font-thin mb-2 mt-5">Nilai Bangunan/meter :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
-      />
-
-      <p className="text-2sm font-thin mb-2 mt-5">Total Nilai :</p>
-      <input
-        className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-        type="text"
-        placeholder="Nama Debitur"
-      />
+      {selectedProperty == "Aset" ? (
+        <AssetValuationForm />
+      ) : (
+        <DataValuationForm />
+      )}
 
       <div className="grid grid-cols-2 gap-2 mb-10 mt-8">
         <button className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
