@@ -5,11 +5,12 @@ interface DropdownProps {
   placeholder: string;
   options: string[]; // Assuming options are an array of strings
   onChange: (selectedOption: string) => void; // Function type specifying it takes a string and returns void
+  initialValue?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ placeholder, options, onChange }) => {
+const Dropdown: React.FC<DropdownProps> = ({ placeholder, options, onChange, initialValue = ""}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string>(""); // Define state with a default type
+  const [selectedOption, setSelectedOption] = useState<string>(initialValue); // Define state with a default type
   const dropdownRef = useRef<HTMLDivElement>(null);  // Ref for the dropdown container
 
   useEffect(() => {

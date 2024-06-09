@@ -15,12 +15,14 @@ import { ValuationCardData } from "../dashboard/maps/components/ValuationCardDat
 
 interface MarkerDetailContentProps {
   onClose: () => void;
+  onEditClicked: (property: Property) => void;
   property: Property;
 }
 
 export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
   property,
   onClose,
+  onEditClicked,
 }: MarkerDetailContentProps) => {
   return (
     <div className="relative w-full z-10 px-12 ">
@@ -86,7 +88,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
 
       {property.valuations.map((valuation) => (
         <>
-          {property.propertiesType == "asset" && (
+          {property.propertiesType == "aset" && (
             <ValuationCardAsset valuation={valuation} />
           )}
 
@@ -97,7 +99,12 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       ))}
 
       <div className="grid grid-cols-2 gap-2 mb-10">
-        <button className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded">
+        <button
+          className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded"
+          onClick={() => {
+            onEditClicked(property);
+          }}
+        >
           Edit <PiPencilSimpleLight className="ml-2" />
         </button>
         <button className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">

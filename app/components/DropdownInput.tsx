@@ -5,12 +5,12 @@ interface DropdownProps {
   placeholder: string;
   options: string[];
   onChange: (selectedOption: string) => void;
+  initialValue?: string;
 }
 
-const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange }) => {
+const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange, initialValue = ""}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string>("");
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialValue);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +31,6 @@ const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleOptionClick = (option: string) => {
-    setSelectedOption(option);
     setInputValue(option);
     onChange(option);
     setIsOpen(false);
@@ -39,8 +38,6 @@ const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setInputValue(value);
-    setSelectedOption("");
     onChange(value);
   };
 

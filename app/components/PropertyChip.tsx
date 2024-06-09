@@ -12,7 +12,7 @@ export const PropertyType: Record<PropertyTypeKey, PropertyTypeInfo> = {
   ASSET: {
     value: "ASSET",
     toColor: () => "bg-red-600",
-    toText: () => "Asset",
+    toText: () => "Aset",
   },
   DATA: {
     value: "DATA",
@@ -20,6 +20,7 @@ export const PropertyType: Record<PropertyTypeKey, PropertyTypeInfo> = {
     toText: () => "Data",
   },
 };
+
 
 interface PropertyChipProps {
   type: PropertyTypeInfo;

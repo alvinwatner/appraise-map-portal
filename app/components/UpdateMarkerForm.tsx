@@ -3,22 +3,30 @@ import Dropdown from "./Dropdown";
 import { useState } from "react";
 import { AssetValuationForm } from "./AssetValuationForm";
 import { DataValuationForm } from "./DataValuationForm";
-import { TbMeterSquare } from "react-icons/tb";
 
 import DropdownInput from "./DropdownInput";
 import { AreaInput } from "./AreaInput";
+import { Property } from "../types/types";
+import { PropertyType } from "./PropertyChip";
+import { capitalizeFirstLetter } from "@/app/utils/helper";
 
-interface AddMarkerFormProps {
+interface UpdateMarkerFormProps {
   onClose: () => void;
+  property?: Property;
 }
 
-export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
+export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
   onClose,
-}: AddMarkerFormProps) => {
-  const propertyTypes = ["Aset", "Pembanding"];
+  property,
+}: UpdateMarkerFormProps) => {
+  const propertyTypes: string[] = Object.values(PropertyType).map((typeInfo) =>
+    typeInfo.toText()
+  );
   const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
 
-  const [selectedProperty, selectProperty] = useState<string>("");
+  const [selectedProperty, selectProperty] = useState<string>(
+    capitalizeFirstLetter(property?.propertiesType ?? "")
+  );
   const [selectedObjectType, selectObjectType] = useState<string>("");
   const [luasTanah, setLuasTanah] = useState<string>("");
   const [luasBangunan, setLuasBangunan] = useState<string>("");
@@ -43,13 +51,14 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         />
       </button>
 
-      <h3 className="text-xl font-medium mb-8">Add</h3>
+      <h3 className="text-xl font-medium mb-8">{property != null ? "Edit" : "Add" }</h3>
 
       <p className="text-2sm font-thin mb-2">Jenis Data :</p>
       <Dropdown
-        placeholder="Jenis Objek"
+        placeholder="Jenis Data"
         options={propertyTypes}
         onChange={onChangePropertyType}
+        initialValue={capitalizeFirstLetter(property?.propertiesType ?? "")}
       />
 
       <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek :</p>
@@ -57,10 +66,12 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         placeholder="Jenis Objek"
         options={objectTypes}
         onChange={onChangeObjectType}
+        initialValue={property?.object_type.name}
       />
 
       <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
       <input
+        value={property != null ? property.name : ""}
         className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
         type="text"
         placeholder="Nama Debitur"
@@ -68,6 +79,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
       <p className="text-2sm font-thin mb-2 mt-5">Alamat:</p>
       <textarea
+        value={property != null ? property.locations.address : ""}
         className="w-full pl-2 py-2 h-20 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm resize-none"
         rows={4}
         placeholder="Nama Debitur"
@@ -75,14 +87,15 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
       <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah :</p>
       <AreaInput
+        initialValue={property != null ? property.landArea?.toString() : ""}
         onChange={(value) => {
           setLuasTanah(value);
         }}
       />
-    
 
       <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
       <AreaInput
+        initialValue={property != null ? property.buildingArea?.toString() : ""}
         onChange={(value) => {
           setLuasBangunan(value);
         }}

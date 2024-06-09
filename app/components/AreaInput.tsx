@@ -3,10 +3,11 @@ import { TbMeterSquare } from "react-icons/tb";
 
 interface AreaInputProps{
   onChange: (value: string) => void;
+  initialValue?: string;
 }
 
-export const AreaInput: React.FC<AreaInputProps> = ({onChange} : AreaInputProps) => {
-  const [value, setValue] = useState<string>("");
+export const AreaInput: React.FC<AreaInputProps> = ({onChange, initialValue = ""} : AreaInputProps) => {
+  const [value, setValue] = useState<string>(initialValue);
 
   const formatLuasValue = (inputValue: string) => {
     // Strip out non-numeric characters

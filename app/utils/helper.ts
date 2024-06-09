@@ -5,3 +5,8 @@ export const formatRupiah = (amount: number): string => {
     minimumFractionDigits: 0,
   });
 };
+
+export const capitalizeFirstLetter = (str: string): string => {
+  if (!str) return str; // Return the original string if it's empty
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
