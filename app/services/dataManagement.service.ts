@@ -1,7 +1,12 @@
 import { supabase } from './../lib/supabaseClient';
 import { Property } from './../types/types';
 
-export const fetchProperties = async (search: string, page: number, perPage: number, filters: any = {}): Promise<{ data: Property[], total: number }> => {
+export const fetchProperties = async (
+  search: string = '',
+  page: number = 1,
+  perPage: number = 10,
+  filters: any = {}
+): Promise<{ data: Property[], total: number }> => {
   let query = supabase
     .from('properties')
     .select(`
