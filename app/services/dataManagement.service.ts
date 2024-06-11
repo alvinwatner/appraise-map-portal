@@ -1,8 +1,8 @@
 import { supabase } from './../lib/supabaseClient';
 import { Property } from './../types/types';
 
-export const fetchProperties = async (): Promise<Property[]> => {
-  const { data, error } = await supabase
+export const fetchProperties = async (search: string, page: number, perPage: number, filters: any = {}): Promise<{ data: Property[], total: number }> => {
+  let query = supabase
     .from('properties')
     .select(`
       id,
@@ -37,15 +37,47 @@ export const fetchProperties = async (): Promise<Property[]> => {
         totalValue,
         reportNumber
       )
-    `)
+    `, { count: 'exact' })
     .is('isDeleted', null)
-    .order('id', { ascending: true }); 
+    .order('id', { ascending: true });
+
+  if (search) {
+    query = query.ilike('name', `%${search}%`);
+  }
+
+  if (filters.propertyType) {
+    query = query.eq('propertiesType', filters.propertyType);
+  }
+
+  if (filters.valuationDate) {
+    query = query.eq('valuations.valuationDate', filters.valuationDate);
+  }
+
+  if (filters.objectType) {
+    query = query.eq('object_type.name', filters.objectType);
+  }
+
+  if (filters.minTotalValue !== undefined) {
+    query = query.gte('valuations.totalValue', filters.minTotalValue);
+  }
+
+  if (filters.maxTotalValue !== undefined) {
+    query = query.lte('valuations.totalValue', filters.maxTotalValue);
+  }
+
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
 
   if (error) {
     console.error('Error fetching properties:', error);
-    return [];
+    return { data: [], total: 0 };
   }
-  return data as Property[];
+  
+  return { data: data as Property[], total: count || 0 };
 };
 
 export const updatePropertiesIsDeleted = async (ids: number[], isDeleted: boolean) => {

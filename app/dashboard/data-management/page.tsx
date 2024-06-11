@@ -1,40 +1,85 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchProperties, updatePropertiesIsDeleted, updateProperty, updateValuation } from '@/app/services/dataManagement.service';
 import { Property } from '@/app/types/types';
 import PropertyTable from './components/PropertyTable';
+import FilterModal from './components/FilterModal';
+import Loading from '@/app/components/Loading';
+
+const debounce = (func: Function, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
 
 const Page = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState(new Set<number>());
-  const [itemsPerPage] = useState(10);
-  const [deletionOccurred, setDeletionOccurred] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editedData, setEditedData] = useState<Map<number, Partial<Property>>>(new Map());
   const [editedValuations, setEditedValuations] = useState<Map<number, any>>(new Map());
+  const [filters, setFilters] = useState({});
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams?.get('page') as string) || 1;
-  const totalPages = Math.ceil(properties.length / itemsPerPage);
-  const currentData = properties.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const itemsPerPage = parseInt(searchParams?.get('perPage') as string) || 10;
+
+  const getProperties = useCallback(async (query: string, page: number, perPage: number, filters: any) => {
+    setLoading(true);
+    const propertiesData = await fetchProperties(query, page, perPage, filters);
+    setProperties(propertiesData.data);
+    setTotalItems(propertiesData.total);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const getProperties = async () => {
-      const propertiesData = await fetchProperties();
-      setProperties(propertiesData);
-      setLoading(false);
-    };
+    getProperties(query, currentPage, itemsPerPage, filters);
+  }, [currentPage, itemsPerPage, query, filters, getProperties]);
 
-    getProperties();
-  }, [deletionOccurred]);
+  const debouncedSearch = useCallback(debounce((value: string) => {
+    setQuery(value);
+    router.push(`?search=${value}&page=1&perPage=${itemsPerPage}`);
+  }, 500), [router, itemsPerPage]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearch(value);
+    debouncedSearch(value);
+  };
+
+  const handleSearchKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      setQuery(search);
+      router.push(`?search=${search}&page=1&perPage=${itemsPerPage}`);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    router.push(`?search=${query}&page=${page}&perPage=${itemsPerPage}`);
+  };
+
+  const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPerPage = parseInt(event.target.value);
+    router.push(`?search=${query}&page=1&perPage=${newPerPage}`);
+  };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelectedRows = new Set(currentData.map((item) => item.id));
+      const newSelectedRows = new Set(properties.map((item) => item.id));
       setSelectedRows(newSelectedRows);
     } else {
       setSelectedRows(new Set());
@@ -51,14 +96,10 @@ const Page = () => {
     setSelectedRows(newSelectedRows);
   };
 
-  const handlePageChange = (page: number) => {
-    router.push(`?page=${page}`);
-  };
-
   const handleDeleteSelected = async () => {
     const idsToDelete = Array.from(selectedRows);
     await updatePropertiesIsDeleted(idsToDelete, true);
-    setDeletionOccurred(!deletionOccurred);
+    setProperties(properties.filter(property => !idsToDelete.includes(property.id)));
     setSelectedRows(new Set());
   };
 
@@ -90,21 +131,33 @@ const Page = () => {
     }
 
     setEditMode(false);
-    setDeletionOccurred(!deletionOccurred);
+    setSelectedRows(new Set());
+    const propertiesData = await fetchProperties(query, currentPage, itemsPerPage);
+    setProperties(propertiesData.data);
+  };
+
+  const handleFilterApply = (filters: any) => {
+    setFilters(filters);
+    setShowFilterModal(false);
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading/>;
   }
 
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
   return (
-    <div className="container mx-auto px-4 py-8 shadow-md">
+    <div className="container mx-auto py-10 px-10 mt-20 border border-inherit">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-2">
           <input
             type="text"
             placeholder="Search"
             className="px-4 py-2 border rounded btn-rounded"
+            value={search}
+            onChange={handleSearchChange}
+            onKeyPress={handleSearchKeyPress}
           />
           <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
@@ -114,9 +167,9 @@ const Page = () => {
           </button>
           <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 1 0 1.42 1.42M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1"></path>
+              <path fill="currentColor" d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 0 0 1.42 1.42m6.58 8.58L13 18.59V9a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42l4 4a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42Z"></path>
             </svg>
-            &nbsp; Export
+            &nbsp;Export
           </button>
         </div>
         <div className="flex space-x-2">
@@ -152,7 +205,7 @@ const Page = () => {
             </svg>
             &nbsp;Sort
           </button>
-          <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center">
+          <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center" onClick={() => setShowFilterModal(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="M22 18.605a.75.75 0 0 1-.75.75h-5.1a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h7.74a2.93 2.93 0 0 1 5.66 0h5.1a.75.75 0 0 1 .75.75m0-13.21a.75.75 0 0 1-.75.75H18.8a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h10.39a2.93 2.93 0 0 1 5.66 0h2.45a.74.74 0 0 1 .75.75m0 6.6a.74.74 0 0 1-.75.75H9.55a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h1.14a2.93 2.93 0 0 1 5.66 0h11.7a.75.75 0 0 1 .75.75"></path>
             </svg>
@@ -160,78 +213,68 @@ const Page = () => {
           </button>
         </div>
       </div>
-      <PropertyTable
-        currentData={currentData}
-        selectedRows={selectedRows}
-        handleSelectRow={handleSelectRow}
-        handleSelectAll={handleSelectAll}
-        handleChange={handleChange}
-        editMode={editMode}
-        editedData={editedData} // Pass editedData to PropertyTable
-      />
-      <div className="mt-4 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-        <div className="flex flex-1 justify-between sm:hidden">
+      <div className="table-container" style={{ maxHeight: '60vh' }}>
+        <PropertyTable
+          currentData={properties}
+          selectedRows={selectedRows}
+          handleSelectRow={handleSelectRow}
+          handleSelectAll={handleSelectAll}
+          handleChange={handleChange}
+          editMode={editMode}
+          editedData={editedData}
+        />
+      </div>
+      <div className="mt-4 flex justify-between">
+        <div>
+          <span className="text-sm text-gray-700">
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+          </span>
+        </div>
+        <div className="flex items-center space-x-2">
           <button
+            className="px-4 py-2 text-sm border rounded-md"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Previous
           </button>
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              className={`px-4 py-2 text-sm border rounded-md ${currentPage === index + 1 ? 'bg-gray-300' : ''}`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
           <button
+            className="px-4 py-2 text-sm border rounded-md"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Next
           </button>
         </div>
-        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-              <span className="font-medium">{Math.min(currentPage * itemsPerPage, properties.length)}</span> of{' '}
-              <span className="font-medium">{properties.length}</span> results
-            </p>
-          </div>
-          <div>
-            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed"
-              >
-                <span className="sr-only">Previous</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </button>
-              {Array.from({ length: totalPages }, (_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={`relative inline-flex items-center border px-4 py-2 text-sm font-medium ${currentPage === index + 1
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                    }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed"
-              >
-                <span className="sr-only">Next</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </nav>
-          </div>
+        <div>
+          <label className="mr-2 text-sm">Items per page:</label>
+          <select
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+            className="px-4 py-2 border rounded-md"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
         </div>
       </div>
+      {showFilterModal && (
+        <FilterModal
+          onApply={handleFilterApply}
+          onClose={() => setShowFilterModal(false)}
+        />
+      )}
     </div>
   );
 };
