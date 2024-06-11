@@ -1,5 +1,6 @@
 import React from 'react';
 import { Property } from '@/app/types/types';
+import { formatRupiah } from '@/app/utils/helper';
 
 type PropertyTableProps = {
   currentData: Property[];
@@ -8,7 +9,7 @@ type PropertyTableProps = {
   handleSelectAll: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleChange: (id: number, field: keyof Property, value: any) => void;
   editMode: boolean;
-  editedData: Map<number, Partial<Property>>; // Add editedData prop
+  editedData: Map<number, Partial<Property>>;
 };
 
 const PropertyTable: React.FC<PropertyTableProps> = ({
@@ -20,20 +21,20 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   editMode,
   editedData,
 }) => {
-  const formatRupiah = (value: number | undefined) => {
-    if (value === undefined) return '';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-    }).format(value);
-  };
+  if (currentData.length === 0) {
+    return (
+      <div className="text-center py-4">
+        <p>No data available</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto-static">
       <table className="min-w-full divide-y divide-gray-200 table-auto">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
               <input
                 className="block w-full rounded-md"
                 type="checkbox"
@@ -41,42 +42,11 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                 checked={selectedRows.size === currentData.length}
               />
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Jenis Data
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              No. Laporan
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Tanggal Penilaian
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Jenis Objek
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nama Debitor
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nomor Tlp
-            </th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Alamat
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Luas Tanah
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Luas Bangunan
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nilai Tanah / Meter
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nilai Bangunan / Meter
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nilai
-            </th>
+            {['Jenis Data', 'No. Laporan', 'Tanggal Penilaian', 'Jenis Objek', 'Nama Debitor', 'Nomor Tlp', 'Alamat', 'Luas Tanah', 'Luas Bangunan', 'Nilai Tanah / Meter', 'Nilai Bangunan / Meter', 'Nilai'].map((header, index) => (
+              <th key={index} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+                {header}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -102,7 +72,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
-                      className="rounded-md"
+                      className="block w-full rounded-md"
                       type="text"
                       value={editedData.get(item.id)?.valuations?.[0]?.reportNumber || item.valuations?.[0]?.reportNumber}
                       onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], reportNumber: e.target.value }])}
@@ -118,7 +88,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
-                      className="rounded-md"
+                      className="block w-full rounded-md"
                       type="text"
                       value={editedData.get(item.id)?.object_type?.name || item.object_type?.name}
                       onChange={(e) => handleChange(item.id, 'object_type', { ...item.object_type, name: e.target.value })}
@@ -126,7 +96,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
-                      className="rounded-md"
+                      className="block w-full rounded-md"
                       type="text"
                       value={editedData.get(item.id)?.name || item.name}
                       onChange={(e) => handleChange(item.id, 'name', e.target.value)}
