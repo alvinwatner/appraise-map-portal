@@ -35,10 +35,10 @@ export default function GoogleMaps({
       // ];
 
       const initLatitude = parseFloat(
-        properties[0].locations.latitude.toString().replace(",", ".")
+        properties[0]?.locations.latitude.toString().replace(",", ".")
       );
       const initLongitude = parseFloat(
-        properties[0].locations.longitude.toString().replace(",", ".")
+        properties[0]?.locations.longitude.toString().replace(",", ".")
       );
 
       const initLoc = { lat: initLatitude, lng: initLongitude };
