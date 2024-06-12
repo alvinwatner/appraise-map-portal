@@ -1,4 +1,12 @@
-export const AssetValuationForm: React.FC = () => {
+import { Valuation } from "../types/types";
+
+interface AssetValuationFormProps {
+  valuations?: Valuation[];
+}
+
+export const AssetValuationForm: React.FC<AssetValuationFormProps> = ({
+  valuations,
+}: AssetValuationFormProps) => {
   return (
     <>
       <p className="text-2sm font-thin mb-2 mt-5">Nilai:</p>

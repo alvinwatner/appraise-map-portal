@@ -44,9 +44,21 @@ export default function Page() {
   });
 
   useEffect(() => {
-    if (isLoaded) {
-      fetchProperties().then(setProperties).catch(console.error);
-    }
+    const getData = async () => {
+      if (isLoaded) {
+        try {
+          // Assume loadProperties is a function that returns a Promise<Property[]>
+          const propertiesData = await fetchProperties('', 1, 30);
+
+          setProperties(propertiesData.data);
+          console.log("Properties loaded:", properties);
+        } catch (error) {
+          console.error("Failed to fetch properties:", error);
+        }
+      }
+    };
+
+    getData();
   }, [isLoaded]);
 
   const [onEditProperty, setOnEditProperty] = useState<Property>();
@@ -276,13 +288,14 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Google Maps component */}
-      <GoogleMaps
-        properties={properties}
-        isAdding={isAdding}
-        onMarkerClick={handleMarkerClick}
-        onMapClick={handleMapClick}
-      />
+      {properties.length > 0 && (
+        <GoogleMaps
+          properties={properties}
+          isAdding={isAdding}
+          onMarkerClick={handleMarkerClick}
+          onMapClick={handleMapClick}
+        />
+      )}
 
       {/* Floating action button */}
       <button

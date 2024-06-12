@@ -102,7 +102,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
       />
 
       {selectedProperty == "Aset" ? (
-        <AssetValuationForm />
+        <AssetValuationForm valuations={property?.valuations}/>
       ) : (
         <DataValuationForm />
       )}

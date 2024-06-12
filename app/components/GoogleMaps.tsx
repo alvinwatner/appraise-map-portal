@@ -26,6 +26,10 @@ export default function GoogleMaps({
     });
 
     const initializeMap = async () => {
+      if (!properties || properties.length === 0) {
+        console.error("No properties available to initialize map markers.");
+        return;
+      }      
       const { Map } = await loader.importLibrary("maps");
 
       // const locations = [
@@ -61,6 +65,7 @@ export default function GoogleMaps({
           );
 
           const location = { lat: latitude, lng: longitude };
+          console.log('latitude' + latitude + 'longitude' + longitude);
 
           var url = "/marker_aset.png";
 
