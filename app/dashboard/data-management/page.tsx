@@ -7,6 +7,8 @@ import { Property } from '@/app/types/types';
 import PropertyTable from './components/PropertyTable';
 import FilterModal from './components/FilterModal';
 import Loading from '@/app/components/Loading';
+import ImportPopup from './components/ImportPopup';
+import { supabase } from '@/app/lib/supabaseClient';
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -32,6 +34,109 @@ const Page = () => {
   const [editedValuations, setEditedValuations] = useState<Map<number, any>>(new Map());
   const [filters, setFilters] = useState({});
   const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleImportClick = () => {
+    setShowImportModal(true);
+  };
+
+  const handleCloseImportModal = () => {
+    setShowImportModal(false);
+  };
+
+  const handleImportData = async (jsonData: any[]) => {
+    try {
+        const { count: totalCountProperties, error: countErrorProperties } = await supabase
+            .from('properties')
+            .select('id', { count: 'exact' });
+
+        if (countErrorProperties) {
+            throw countErrorProperties;
+        }
+
+        const { count: totalCountValuations, error: countErrorValuations } = await supabase
+            .from('valuations')
+            .select('id', { count: 'exact' });
+
+        if (countErrorValuations) {
+            throw countErrorValuations;
+        }
+
+        const { count: totalCountLocations, error: countErrorLocations } = await supabase
+            .from('locations')
+            .select('id', { count: 'exact' });
+
+        if (countErrorLocations) {
+            throw countErrorLocations;
+        }
+
+        for (let i = 0; i < jsonData.length; i++) {
+            const item = jsonData[i];
+
+            const { data: objectType, error: errorObjectType } = await supabase
+              .from('object_type')
+              .select('id')
+              .eq('name', item.objectType);
+        
+
+            if (errorObjectType) {
+                throw errorObjectType;
+            }
+
+            const formattedDataLocations = {
+              id: (totalCountLocations || 0) + i + 1,
+              address: item.address,
+            };
+
+            const formattedDataProperties = {
+                id: (totalCountProperties || 0) + i + 1,
+                propertiesType: item.propertiesType,
+                name: item.name,
+                phoneNumber: item.phoneNumber,
+                landArea: item.landArea,
+                buildingArea: item.buildingArea,
+                LocationId: formattedDataLocations.id,
+                ObjectId: objectType[0]?.id
+            };
+
+            const formattedDataValuations = {
+                id: (totalCountValuations || 0) + i + 1,
+                PropertyId: formattedDataProperties.id,
+                reportNumber: item.reportNumber,
+                valuationDate: item.valuationDate.split('/').reverse().join('-'),
+                landValue: item.landValue,
+                buildingValue: item.buildingValue,
+                totalValue: item.totalValue,
+            };
+
+            const insertLocations = await supabase
+                .from('locations')
+                .insert([formattedDataLocations])
+                .select();
+
+            const insertProperties = await supabase
+                .from('properties')
+                .insert([formattedDataProperties])
+                .select();
+
+            const insertValuations = await supabase
+                .from('valuations')
+                .insert([formattedDataValuations])
+                .select();
+
+            const error = insertProperties.error || insertValuations.error || insertLocations.error;
+
+            if (error) {
+                throw error;
+            }
+        }
+
+      } catch (error) {
+          console.error('Error handling import data:', error);
+      }
+  };
+
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -159,7 +264,7 @@ const Page = () => {
             onChange={handleSearchChange}
             onKeyPress={handleSearchKeyPress}
           />
-          <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }}>
+          <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }} onClick={handleImportClick}>
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1m-9.71 1.71a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42L13 12.59V3a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42Z"></path>
             </svg>
@@ -275,6 +380,11 @@ const Page = () => {
           onClose={() => setShowFilterModal(false)}
         />
       )}
+      <ImportPopup
+        isOpen={showImportModal}
+        onClose={handleCloseImportModal}
+        onImport={handleImportData}
+      />
     </div>
   );
 };
