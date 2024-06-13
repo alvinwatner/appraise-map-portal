@@ -22,6 +22,51 @@ const debounce = (func: Function, delay: number) => {
   };
 };
 
+// Function to escape CSV fields
+const escapeCSVField = (field: any): string => {
+  if (field === null || field === undefined) return '';
+  const fieldString = String(field);
+  if (fieldString.includes(',') || fieldString.includes('"') || fieldString.includes('\n')) {
+    return `"${fieldString.replace(/"/g, '""')}"`;
+  }
+  return fieldString;
+};
+
+const flattenProperty = (property: Property) => {
+  return property.valuations.map(valuation => ({
+    'JENIS DATA': escapeCSVField(property.propertiesType),
+    'NO. LAPORAN': escapeCSVField(valuation.reportNumber),
+    'TANGGAL PENILAIAN': escapeCSVField(valuation.valuationDate),
+    'JENIS OBJEK': escapeCSVField(property.object_type.name),
+    'NAMA DEBITOR': escapeCSVField(property.name),
+    'NOMOR TLP': escapeCSVField(property.phoneNumber),
+    'ALAMAT': escapeCSVField(property.locations.address),
+    'LUAS TANAH': escapeCSVField(property.landArea),
+    'LUAS BANGUNAN': escapeCSVField(property.buildingArea),
+    'NILAI TANAH / METER': escapeCSVField(valuation.landValue),
+    'NILAI BANGUNAN / METER': escapeCSVField(valuation.buildingValue),
+    'NILAI': escapeCSVField(valuation.totalValue),
+  }));
+};
+
+const convertToCSV = (data: Property[]): string => {
+  const flattenedData = data.flatMap(flattenProperty);
+  const header = Object.keys(flattenedData[0]).join(',');
+  const rows = flattenedData.map(row => Object.values(row).join(','));
+  return [header, ...rows].join('\n');
+};
+
+// Utility function to download a CSV file
+const downloadCSV = (data: string, filename: string): void => {
+  const blob = new Blob([data], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', filename);
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const Page = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -246,6 +291,11 @@ const Page = () => {
     setShowFilterModal(false);
   };
 
+  const handleExportClick = () => {
+    const csvData = convertToCSV(properties);
+    downloadCSV(csvData, 'properties.csv');
+  };
+
   if (loading) {
     return <Loading/>;
   }
@@ -270,7 +320,7 @@ const Page = () => {
             </svg>
             &nbsp;Import
           </button>
-          <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }}>
+          <button className="text-white px-4 py-2 rounded btn-rounded flex items-center" style={{ backgroundColor: "#20744A" }} onClick={handleExportClick}>
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 0 0 1.42 1.42m6.58 8.58L13 18.59V9a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42l4 4a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42Z"></path>
             </svg>
