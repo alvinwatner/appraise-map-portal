@@ -1,4 +1,12 @@
-export const DataValuationForm: React.FC = () => {
+import { Valuation } from "../types/types";
+
+interface DataValuationFormProps {
+  valuations?: Valuation[];
+}
+
+export const DataValuationForm: React.FC<DataValuationFormProps> = ({
+  valuations,
+} : DataValuationFormProps) => {
   return (
     <>
       <p className="text-2sm font-thin mb-2 mt-5">Indikasi Penawaran:</p>

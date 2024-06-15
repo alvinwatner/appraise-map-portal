@@ -51,7 +51,9 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         />
       </button>
 
-      <h3 className="text-xl font-medium mb-8">{property != null ? "Edit" : "Add" }</h3>
+      <h3 className="text-xl font-medium mb-8">
+        {property != null ? "Edit" : "Add"}
+      </h3>
 
       <p className="text-2sm font-thin mb-2">Jenis Data :</p>
       <Dropdown
@@ -102,7 +104,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
       />
 
       {selectedProperty == "Aset" ? (
-        <AssetValuationForm valuations={property?.valuations}/>
+        <AssetValuationForm valuations={property?.valuations ?? []} />
       ) : (
         <DataValuationForm />
       )}
