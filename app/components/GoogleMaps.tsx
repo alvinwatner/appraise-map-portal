@@ -116,7 +116,7 @@ export default function GoogleMaps({
     };
 
     initializeMap();
-  }, [onMarkerClick, isAdding]);
+  }, [onMarkerClick, isAdding, properties, onMapClick]);
 
   return <div className="h-full  " ref={mapRef} />;
 }

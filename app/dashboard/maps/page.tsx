@@ -59,7 +59,7 @@ export default function Page() {
     };
 
     getData();
-  }, [isLoaded]);
+  }, [isLoaded, properties]);
 
   const [onEditProperty, setOnEditProperty] = useState<Property>();
   const [isAdding, setIsAdding] = useState(false);

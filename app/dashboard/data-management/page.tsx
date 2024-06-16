@@ -38,7 +38,7 @@ const flattenProperty = (property: Property) => {
     'NO. LAPORAN': escapeCSVField(valuation.reportNumber),
     'TANGGAL PENILAIAN': escapeCSVField(valuation.valuationDate),
     'JENIS OBJEK': escapeCSVField(property.object_type.name),
-    'NAMA DEBITOR': escapeCSVField(property.name),
+    'NAMA DEBITOR': escapeCSVField(property.debitur),
     'NOMOR TLP': escapeCSVField(property.phoneNumber),
     'ALAMAT': escapeCSVField(property.locations.address),
     'LUAS TANAH': escapeCSVField(property.landArea),
