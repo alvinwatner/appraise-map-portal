@@ -1,8 +1,8 @@
 import { IoClose } from "react-icons/io5";
 import Dropdown from "./Dropdown";
 import { useState } from "react";
-import { AssetValuationForm } from "./AssetValuationForm";
-import { DataValuationForm } from "./DataValuationForm";
+import { AssetValuationForms } from "./AssetValuationForm";
+import { DataValuationForms } from "./DataValuationForm";
 
 import DropdownInput from "./DropdownInput";
 import { AreaInput } from "./AreaInput";
@@ -104,9 +104,15 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         />
 
         {selectedProperty == "Aset" ? (
-          <AssetValuationForm valuations={property?.valuations ?? []} isEdit= {property != null}/>
+          <AssetValuationForms
+            valuations={property?.valuations ?? []}
+            isEdit={property != null}
+          />
         ) : (
-          <DataValuationForm />
+          <DataValuationForms
+            valuations={property?.valuations ?? []}
+            isEdit={property != null}
+          />
         )}
 
         <div className="grid grid-cols-2 gap-2 mb-10 mt-8">

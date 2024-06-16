@@ -12,7 +12,7 @@ interface AssetValuationDetailProps {
   valuation?: Valuation | null;
 }
 
-const ValuationDetails: React.FC<AssetValuationDetailProps> = ({
+const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
   valuation,
 }: AssetValuationDetailProps) => {
   return (
@@ -65,27 +65,30 @@ const ValuationDetails: React.FC<AssetValuationDetailProps> = ({
   );
 };
 
-export const AssetValuationForm: React.FC<AssetValuationFormProps> = ({
+export const AssetValuationForms: React.FC<AssetValuationFormProps> = ({
   valuations,
   isEdit,
 }: AssetValuationFormProps) => {
   const [valuationComponents, setValuationComponents] = useState(
     valuations.map((valuation, index) => (
-      <ValuationDetails key={index} valuation={valuation} />
+      <AsetValuationForm key={index} valuation={valuation} />
     ))
   );
 
   const handleAddValuation = () => {
-    const newComponent = (
-      <ValuationDetails key={valuationComponents.length} valuation={null} />
+    const newValuation = (
+      <AsetValuationForm key={valuationComponents.length} valuation={null} />
     );
-    setValuationComponents([newComponent, ...valuationComponents]);
+    setValuationComponents([newValuation, ...valuationComponents]);
   };
 
   useEffect(() => {
     const addInitialForm = async () => {
       setValuationComponents([
-        <ValuationDetails key={valuationComponents.length} valuation={null} />,
+        <AsetValuationForm
+          key={valuationComponents.length}
+          valuation={null}
+        />,
       ]);
     };
     if (!isEdit) {
