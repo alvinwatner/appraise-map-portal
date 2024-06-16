@@ -11,7 +11,7 @@ export const fetchProperties = async (
     .from('properties')
     .select(`
       id,
-      name,
+      debitur,
       landArea,
       buildingArea,
       phoneNumber,
@@ -40,7 +40,8 @@ export const fetchProperties = async (
         landValue,
         buildingValue,
         totalValue,
-        reportNumber
+        reportNumber,
+        appraiser
       )
     `, { count: 'exact' })
     .is('isDeleted', null)
@@ -82,7 +83,7 @@ export const fetchProperties = async (
     return { data: [], total: 0 };
   }
   
-  return { data: data as Property[], total: count || 0 };
+  return { data: data as unknown as Property[], total: count || 0 };
 };
 
 export const updatePropertiesIsDeleted = async (ids: number[], isDeleted: boolean) => {
