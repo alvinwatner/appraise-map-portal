@@ -45,7 +45,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
   const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
 
   const [selectedPropertyType, selectPropertyType] = useState<string>(
-    capitalizeFirstLetter(property?.propertiesType ?? "")
+    property != null ? property?.propertiesType : "aset"
   );
   const [selectedObjectType, selectObjectType] = useState<string>("");
   const [landArea, setlandArea] = useState<string>("");
@@ -169,7 +169,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           placeholder="Jenis Data"
           options={propertyTypes}
           onChange={onChangePropertyType}
-          initialValue={capitalizeFirstLetter(property?.propertiesType ?? "")}
+          initialValue={capitalizeFirstLetter(property?.propertiesType ?? "Aset")}
         />
 
         <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek :</p>
@@ -180,11 +180,11 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           initialValue={property?.object_type.name}
         />
 
-        {property?.propertiesType != "aset" && (
+        {selectedPropertyType != "aset" && (
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nomor HP :</p>
             <input
-              value={property != null ? property.debitur : ""}
+              value={property != null ? property.phoneNumber : phoneNumber}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
@@ -198,14 +198,15 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           </>
         )}
 
-        {property?.propertiesType == "aset" && (
+        {selectedPropertyType == "aset" && (
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
             <input
-              value={property != null ? property.debitur : ""}
+              value={property != null ? property.debitur : debitur}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
+                console.log("Input changed: ", event.target.value);
                 setDebitur(event.target.value);
               }}
               placeholder="Nama Debitur"
@@ -217,7 +218,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         )}
         <p className="text-2sm font-thin mb-2 mt-5">Alamat:</p>
         <textarea
-          value={property != null ? property.locations.address : ""}
+          value={property != null ? property.locations.address : address}
           className="w-full pl-2 py-2 h-20 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm resize-none"
           rows={4}
           onChange={(event) => {
@@ -243,7 +244,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
         <AreaInput
           initialValue={
-            property != null ? property.buildingArea?.toString() : ""
+            property != null ? property.buildingArea?.toString() : buildingArea
           }
           onChange={(value) => {
             setbuildingArea(value);
@@ -253,7 +254,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           <p className="text-red-500 text-xs">{errors.buildingArea}</p>
         )}
 
-        {selectedPropertyType == "Aset" ? (
+        {selectedPropertyType == "aset" ? (
           <AssetValuationForms
             valuations={property?.valuations ?? []}
             isEdit={property != null}

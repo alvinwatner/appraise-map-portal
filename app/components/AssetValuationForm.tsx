@@ -18,6 +18,12 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
   valuation,
   onChange,
 }: AssetValuationDetailProps) => {
+  const [landValue, setLandValue] = useState<number>(0);
+  const [buildingValue, setBuildingValue] = useState<number>(0);
+  const [totalValue, setTotalValue] = useState<number>(0);
+  const [valuationDate, setValuationDate] = useState<string>("");
+  const [reportNumber, setReportNumber] = useState<string>("");
+
   return (
     <div>
       <p className="text-2sm font-thin mb-2 mt-5">Nilai:</p>
@@ -25,13 +31,16 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <p className="text-2sm font-thin mb-2 mt-5">Nilai Tanah/meter :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(valuation != null ? valuation.landValue : 0)}
-          onChange={(e) =>
+          value={formatRupiah(
+            valuation != null ? valuation.landValue : landValue
+          )}
+          onChange={(e) => {
+            setLandValue(Number(e.target.value));
             onChange(
               "landValue",
-              formatRupiah(valuation != null ? valuation.landValue : 0)
-            )
-          }
+              formatRupiah(valuation != null ? valuation.landValue : landValue)
+            );
+          }}
           type="text"
           placeholder="Nilai Tanah"
         />
@@ -39,13 +48,18 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <p className="text-2sm font-thin mb-2 mt-5">Nilai Bangunan/meter :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(valuation != null ? valuation.buildingValue : 0)}
-          onChange={(e) =>
+          value={formatRupiah(
+            valuation != null ? valuation.buildingValue : buildingValue
+          )}
+          onChange={(e) => {
+            setBuildingValue(Number(e.target.value));
             onChange(
               "buildingValue",
-              formatRupiah(valuation != null ? valuation.buildingValue : 0)
-            )
-          }
+              formatRupiah(
+                valuation != null ? valuation.buildingValue : buildingValue
+              )
+            );
+          }}
           type="text"
           placeholder="Nilai Bangunan"
         />
@@ -53,13 +67,18 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <p className="text-2sm font-thin mb-2 mt-5">Total Nilai :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(valuation != null ? valuation.totalValue : 0)}
-          onChange={(e) =>
+          value={formatRupiah(
+            valuation != null ? valuation.totalValue : totalValue
+          )}
+          onChange={(e) => {
+            setTotalValue(Number(e.target.value));
             onChange(
               "totalValue",
-              formatRupiah(valuation != null ? valuation.totalValue : 0)
-            )
-          }
+              formatRupiah(
+                valuation != null ? valuation.totalValue : totalValue
+              )
+            );
+          }}
           type="text"
           placeholder="Total Nilai"
         />
@@ -69,32 +88,32 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
           value={
             valuation != null
               ? format(valuation.valuationDate, "dd/MM/yyyy")
-              : ""
+              : valuationDate
           }
-          onChange={(e) =>
+          onChange={(e) => {
+            setValuationDate(e.target.value);
             onChange(
               "valuationDate",
               valuation != null
                 ? format(valuation.valuationDate, "dd/MM/yyyy")
-                : ""
-            )
-          }
+                : valuationDate
+            );
+          }}
           type="text"
           placeholder="Tanggal Penilaian"
         />
         <p className="text-2sm font-thin mb-2 mt-5">No Laporan :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm mb-4 overflow-hidden whitespace-nowrap text-overflow-ellipsis"
-          value={valuation != null ? valuation.reportNumber : ""}
+          value={valuation != null ? valuation.reportNumber : reportNumber}
           type="text"
-          onChange={(e) =>
+          onChange={(e) => {
+            setReportNumber(e.target.value);
             onChange(
               "reportNumber",
-              valuation != null
-                ? valuation.reportNumber
-                : ""
-            )
-          }
+              valuation != null ? valuation.reportNumber : reportNumber
+            );
+          }}
           placeholder="No Laporan :"
         />
       </div>

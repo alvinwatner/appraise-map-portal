@@ -3,15 +3,15 @@ import { TiArrowSortedDown } from "react-icons/ti";
 
 interface DropdownProps {
   placeholder: string;
-  options: string[]; // Assuming options are an array of strings
-  onChange: (selectedOption: string) => void; // Function type specifying it takes a string and returns void
+  options: string[];
+  onChange: (selectedOption: string) => void;
   initialValue?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ placeholder, options, onChange, initialValue = ""}) => {
+const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange, initialValue = ""}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string>(initialValue); // Define state with a default type
-  const dropdownRef = useRef<HTMLDivElement>(null);  // Ref for the dropdown container
+  const [inputValue, setInputValue] = useState(initialValue);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -20,38 +20,43 @@ const Dropdown: React.FC<DropdownProps> = ({ placeholder, options, onChange, ini
       }
     };
 
-    // Add when the dropdown is opened and cleanup when closed or component unmounts
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);  // Effect runs only when `isOpen` changes
-
-
+  }, [isOpen]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleOptionClick = (option: string) => {
-    // Explicitly define the type of `option`
-    setSelectedOption(option);
+    setInputValue(option);
     onChange(option);
     setIsOpen(false);
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    onChange(value);
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={toggleDropdown}
-        className=" w-full pl-2 py-2 rounded-lg text-left ring-2 ring-[#D9D9D9] text-sm"
-      >
-        <span className= {`${selectedOption != "" ? "text-black" : "text-gray-400"}`}>{selectedOption || placeholder}</span>
-        <TiArrowSortedDown size={15} className="absolute right-2 top-3 text-gray-400" />
-      </button>
+      <div className="flex items-center ring-2 ring-[#D9D9D9] rounded-lg">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onClick={toggleDropdown}
+          placeholder={placeholder}
+          className="w-full pl-2 py-2 text-left text-sm rounded-lg outline-none"
+        />
+        <TiArrowSortedDown size={15} className="mr-2 text-gray-400 cursor-pointer" onClick={toggleDropdown} />
+      </div>
       {isOpen && (
         <ul className="absolute top-10 shadow-md bg-white py-1 text-black rounded w-full z-10">
-          {options.map((option, index) => (
+          {options.filter(option => option.toLowerCase().includes(inputValue.toLowerCase())).map((option, index) => (
             <li
               key={index}
               className="px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer"
@@ -66,4 +71,4 @@ const Dropdown: React.FC<DropdownProps> = ({ placeholder, options, onChange, ini
   );
 };
 
-export default Dropdown;
+export default DropdownInput;

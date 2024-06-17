@@ -2,6 +2,8 @@
 import GoogleMaps from "@/app/components/GoogleMaps";
 import { Autocomplete } from "@react-google-maps/api";
 import { useMemo, useState, useRef } from "react";
+import { fetchProperties } from "@/app/services/dataManagement.service";
+
 import { IoSearchOutline } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
@@ -12,18 +14,16 @@ import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
 import { SearchResult } from "@/app/components/SearchResult";
-<<<<<<< Updated upstream
-import { AddMarkerForm } from "@/app/components/AddMarkerForm";
-=======
 import { UpdateMarkerForm } from "@/app/components/UpdateMarkerForm";
 import { Property } from "@/app/types/types";
 import Loading from "@/app/components/Loading";
->>>>>>> Stashed changes
+
 
 enum LeftWhiteSheetComponent {
   markerDetail,
   searchResult,
   add,
+  edit,
   hide,
 }
 
@@ -34,6 +34,9 @@ export default function Page() {
     lat: -8.7932639,
     lng: 115.1499561,
   });
+
+  const [properties, setProperties] = useState<Property[]>([]);
+
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useLoadScript({
@@ -42,8 +45,7 @@ export default function Page() {
     libraries: libraries as any,
   });
 
-<<<<<<< Updated upstream
-=======
+
   useEffect(() => {
     const getData = async () => {
       if (isLoaded) {
@@ -62,7 +64,6 @@ export default function Page() {
   }, [isLoaded, properties]);
 
   const [onEditProperty, setOnEditProperty] = useState<Property>();
->>>>>>> Stashed changes
   const [isAdding, setIsAdding] = useState(false);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
@@ -70,6 +71,11 @@ export default function Page() {
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
   );
+
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null
+  );
+
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
 
@@ -88,12 +94,17 @@ export default function Page() {
     }
   };
 
-  const handleMarkerClick = (location: google.maps.LatLngLiteral) => {
+  const handleMarkerClick = (property: Property) => {
     console.log("is this executeed");
-    setMarkerDetail(location);
+    setSelectedProperty(property);
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
     setClickCoordinates(null);
+  };
+
+  const handleOnEditClick = (property: Property) => {
+    setOnEditProperty(property);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.edit);
   };
 
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
@@ -109,7 +120,7 @@ export default function Page() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setLeftWhiteSheet(false);
-        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);        
+        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
         setIsAdding(false);
         setClickCoordinates(null);
       }
@@ -130,6 +141,8 @@ export default function Page() {
       case LeftWhiteSheetComponent.markerDetail:
         return (
           <MarkerDetailContent
+            property={selectedProperty!}
+            onEditClicked={handleOnEditClick}
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -138,7 +151,7 @@ export default function Page() {
         );
       case LeftWhiteSheetComponent.markerDetail:
         return (
-          <AddMarkerForm
+          <UpdateMarkerForm
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -149,9 +162,6 @@ export default function Page() {
         return <SearchResult />;
       case LeftWhiteSheetComponent.add:
         return (
-<<<<<<< Updated upstream
-          <AddMarkerForm
-=======
           <UpdateMarkerForm
             onClose={() => {
               setLeftWhiteSheet(false);
@@ -165,7 +175,7 @@ export default function Page() {
         return (
           <UpdateMarkerForm
             property={onEditProperty}
->>>>>>> Stashed changes
+
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -288,12 +298,14 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Google Maps component */}
-      <GoogleMaps
-        isAdding={isAdding}
-        onMarkerClick={handleMarkerClick}
-        onMapClick={handleMapClick}
-      />
+      {properties.length > 0 && (
+        <GoogleMaps
+          properties={properties}
+          isAdding={isAdding}
+          onMarkerClick={handleMarkerClick}
+          onMapClick={handleMapClick}
+        />
+      )}
 
       {/* Floating action button */}
       <button
