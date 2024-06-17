@@ -12,7 +12,13 @@ import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
 import { SearchResult } from "@/app/components/SearchResult";
+<<<<<<< Updated upstream
 import { AddMarkerForm } from "@/app/components/AddMarkerForm";
+=======
+import { UpdateMarkerForm } from "@/app/components/UpdateMarkerForm";
+import { Property } from "@/app/types/types";
+import Loading from "@/app/components/Loading";
+>>>>>>> Stashed changes
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -36,7 +42,30 @@ export default function Page() {
     libraries: libraries as any,
   });
 
+<<<<<<< Updated upstream
+=======
+  useEffect(() => {
+    const getData = async () => {
+      if (isLoaded) {
+        try {
+          // Assume loadProperties is a function that returns a Promise<Property[]>
+          const propertiesData = await fetchProperties('', 1, 30);
+
+          setProperties(propertiesData.data);
+        } catch (error) {
+          console.error("Failed to fetch properties:", error);
+        }
+      }
+    };
+
+    getData();
+  }, [isLoaded, properties]);
+
+  const [onEditProperty, setOnEditProperty] = useState<Property>();
+>>>>>>> Stashed changes
   const [isAdding, setIsAdding] = useState(false);
+  const [lat, setLat] = useState<number>(0);
+  const [lng, setLng] = useState<number>(0);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
@@ -68,7 +97,10 @@ export default function Page() {
   };
 
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
-    console.log("eeehh dikasdkakd");
+    console.log("eeehh dapat location - lat = " + location.lat + "lng" + location.lng);
+    setLat(location.lat);
+    setLng(location.lng);
+
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
   };
@@ -117,7 +149,23 @@ export default function Page() {
         return <SearchResult />;
       case LeftWhiteSheetComponent.add:
         return (
+<<<<<<< Updated upstream
           <AddMarkerForm
+=======
+          <UpdateMarkerForm
+            onClose={() => {
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+            }}
+            lat={lat}
+            lng={lng}
+          />
+        );
+      case LeftWhiteSheetComponent.edit:
+        return (
+          <UpdateMarkerForm
+            property={onEditProperty}
+>>>>>>> Stashed changes
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -152,7 +200,7 @@ export default function Page() {
   };
 
   if (!isLoaded) {
-    return <p>Loading...</p>;
+    return <Loading/>;
   }
 
   return (

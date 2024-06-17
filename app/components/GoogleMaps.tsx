@@ -38,7 +38,26 @@ export default function GoogleMaps({
           disableDefaultUI: true,
         });
 
+<<<<<<< Updated upstream
         // Add a click listener on the map
+=======
+        properties.forEach((property) => {
+          // Ensure latitude and longitude are converted to numbers with period as decimal separator
+          const latitude = parseFloat(
+            property.locations.latitude.toString().replace(",", ".")
+          );
+          const longitude = parseFloat(
+            property.locations.longitude.toString().replace(",", ".")
+          );
+
+          const location = { lat: latitude, lng: longitude };
+
+          var url = "/marker_aset.png";
+
+          if (property.propertiesType == "data"){
+            url = "/marker_data.png"
+          }
+>>>>>>> Stashed changes
 
         locations.forEach((location) => {
           const marker = new google.maps.Marker({
@@ -64,7 +83,6 @@ export default function GoogleMaps({
             const lat = event.latLng?.lat();
             const lng = event.latLng?.lng();
             if (lat && lng) {
-              console.log(`Latitude: ${lat}, Longitude: ${lng}`);
               if (isAdding) {
                 onMapClick({
                   lat: lat,
