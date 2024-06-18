@@ -592,6 +592,7 @@ const importDataData = async (jsonData: RowData[]) => {
         <FilterModal
           onApply={handleFilterApply}
           onClose={() => setShowFilterModal(false)}
+          defaultFilters={filters}
         />
       )}
       <ImportPopup

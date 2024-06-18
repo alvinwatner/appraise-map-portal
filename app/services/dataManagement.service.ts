@@ -34,7 +34,7 @@ export const fetchProperties = async (
         id,
         name
       ),
-      valuations (
+      valuations!inner(
         id,
         valuationDate,
         landValue,
@@ -48,15 +48,11 @@ export const fetchProperties = async (
     .order('id', { ascending: true });
 
   if (search) {
-    query = query.ilike('debitur', `%${search}%`); // Adjusted to search by 'debitur' field
+    query = query.ilike('debitur', `%${search}%`);
   }
 
   if (filters.propertyType) {
     query = query.eq('propertiesType', filters.propertyType);
-  }
-
-  if (filters.valuationDate) {
-    query = query.eq('valuations.valuationDate', filters.valuationDate);
   }
 
   if (filters.objectType) {
@@ -71,6 +67,10 @@ export const fetchProperties = async (
     query = query.lte('valuations.totalValue', filters.maxTotalValue);
   }
 
+  if (filters.valuationDate) {
+    query = query.eq('valuations.valuationDate', filters.valuationDate); // Type assertion to any
+  }
+
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
 
@@ -82,7 +82,7 @@ export const fetchProperties = async (
     console.error('Error fetching properties:', error);
     return { data: [], total: 0 };
   }
-  
+
   return { data: data as unknown as Property[], total: count || 0 };
 };
 
@@ -197,7 +197,7 @@ export const fetchAllProperties = async (
     return { data: [], total: 0 };
   }
   
-  return { data: data as Property[], total: count || 0 };
+  return { data: data as unknown as Property[], total: count || 0 };
 };
 
 export const fetchObjectTypes = async (): Promise<{ data: { id: number, name: string }[], total: number }> => {
