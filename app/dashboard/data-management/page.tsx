@@ -424,13 +424,17 @@ const importDataData = async (jsonData: RowData[]) => {
   };
 
   const handleExport = async (exportAll: boolean) => {
+    const asset = exportAll
+      ? await fetchAllProperties(query, { ...filters, propertiesType: 'asset' })
+      : await fetchProperties(query, currentPage, itemsPerPage, { ...filters, propertiesType: 'asset' })
+
     const data = exportAll
-      ? await fetchAllProperties(query, filters)
-      : { data: properties };
+      ? await fetchAllProperties(query, { ...filters, propertyType: 'data' })
+      : await fetchProperties(query, currentPage, itemsPerPage, { ...filters, propertyType: 'data' })
   
     const workbook = XLSX.utils.book_new();
   
-    const assetData = data.data.flatMap((property) => flattenAsset(property));
+    const assetData = asset.data.flatMap((property) => flattenAsset(property));
     const assetSheet = XLSX.utils.json_to_sheet(assetData);
     XLSX.utils.book_append_sheet(workbook, assetSheet, 'Asset Sheet');
   
@@ -446,8 +450,6 @@ const importDataData = async (jsonData: RowData[]) => {
   const handleCloseExportModal = () => {
     setShowExportModal(false);
   };
-
-  // Rest of your existing component code...
 
   const handleExportClick = () => {
     setShowExportModal(true);
