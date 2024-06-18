@@ -199,3 +199,16 @@ export const fetchAllProperties = async (
   
   return { data: data as Property[], total: count || 0 };
 };
+
+export const fetchObjectTypes = async (): Promise<{ data: { id: number, name: string }[], total: number }> => {
+  const { data, error, count } = await supabase
+    .from('object_type')
+    .select('id, name', { count: 'exact' });
+
+  if (error) {
+    console.error('Error fetching object types:', error);
+    return { data: [], total: 0 };
+  }
+
+  return { data: data as { id: number, name: string }[], total: count || 0 };
+};

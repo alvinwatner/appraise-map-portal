@@ -41,4 +41,5 @@ export interface Property {
   locations: Location;
   object_type: ObjectType;
   valuations: Valuation[];
+  ObjectId: string
 }

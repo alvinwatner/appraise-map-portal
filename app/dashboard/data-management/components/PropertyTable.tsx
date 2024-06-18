@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Property } from '@/app/types/types';
 import { formatRupiah } from '@/app/utils/helper';
+import { fetchObjectTypes } from '@/app/services/dataManagement.service';
 
 type PropertyTableProps = {
   currentData: Property[];
@@ -12,6 +13,11 @@ type PropertyTableProps = {
   editedData: Map<number, Partial<Property>>;
 };
 
+type ObjectType = {
+  id: number;
+  name: string;
+};
+
 const PropertyTable: React.FC<PropertyTableProps> = ({
   currentData,
   selectedRows,
@@ -21,6 +27,16 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   editMode,
   editedData,
 }) => {
+  const [objectTypes, setObjectTypes] = useState<ObjectType[]>([]);
+
+  useEffect(() => {
+    const getObjectTypes = async () => {
+      const { data } = await fetchObjectTypes();
+      setObjectTypes(data);
+    };
+    getObjectTypes();
+  }, []);
+
   if (currentData.length === 0) {
     return (
       <div className="text-center py-4">
@@ -91,12 +107,21 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <input
+                    <select
                       className="block w-full rounded-md"
-                      type="text"
-                      value={editedData.get(item.id)?.object_type?.name || item.object_type?.name}
-                      onChange={(e) => handleChange(item.id, 'object_type', { ...item.object_type, name: e.target.value })}
-                    />
+                      value={editedData.get(item.id)?.object_type?.id || item.object_type?.id}
+                      onChange={(e) => {
+                        const selectedId = parseInt(e.target.value, 10);
+                        const selectedObjectType = objectTypes.find(type => type.id === selectedId);
+                        handleChange(item.id, 'ObjectId', selectedObjectType?.id);
+                      }}
+                    >
+                      {objectTypes.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
