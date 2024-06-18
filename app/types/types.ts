@@ -26,11 +26,12 @@ export interface Valuation {
   buildingValue: number;
   totalValue: number;
   reportNumber: string;
+  appraiser: string;
 }
 
 export interface Property {
   id: number;
-  name: string;
+  debitur: string;
   landArea: number;
   buildingArea: number;
   phoneNumber: string;

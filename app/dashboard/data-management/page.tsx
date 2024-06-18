@@ -2,13 +2,16 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchProperties, updatePropertiesIsDeleted, updateProperty, updateValuation } from '@/app/services/dataManagement.service';
+import { fetchAllProperties, fetchProperties, updatePropertiesIsDeleted, updateProperty, updateValuation } from '@/app/services/dataManagement.service';
 import { Property } from '@/app/types/types';
 import PropertyTable from './components/PropertyTable';
 import FilterModal from './components/FilterModal';
 import Loading from '@/app/components/Loading';
 import ImportPopup from './components/ImportPopup';
 import { supabase } from '@/app/lib/supabaseClient';
+import ExportPopup from './components/ExportPopup';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -32,39 +35,35 @@ const escapeCSVField = (field: any): string => {
   return fieldString;
 };
 
-const flattenProperty = (property: Property) => {
+const flattenAsset = (property: Property) => {
   return property.valuations.map(valuation => ({
-    'JENIS DATA': escapeCSVField(property.propertiesType),
-    'NO. LAPORAN': escapeCSVField(valuation.reportNumber),
-    'TANGGAL PENILAIAN': escapeCSVField(valuation.valuationDate),
-    'JENIS OBJEK': escapeCSVField(property.object_type.name),
-    'NAMA DEBITOR': escapeCSVField(property.name),
-    'NOMOR TLP': escapeCSVField(property.phoneNumber),
-    'ALAMAT': escapeCSVField(property.locations.address),
-    'LUAS TANAH': escapeCSVField(property.landArea),
-    'LUAS BANGUNAN': escapeCSVField(property.buildingArea),
-    'NILAI TANAH / METER': escapeCSVField(valuation.landValue),
-    'NILAI BANGUNAN / METER': escapeCSVField(valuation.buildingValue),
-    'NILAI': escapeCSVField(valuation.totalValue),
+    'TANGGAL PENILAIAN': escapeCSVField(valuation.valuationDate || null),
+    'JENIS OBJEK': escapeCSVField(property.object_type?.name || null),
+    'NAMA DEBITUR': escapeCSVField(property.debitur || null),
+    'ALAMAT': escapeCSVField(property.locations.address || null),
+    'KOORDINAT': escapeCSVField(property.locations.longitude || null + ',' + property.locations.latitude || null),
+    'LUAS TANAH': escapeCSVField(property.landArea || null),
+    'LUAS BANGUNAN': escapeCSVField(property.buildingArea || null),
+    'PENILAI': escapeCSVField(valuation.appraiser || null),
+    'HARGA TANAH /mÂ²': escapeCSVField(valuation.landValue || null),
+    'NILAI': escapeCSVField(valuation.totalValue || null),
+    'NOMOR LAPORAN': escapeCSVField(valuation.reportNumber || null),
   }));
 };
 
-const convertToCSV = (data: Property[]): string => {
-  const flattenedData = data.flatMap(flattenProperty);
-  const header = Object.keys(flattenedData[0]).join(',');
-  const rows = flattenedData.map(row => Object.values(row).join(','));
-  return [header, ...rows].join('\n');
-};
-
-// Utility function to download a CSV file
-const downloadCSV = (data: string, filename: string): void => {
-  const blob = new Blob([data], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.setAttribute('href', url);
-  a.setAttribute('download', filename);
-  a.click();
-  URL.revokeObjectURL(url);
+const flattenData = (property: Property) => {
+  return property.valuations.map(valuation => ({
+    'TANGGAL': escapeCSVField(valuation.valuationDate || null),
+    'JENIS OBJEK': escapeCSVField(property.object_type?.name || null),
+    'ALAMAT': escapeCSVField(property.locations.address || null),
+    'NO. HP': escapeCSVField(property.phoneNumber || null),
+    'KOORDINAT': escapeCSVField(property.locations.longitude || null + ',' + property.locations.latitude || null),
+    'LUAS TANAH': escapeCSVField(property.landArea || null),
+    'LUAS BANGUNAN': escapeCSVField(property.buildingArea || null),
+    'NILAI TANAH /mÂ²': escapeCSVField(valuation.landValue || null),
+    'NILAI BANGUNAN /mÂ²': escapeCSVField(valuation.buildingValue || null),
+    'INDIKASI PENAWARAN/TRANSAKSI': escapeCSVField(valuation.totalValue || null),
+  }));
 };
 
 const Page = () => {
@@ -79,8 +78,25 @@ const Page = () => {
   const [editedValuations, setEditedValuations] = useState<Map<number, any>>(new Map());
   const [filters, setFilters] = useState({});
   const [showFilterModal, setShowFilterModal] = useState(false);
-
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  interface RowData {
+    propertiesType?: string | null;
+    reportNumber?: string | null;
+    valuationDate?: string | null;
+    objectType?: string | null;
+    debitur?: string | null;
+    phoneNumber?: string | null;
+    address?: string | null;
+    landArea?: string | null;
+    buildingArea?: string | null;
+    landValue?: string | null;
+    buildingValue?: string | null;
+    totalValue?: string | null;
+    coordinates?: string | null;
+    appraiser?: string | null;
+  }
 
   const handleImportClick = () => {
     setShowImportModal(true);
@@ -90,98 +106,214 @@ const Page = () => {
     setShowImportModal(false);
   };
 
-  const handleImportData = async (jsonData: any[]) => {
+  const parseAndFormatFloat = (value: string | null | undefined): number | null => {
+    if (value == null) return null;
+    const cleanedValue = value.replace(/,/g, '');
+  
+    const floatValue = parseFloat(cleanedValue);
+  
+    if (isNaN(floatValue)) {
+      throw new Error(`Invalid number format for value: ${value}`);
+    }
+  
+    return floatValue;
+  };  
+
+  const handleImportData = async (jsonData: RowData[], dataType: string) => {
+    if (dataType === 'asset') {
+      await importAssetData(jsonData);
+    } else if (dataType === 'data') {
+      await importDataData(jsonData);
+    }
+  };
+  
+  const importAssetData = async (jsonData: RowData[]) => {
     try {
-        const { count: totalCountProperties, error: countErrorProperties } = await supabase
-            .from('properties')
-            .select('id', { count: 'exact' });
-
-        if (countErrorProperties) {
-            throw countErrorProperties;
-        }
-
-        const { count: totalCountValuations, error: countErrorValuations } = await supabase
-            .from('valuations')
-            .select('id', { count: 'exact' });
-
-        if (countErrorValuations) {
-            throw countErrorValuations;
-        }
-
-        const { count: totalCountLocations, error: countErrorLocations } = await supabase
-            .from('locations')
-            .select('id', { count: 'exact' });
-
-        if (countErrorLocations) {
-            throw countErrorLocations;
-        }
-
-        for (let i = 0; i < jsonData.length; i++) {
-            const item = jsonData[i];
-
-            const { data: objectType, error: errorObjectType } = await supabase
-              .from('object_type')
-              .select('id')
-              .eq('name', item.objectType);
-        
-
-            if (errorObjectType) {
-                throw errorObjectType;
-            }
-
-            const formattedDataLocations = {
-              id: (totalCountLocations || 0) + i + 1,
-              address: item.address,
-            };
-
-            const formattedDataProperties = {
-                id: (totalCountProperties || 0) + i + 1,
-                propertiesType: item.propertiesType,
-                name: item.name,
-                phoneNumber: item.phoneNumber,
-                landArea: item.landArea,
-                buildingArea: item.buildingArea,
-                LocationId: formattedDataLocations.id,
-                ObjectId: objectType[0]?.id
-            };
-
-            const formattedDataValuations = {
-                id: (totalCountValuations || 0) + i + 1,
-                PropertyId: formattedDataProperties.id,
-                reportNumber: item.reportNumber,
-                valuationDate: item.valuationDate.split('/').reverse().join('-'),
-                landValue: item.landValue,
-                buildingValue: item.buildingValue,
-                totalValue: item.totalValue,
-            };
-
-            const insertLocations = await supabase
-                .from('locations')
-                .insert([formattedDataLocations])
-                .select();
-
-            const insertProperties = await supabase
-                .from('properties')
-                .insert([formattedDataProperties])
-                .select();
-
-            const insertValuations = await supabase
-                .from('valuations')
-                .insert([formattedDataValuations])
-                .select();
-
-            const error = insertProperties.error || insertValuations.error || insertLocations.error;
-
-            if (error) {
-                throw error;
-            }
-        }
-
-      } catch (error) {
-          console.error('Error handling import data:', error);
+      const { count: totalCountProperties, error: countErrorProperties } = await supabase
+        .from('properties')
+        .select('id', { count: 'exact' });
+  
+      if (countErrorProperties) {
+        throw countErrorProperties;
       }
+  
+      const { count: totalCountValuations, error: countErrorValuations } = await supabase
+        .from('valuations')
+        .select('id', { count: 'exact' });
+  
+      if (countErrorValuations) {
+        throw countErrorValuations;
+      }
+  
+      const { count: totalCountLocations, error: countErrorLocations } = await supabase
+        .from('locations')
+        .select('id', { count: 'exact' });
+  
+      if (countErrorLocations) {
+        throw countErrorLocations;
+      }
+  
+      for (let i = 0; i < jsonData.length; i++) {
+        const item = jsonData[i];
+  
+        const { data: objectType, error: errorObjectType } = await supabase
+          .from('object_type')
+          .select('id')
+          .eq('name', item.objectType);
+  
+        if (errorObjectType) {
+          throw errorObjectType;
+        }
+  
+        const coordinatesArray = item.coordinates?.split(", ").map(Number);
+        const formattedDataLocations = {
+          id: (totalCountLocations || 0) + i + 1,
+          address: item.address,
+          latitude: coordinatesArray?.[0],
+          longitude: coordinatesArray?.[1],
+        };
+  
+        const formattedDataProperties = {
+          id: (totalCountProperties || 0) + i + 1,
+          debitur: item.debitur,
+          phoneNumber: item.phoneNumber,
+          landArea: parseAndFormatFloat(item.landArea),
+          buildingArea: parseAndFormatFloat(item.buildingArea),
+          LocationId: formattedDataLocations.id,
+          ObjectId: objectType[0]?.id,
+          propertiesType: 'asset'
+        };
+  
+        const formattedDataValuations = {
+          id: (totalCountValuations || 0) + i + 1,
+          PropertyId: formattedDataProperties.id,
+          reportNumber: item.reportNumber,
+          valuationDate: item.valuationDate?.split('/').reverse().join('-'),
+          buildingValue: parseAndFormatFloat(item.buildingValue),
+          landValue: parseAndFormatFloat(item.landValue),
+          totalValue: parseAndFormatFloat(item.totalValue),
+          appraiser: item.appraiser,
+        };
+  
+        const insertLocations = await supabase
+          .from('locations')
+          .insert([formattedDataLocations])
+          .select();
+  
+        const insertProperties = await supabase
+          .from('properties')
+          .insert([formattedDataProperties])
+          .select();
+  
+        const insertValuations = await supabase
+          .from('valuations')
+          .insert([formattedDataValuations])
+          .select();
+  
+        const error = insertProperties.error || insertValuations.error || insertLocations.error;
+  
+        if (error) {
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error('Error handling import asset data:', error);
+    }
   };
 
+const importDataData = async (jsonData: RowData[]) => {
+  try {
+    const { count: totalCountProperties, error: countErrorProperties } = await supabase
+      .from('properties')
+      .select('id', { count: 'exact' });
+
+    if (countErrorProperties) {
+      throw countErrorProperties;
+    }
+
+    const { count: totalCountValuations, error: countErrorValuations } = await supabase
+      .from('valuations')
+      .select('id', { count: 'exact' });
+
+    if (countErrorValuations) {
+      throw countErrorValuations;
+    }
+
+    const { count: totalCountLocations, error: countErrorLocations } = await supabase
+      .from('locations')
+      .select('id', { count: 'exact' });
+
+    if (countErrorLocations) {
+      throw countErrorLocations;
+    }
+
+    for (let i = 0; i < jsonData.length; i++) {
+      const item = jsonData[i];
+
+      const { data: objectType, error: errorObjectType } = await supabase
+        .from('object_type')
+        .select('id')
+        .eq('name', item.objectType);
+
+      if (errorObjectType) {
+        throw errorObjectType;
+      }
+
+      const coordinatesArray = item.coordinates?.split(", ").map(Number);
+      const formattedDataLocations = {
+        id: (totalCountLocations || 0) + i + 1,
+        address: item.address,
+        latitude: coordinatesArray?.[0],
+        longitude: coordinatesArray?.[1],
+      };
+
+      const formattedDataProperties = {
+        id: (totalCountProperties || 0) + i + 1,
+        propertiesType: 'data',
+        debitur: item.debitur,
+        phoneNumber: item.phoneNumber,
+        landArea: parseAndFormatFloat(item.landArea),
+        buildingArea: parseAndFormatFloat(item.buildingArea),
+        LocationId: formattedDataLocations.id,
+        ObjectId: objectType[0]?.id,
+      };
+
+      const formattedDataValuations = {
+        id: (totalCountValuations || 0) + i + 1,
+        PropertyId: formattedDataProperties.id,
+        reportNumber: item.reportNumber,
+        valuationDate: item.valuationDate?.split('/').reverse().join('-'),
+        buildingValue: parseAndFormatFloat(item.buildingValue),
+        landValue: parseAndFormatFloat(item.landValue),
+        totalValue: parseAndFormatFloat(item.totalValue),
+        appraiser: item.appraiser,
+      };
+
+      const insertLocations = await supabase
+        .from('locations')
+        .insert([formattedDataLocations])
+        .select();
+
+      const insertProperties = await supabase
+        .from('properties')
+        .insert([formattedDataProperties])
+        .select();
+
+      const insertValuations = await supabase
+        .from('valuations')
+        .insert([formattedDataValuations])
+        .select();
+
+      const error = insertProperties.error || insertValuations.error || insertLocations.error;
+
+      if (error) {
+        throw error;
+      }
+    }
+  } catch (error) {
+    console.error('Error handling import data data:', error);
+  }
+};
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -291,9 +423,34 @@ const Page = () => {
     setShowFilterModal(false);
   };
 
+  const handleExport = async (exportAll: boolean) => {
+    const data = exportAll
+      ? await fetchAllProperties(query, filters)
+      : { data: properties };
+  
+    const workbook = XLSX.utils.book_new();
+  
+    const assetData = data.data.flatMap((property) => flattenAsset(property));
+    const assetSheet = XLSX.utils.json_to_sheet(assetData);
+    XLSX.utils.book_append_sheet(workbook, assetSheet, 'Asset Sheet');
+  
+    const dataData = data.data.flatMap((property) => flattenData(property));
+    const dataSheet = XLSX.utils.json_to_sheet(dataData);
+    XLSX.utils.book_append_sheet(workbook, dataSheet, 'Data Sheet');
+  
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, 'properties.xlsx');
+  };  
+
+  const handleCloseExportModal = () => {
+    setShowExportModal(false);
+  };
+
+  // Rest of your existing component code...
+
   const handleExportClick = () => {
-    const csvData = convertToCSV(properties);
-    downloadCSV(csvData, 'properties.csv');
+    setShowExportModal(true);
   };
 
   if (loading) {
@@ -435,6 +592,9 @@ const Page = () => {
         onClose={handleCloseImportModal}
         onImport={handleImportData}
       />
+      {showExportModal && (
+        <ExportPopup isOpen={showExportModal} onClose={handleCloseExportModal} onExport={handleExport} />
+      )}
     </div>
   );
 };

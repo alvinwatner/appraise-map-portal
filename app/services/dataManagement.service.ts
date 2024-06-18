@@ -11,7 +11,7 @@ export const fetchProperties = async (
     .from('properties')
     .select(`
       id,
-      name,
+      debitur,
       landArea,
       buildingArea,
       phoneNumber,
@@ -40,14 +40,15 @@ export const fetchProperties = async (
         landValue,
         buildingValue,
         totalValue,
-        reportNumber
+        reportNumber,
+        appraiser
       )
     `, { count: 'exact' })
     .is('isDeleted', null)
     .order('id', { ascending: true });
 
   if (search) {
-    query = query.ilike('name', `%${search}%`);
+    query = query.ilike('debitur', `%${search}%`); // Adjusted to search by 'debitur' field
   }
 
   if (filters.propertyType) {
@@ -119,4 +120,82 @@ export const updateValuation = async (id: number, changes: any) => {
     throw new Error(error.message);
   }
   return data;
+};
+
+export const fetchAllProperties = async (
+  search: string = '',
+  filters: any = {}
+): Promise<{ data: Property[], total: number }> => {
+  let query = supabase
+    .from('properties')
+    .select(`
+      id,
+      debitur,
+      landArea,
+      buildingArea,
+      phoneNumber,
+      propertiesType,
+      isDeleted,
+      users (
+        id,
+        email,
+        username,
+        lastLogin,
+        isActive
+      ),
+      locations (
+        id,
+        latitude,
+        longitude,
+        address
+      ),
+      object_type (
+        id,
+        name
+      ),
+      valuations (
+        id,
+        valuationDate,
+        landValue,
+        buildingValue,
+        totalValue,
+        reportNumber,
+        appraiser
+      )
+    `, { count: 'exact' })
+    .is('isDeleted', null)
+    .order('id', { ascending: true });
+
+  if (search) {
+    query = query.ilike('debitur', `%${search}%`);
+  }
+
+  if (filters.propertyType) {
+    query = query.eq('propertiesType', filters.propertyType);
+  }
+
+  if (filters.valuationDate) {
+    query = query.eq('valuations.valuationDate', filters.valuationDate);
+  }
+
+  if (filters.objectType) {
+    query = query.eq('object_type.name', filters.objectType);
+  }
+
+  if (filters.minTotalValue !== undefined) {
+    query = query.gte('valuations.totalValue', filters.minTotalValue);
+  }
+
+  if (filters.maxTotalValue !== undefined) {
+    query = query.lte('valuations.totalValue', filters.maxTotalValue);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('Error fetching properties:', error);
+    return { data: [], total: 0 };
+  }
+  
+  return { data: data as Property[], total: count || 0 };
 };

@@ -6,26 +6,29 @@ import Papa from 'papaparse';
 interface ImportPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (jsonData: any[]) => void;
+  onImport: (jsonData: any[], dataType: string) => void;
 }
 
 interface RowData {
-  propertiesType: string | null;
-  reportNumber: string | null;
-  valuationDate: string | null;
-  objectType: string | null;
-  name: string | null;
-  phoneNumber: string | null;
-  address: string | null;
-  landArea: string | null;
-  buildingArea: string | null;
-  landValue: string | null;
-  buildingValue: string | null;
-  totalValue: string | null;
+  propertiesType?: string | null;
+  reportNumber?: string | null;
+  valuationDate?: string | null;
+  objectType?: string | null;
+  debitur?: string | null;
+  phoneNumber?: string | null;
+  address?: string | null;
+  landArea?: string | null;
+  buildingArea?: string | null;
+  landValue?: string | null;
+  buildingValue?: string | null;
+  totalValue?: string | null;
+  coordinates?: string | null;
+  appraiser?: string | null;
 }
 
 const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) => {
   const [file, setFile] = useState<File | null>(null);
+  const [dataType, setDataType] = useState<'asset' | 'data'>('asset');
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -33,73 +36,77 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
     }
   };
 
+  const handleDataTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDataType(event.target.value as 'asset' | 'data');
+  };
+
   const handleImport = () => {
     if (file) {
-      if (file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-        const reader = new FileReader();
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          if (e.target && e.target.result) {
-            const content = e.target.result as string;
-            const mapData = (row: any): RowData => {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target && e.target.result) {
+          const content = e.target.result as string;
+          const mapData = (row: any): RowData => {
+            if (dataType === 'asset') {
               return {
-                propertiesType: row["Jenis Data"] || null,
-                reportNumber: row["No. Laporan"] || null,
-                valuationDate: row["Tanggal Penilaian"] || null,
-                objectType: row["Jenis Objek"] || null,
-                name: row["Nama Debitor"] || null,
-                phoneNumber: row["No Telepon"] || null,
-                address: row["Alamat"] || null,
-                landArea: row["Luas Tanah"] || null,
-                buildingArea: row["Luas Bangunan"] || null,
-                landValue: row["Nilai Tanah"] || null,
-                buildingValue: row["Nilai Bangunan"] || null,
-                totalValue: row["Nilai"] || null,
+                valuationDate: row["TANGGAL PENILAIAN"] || null,
+                objectType: row["JENIS OBJEK"] || null,
+                debitur: row["NAMA DEBITUR"] || null,
+                address: row["ALAMAT"] || null,
+                coordinates: row["KOORDINAT"] || null,
+                landArea: row["LUAS TANAH"] || null,
+                buildingArea: row["LUAS BANGUNAN"] || null,
+                appraiser: row["PENILAI"] || null,
+                landValue: row["HARGA TANAH /mÂ²"] || null,
+                totalValue: row["NILAI"] || null,
+                reportNumber: row["NOMOR LAPORAN"] || null,
               };
-            };
-
-            if (file.name.endsWith('.csv')) {
-              const result = Papa.parse(content, { header: true });
-              const jsonData: RowData[] = (result.data as any[])
-                .map(mapData)
-                .filter(row => Object.values(row).some(value => value !== null && value !== ''));
-
-              const isValid = jsonData.every(row => row.propertiesType === 'data' || row.propertiesType === 'aset');
-              if (!isValid) {
-                alert("Invalid 'Jenis Data'. Must be 'data' or 'aset'.");
-                return;
-              }
-
-              onImport(jsonData);
             } else {
-              const workbook = XLSX.read(content, { type: 'binary' });
-              const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
-              const headers: string[] = sheetData[0] as string[];
-              const data = sheetData.slice(1).map(row => {
-                const rowData: { [key: string]: any } = {};
-                (row as any[]).forEach((cell, index) => {
-                  rowData[headers[index]] = cell;
-                });
-                return rowData;
-              });
-
-              const jsonData: RowData[] = data
-                .map(mapData)
-                .filter(row => Object.values(row).some(value => value !== null && value !== ''));
-
-              const isValid = jsonData.every(row => row.propertiesType === 'data' || row.propertiesType === 'aset');
-              if (!isValid) {
-                alert("Invalid 'Jenis Data'. Must be 'data' or 'aset'.");
-                return;
-              }
-
-              onImport(jsonData);
+              return {
+                valuationDate: row["TANGGAL"] || null,
+                objectType: row["JENIS OBJEK"] || null,
+                address: row["ALAMAT"] || null,
+                phoneNumber: row["NO. HP"] || null,
+                coordinates: row["KOORDINAT"] || null,
+                landArea: row["LUAS TANAH"] || null,
+                buildingArea: row["LUAS BANGUNAN"] || null,
+                landValue: row["NILAI TANAH /mÂ²"] || null,
+                buildingValue: row["NILAI BANGUNAN /mÂ²"] || null,
+                totalValue: row["INDIKASI PENAWARAN/TRANSAKSI"] || null,
+              };
             }
+          };
+
+          if (file.name.endsWith('.csv')) {
+            const result = Papa.parse(content, { header: true });
+            const jsonData: RowData[] = (result.data as any[])
+              .map(mapData)
+              .filter(row => Object.values(row).some(value => value !== null && value !== ''));
+
+            onImport(jsonData, dataType);
+          } else {
+            const workbook = XLSX.read(content, { type: 'binary' });
+            const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+            const headers: string[] = sheetData[0] as string[];
+            const data = sheetData.slice(1).map(row => {
+              const rowData: { [key: string]: any } = {};
+              (row as any[]).forEach((cell, index) => {
+                rowData[headers[index]] = cell;
+              });
+              return rowData;
+            });
+
+            const jsonData: RowData[] = data
+              .map(mapData)
+              .filter(row => Object.values(row).some(value => value !== null && value !== ''));
+
+            onImport(jsonData, dataType);
           }
-        };
-        reader.readAsBinaryString(file);
-      } else {
-        console.error('Unsupported file format');
-      }
+        }
+      };
+      reader.readAsBinaryString(file);
+    } else {
+      console.error('Unsupported file format');
     }
     onClose();
   };
@@ -116,10 +123,30 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
       <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md">
         <div className="px-6 py-4">
           <div className="text-center font-bold text-xl mb-4">Import Data</div>
+          <div className="mb-4">
+            <label className="mr-4">
+              <input
+                type="radio"
+                value="asset"
+                checked={dataType === 'asset'}
+                onChange={handleDataTypeChange}
+              />
+              Asset
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="data"
+                checked={dataType === 'data'}
+                onChange={handleDataTypeChange}
+              />
+              Data
+            </label>
+          </div>
           <input
             type="file"
             onChange={handleFileChange}
-            accept=".csv, .xls, .xlsx" // Only allow CSV and Excel files
+            accept=".csv, .xls, .xlsx"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4"
           />
           <div className="flex justify-end">

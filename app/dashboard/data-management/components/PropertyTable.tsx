@@ -98,8 +98,8 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.name || item.name}
-                      onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                      value={editedData.get(item.id)?.debitur || item.debitur}
+                      onChange={(e) => handleChange(item.id, 'debitur', e.target.value)}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -165,7 +165,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">{item.valuations?.[0]?.reportNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{new Date(item.valuations?.[0]?.valuationDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.object_type?.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.debitur}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.phoneNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.locations?.address}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{item.landArea}</td>
