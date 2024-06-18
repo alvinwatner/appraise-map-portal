@@ -385,8 +385,8 @@ const importDataData = async (jsonData: RowData[]) => {
     setSelectedRows(new Set());
   };
 
-  const handleEditSelected = () => {
-    setEditMode(true);
+  const handleEditSelected = (isEditMode: boolean) => {
+    setEditMode(isEditMode);
   };
 
   const handleChange = (id: number, field: keyof Property, value: any) => {
@@ -489,14 +489,14 @@ const importDataData = async (jsonData: RowData[]) => {
         <div className="flex space-x-2">
           <div className="flex space-x-2">
             {!editMode && (
-              <button className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleEditSelected}>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={() => handleEditSelected(true)}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"></path>
                 </svg>
                 &nbsp;Ubah
               </button>
             )}
-            {selectedRows.size > 0 && (
+            {selectedRows.size > 0 && editMode && (
               <>
                 {editMode && (
                   <button className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleSave}>
@@ -515,6 +515,9 @@ const importDataData = async (jsonData: RowData[]) => {
               </>
             )}
           </div>
+          {editMode && (
+            <button className="bg-yellow-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={() => handleEditSelected(false)}>Cancel</button>
+          )}
           <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="m7 10l5 5l5-5z"></path>
