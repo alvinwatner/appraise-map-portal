@@ -487,32 +487,34 @@ const importDataData = async (jsonData: RowData[]) => {
           </button>
         </div>
         <div className="flex space-x-2">
-          {selectedRows.size > 0 && (
-            <div className="flex space-x-2">
-              {!editMode && (
-                <button className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleEditSelected}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"></path>
-                  </svg>
-                  &nbsp;Ubah
-                </button>
-              )}
-              {editMode && (
-                <button className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleSave}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M12 0C5.4 0 0 5.4 0 12c0 6.6 5.4 12 12 12s12-5.4 12-12C24 5.4 18.6 0 12 0zm6.3 8.7l-7.5 7.5c-.3.3-.6.4-1 .4s-.7-.1-1-.4l-3.3-3.3c-.5-.5-.5-1.3 0-1.8c.5-.5 1.3-.5 1.8 0L10 13l6.8-6.8c.5-.5 1.3-.5 1.8 0c.4.5.4 1.3-.3 1.8z"></path>
-                  </svg>
-                  &nbsp; Simpan
-                </button>
-              )}
-              <button className="bg-red-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleDeleteSelected}>
+          <div className="flex space-x-2">
+            {!editMode && (
+              <button className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleEditSelected}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M15 3H9V1h6v2zm5 0h-4V1c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v1h20V5c0-1.1-.9-2-2-2zM4 7v15c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7H4z"></path>
+                  <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"></path>
                 </svg>
-                &nbsp; Hapus
+                &nbsp;Ubah
               </button>
-            </div>
-          )}
+            )}
+            {selectedRows.size > 0 && (
+              <>
+                {editMode && (
+                  <button className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleSave}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M12 0C5.4 0 0 5.4 0 12c0 6.6 5.4 12 12 12s12-5.4 12-12C24 5.4 18.6 0 12 0zm6.3 8.7l-7.5 7.5c-.3.3-.6.4-1 .4s-.7-.1-1-.4l-3.3-3.3c-.5-.5-.5-1.3 0-1.8c.5-.5 1.3-.5 1.8 0L10 13l6.8-6.8c.5-.5 1.3-.5 1.8 0c.4.5.4 1.3-.3 1.8z"></path>
+                    </svg>
+                    &nbsp; Simpan
+                  </button>
+                )}
+                <button className="bg-red-500 text-white px-4 py-2 rounded btn-rounded flex items-center" onClick={handleDeleteSelected}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M15 3H9V1h6v2zm5 0h-4V1c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v1h20V5c0-1.1-.9-2-2-2zM4 7v15c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7H4z"></path>
+                  </svg>
+                  &nbsp; Hapus
+                </button>
+              </>
+            )}
+          </div>
           <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="m7 10l5 5l5-5z"></path>

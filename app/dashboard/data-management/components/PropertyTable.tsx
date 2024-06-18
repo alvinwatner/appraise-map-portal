@@ -34,6 +34,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
       <table className="min-w-full divide-y divide-gray-200 table-auto">
         <thead className="bg-gray-50">
           <tr>
+          {editMode ? (
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
               <input
                 className="block w-full rounded-md"
@@ -42,6 +43,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                 checked={selectedRows.size === currentData.length}
               />
             </th>
+          ) : null}
             {['Jenis Data', 'No. Laporan', 'Tanggal Penilaian', 'Jenis Objek', 'Nama Debitor', 'Nomor Tlp', 'Alamat', 'Luas Tanah', 'Luas Bangunan', 'Nilai Tanah / Meter', 'Nilai Bangunan / Meter', 'Nilai'].map((header, index) => (
               <th key={index} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
                 {header}
@@ -52,6 +54,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {currentData.map((item) => (
             <tr key={item.id} className={`${selectedRows.has(item.id) ? 'bg-gray-200' : ''}`}>
+            {editMode ? (
               <td className="px-6 py-4 whitespace-nowrap">
                 <input
                   className="block w-full rounded-md"
@@ -60,6 +63,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                   onChange={() => handleSelectRow(item.id)}
                 />
               </td>
+            ) : null}
               {editMode && selectedRows.has(item.id) ? (
                 <>
                   <td className="px-6 py-4 whitespace-nowrap">
