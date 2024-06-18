@@ -83,7 +83,7 @@ export const fetchProperties = async (
     return { data: [], total: 0 };
   }
   
-  return { data: data as Property[], total: count || 0 };
+  return { data: data as unknown as Property[], total: count || 0 };
 };
 
 export const updatePropertiesIsDeleted = async (ids: number[], isDeleted: boolean) => {

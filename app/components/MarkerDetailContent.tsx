@@ -3,7 +3,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { PiPencilSimpleLight } from "react-icons/pi";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
-import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
+import { PropertyRowItem, PropertyRowItemWithIcon } from "@/app/components/PropertyRowItem";
 import { Property } from "../types/types";
 import { MdPhone } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
@@ -36,7 +36,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
 
       <h3 className="text-lg font-medium mb-2">{property.object_type.name}</h3>
       {property.propertiesType == "asset" && (
-        <h3 className="text-sm font-thin mb-2">{property.name}</h3>
+        <h3 className="text-sm font-thin mb-2">{property.debitur}</h3>
       )}
       <PropertyChip
         type={
@@ -53,7 +53,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         className="mb-6"
       />
       {property.propertiesType == "data" && (
-        <PropertyRowItem
+        <PropertyRowItemWithIcon
           icon={MdPhone}
           title="Nomor HP :"
           body={property.phoneNumber}

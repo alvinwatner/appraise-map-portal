@@ -1,4 +1,4 @@
-import { PropertyRowItem } from "@/app/components/PropertyInfoRowItem";
+import { PropertyRowItem } from "@/app/components/PropertyRowItem";
 import { Valuation } from "@/app/types/types";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { format } from 'date-fns';
