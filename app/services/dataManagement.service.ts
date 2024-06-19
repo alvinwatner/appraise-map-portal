@@ -45,7 +45,7 @@ export const fetchProperties = async (
       )
     `, { count: 'exact' })
     .is('isDeleted', null)
-    .order('id', { ascending: true });
+    .order('id', { ascending: false });
 
   if (search) {
     query = query.ilike('debitur', `%${search}%`);
@@ -99,6 +99,17 @@ export const updatePropertiesIsDeleted = async (ids: number[], isDeleted: boolea
 };
 
 export const updateProperty = async (id: number, changes: Partial<Property>) => {
+  if(changes.locations) {
+    const { data, error }  = await supabase
+    .from('locations')
+    .update( changes.locations )
+    .eq('id', changes.locations.id)
+    .select()
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  }
   const { data, error } = await supabase
     .from('properties')
     .update(changes)
@@ -114,7 +125,7 @@ export const updateValuation = async (id: number, changes: any) => {
   const { data, error } = await supabase
     .from('valuations')
     .update(changes)
-    .eq('PropertyId', id);
+    .eq('id', id);
 
   if (error) {
     throw new Error(error.message);
@@ -153,7 +164,7 @@ export const fetchAllProperties = async (
         id,
         name
       ),
-      valuations (
+      valuations!inner(
         id,
         valuationDate,
         landValue,

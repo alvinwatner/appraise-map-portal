@@ -391,9 +391,11 @@ const importDataData = async (jsonData: RowData[]) => {
 
   const handleChange = (id: number, field: keyof Property, value: any) => {
     if (field === 'valuations') {
-      const newEditedValuations = new Map(editedValuations);
-      newEditedValuations.set(id, value);
-      setEditedValuations(newEditedValuations);
+      setEditedValuations((prevEditedValuations) => {
+        const newEditedValuations = new Map(prevEditedValuations);
+        newEditedValuations.set(value[0].id, value[0]);
+        return newEditedValuations;
+      });
     } else {
       const newEditedData = new Map(editedData);
       const editedItem = newEditedData.get(id) || {};
@@ -401,7 +403,7 @@ const importDataData = async (jsonData: RowData[]) => {
       newEditedData.set(id, editedItem);
       setEditedData(newEditedData);
     }
-  };
+  };   
 
   const handleSave = async () => {
     for (const [id, changes] of Array.from(editedData.entries())) {
@@ -454,6 +456,19 @@ const importDataData = async (jsonData: RowData[]) => {
   const handleExportClick = () => {
     setShowExportModal(true);
   };
+
+  useEffect(() => {
+    if (editMode) {
+      const newEditedValuations = new Map();
+      properties.forEach((property) => {
+        if (property.valuations) {
+          newEditedValuations.set(property.valuations[0].id, property.valuations[0]);
+        }
+      });
+      setEditedValuations(newEditedValuations);
+    }
+  }, [editMode, properties]);
+  
 
   if (loading) {
     return <Loading/>;
@@ -541,6 +556,7 @@ const importDataData = async (jsonData: RowData[]) => {
           handleChange={handleChange}
           editMode={editMode}
           editedData={editedData}
+          editedValuations={editedValuations}
         />
       </div>
       <div className="mt-4 flex justify-between">

@@ -11,6 +11,7 @@ type PropertyTableProps = {
   handleChange: (id: number, field: keyof Property, value: any) => void;
   editMode: boolean;
   editedData: Map<number, Partial<Property>>;
+  editedValuations: Map<number, any>;
 };
 
 type ObjectType = {
@@ -26,6 +27,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   handleChange,
   editMode,
   editedData,
+  editedValuations
 }) => {
   const [objectTypes, setObjectTypes] = useState<ObjectType[]>([]);
 
@@ -86,24 +88,44 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.propertiesType || item.propertiesType}
-                      onChange={(e) => handleChange(item.id, 'propertiesType', e.target.value)}
+                      value={
+                        editedData.get(item.id)?.propertiesType === null
+                          ? ''
+                          : editedData.get(item.id)?.propertiesType ?? item.propertiesType ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'propertiesType', newBuildingValue);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.valuations?.[0]?.reportNumber || item.valuations?.[0]?.reportNumber}
-                      onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], reportNumber: e.target.value }])}
+                      value={
+                        editedValuations.get(item.valuations?.[0]?.id)?.reportNumber === null
+                          ? ''
+                          : editedValuations.get(item.valuations?.[0]?.id)?.reportNumber ?? item.valuations?.[0]?.reportNumber ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
+                        handleChange(item.id, 'valuations', [{ ...currentValuation, reportNumber: newBuildingValue }]);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="date"
-                      value={new Date(editedData.get(item.id)?.valuations?.[0]?.valuationDate || item.valuations?.[0]?.valuationDate).toISOString().split('T')[0]}
-                      onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], valuationDate: new Date(e.target.value) }])}
+                      value={editedValuations?.get(item.valuations?.[0]?.id)?.valuationDate || item.valuations?.[0]?.valuationDate || ''}
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || '';
+                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
+                        handleChange(item.id, 'valuations', [{ ...currentValuation, valuationDate: newBuildingValue }]);
+                      }}
+                      
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -127,64 +149,111 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.debitur || item.debitur}
-                      onChange={(e) => handleChange(item.id, 'debitur', e.target.value)}
+                      value={
+                        editedData.get(item.id)?.debitur === null
+                          ? ''
+                          : editedData.get(item.id)?.debitur ?? item.debitur ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'debitur', newBuildingValue );
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.phoneNumber || item.phoneNumber}
-                      onChange={(e) => handleChange(item.id, 'phoneNumber', e.target.value)}
+                      value={
+                        editedData.get(item.id)?.phoneNumber === null
+                          ? ''
+                          : editedData.get(item.id)?.phoneNumber ?? item.phoneNumber ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'phoneNumber', newBuildingValue );
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="text"
-                      value={editedData.get(item.id)?.locations?.address || item.locations?.address}
-                      onChange={(e) => handleChange(item.id, 'locations', { ...item.locations, address: e.target.value })}
+                      value={
+                        editedData.get(item.id)?.locations?.address === null
+                          ? ''
+                          : editedData.get(item.id)?.locations?.address ?? item.locations?.address ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'locations', { ...item.locations, address: newBuildingValue });
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedData.get(item.id)?.landArea || item.landArea}
-                      onChange={(e) => handleChange(item.id, 'landArea', Number(e.target.value))}
+                      value={
+                        editedData.get(item.id)?.landArea === null
+                          ? ''
+                          : editedData.get(item.id)?.landArea ?? item.landArea ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'landArea', newBuildingValue);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedData.get(item.id)?.buildingArea || item.buildingArea}
-                      onChange={(e) => handleChange(item.id, 'buildingArea', Number(e.target.value))}
+                      value={
+                        editedData.get(item.id)?.buildingArea === null
+                          ? ''
+                          : editedData.get(item.id)?.buildingArea ?? item.buildingArea ?? ''
+                      }
+                      onChange={(e) => {
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, 'buildingArea', newBuildingValue);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedData.get(item.id)?.valuations?.[0]?.landValue || item.valuations?.[0]?.landValue}
-                      onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], landValue: Number(e.target.value) }])}
+                      value={editedValuations.get(item.valuations?.[0]?.id)?.landValue || item.valuations?.[0]?.landValue}
+                      onChange={(e) => {
+                        const newBuildingValue = Number(e.target.value) || 0;
+                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
+                        handleChange(item.id, 'valuations', [{ ...currentValuation, landValue: newBuildingValue }]);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedData.get(item.id)?.valuations?.[0]?.buildingValue || item.valuations?.[0]?.buildingValue}
-                      onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], buildingValue: Number(e.target.value) }])}
+                      value={editedValuations.get(item.valuations?.[0]?.id)?.buildingValue ?? item.valuations?.[0]?.buildingValue ?? ''}
+                      onChange={(e) => {
+                        const newBuildingValue = Number(e.target.value) || 0;
+                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
+                        handleChange(item.id, 'valuations', [{ ...currentValuation, buildingValue: newBuildingValue }]);
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedData.get(item.id)?.valuations?.[0]?.totalValue || item.valuations?.[0]?.totalValue}
-                      onChange={(e) => handleChange(item.id, 'valuations', [{ ...item.valuations?.[0], totalValue: Number(e.target.value) }])}
+                      value={editedValuations.get(item.valuations?.[0]?.id)?.totalValue || item.valuations?.[0]?.totalValue || ''}
+                      onChange={(e) => {
+                        const newTotalValue = Number(e.target.value) || 0;
+                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
+                        handleChange(item.id, 'valuations', [{ ...currentValuation, totalValue: newTotalValue }]);
+                      }}
                     />
                   </td>
                 </>
