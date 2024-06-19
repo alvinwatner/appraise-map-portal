@@ -45,7 +45,7 @@ const flattenAsset = (property: Property) => {
     'LUAS TANAH': escapeCSVField(property.landArea || null),
     'LUAS BANGUNAN': escapeCSVField(property.buildingArea || null),
     'PENILAI': escapeCSVField(valuation.appraiser || null),
-    'HARGA TANAH /mÂ²': escapeCSVField(valuation.landValue || null),
+    'HARGA TANAH /m²': escapeCSVField(valuation.landValue || null),
     'NILAI': escapeCSVField(valuation.totalValue || null),
     'NOMOR LAPORAN': escapeCSVField(valuation.reportNumber || null),
   }));
@@ -60,8 +60,8 @@ const flattenData = (property: Property) => {
     'KOORDINAT': escapeCSVField(property.locations.longitude || null + ',' + property.locations.latitude || null),
     'LUAS TANAH': escapeCSVField(property.landArea || null),
     'LUAS BANGUNAN': escapeCSVField(property.buildingArea || null),
-    'NILAI TANAH /mÂ²': escapeCSVField(valuation.landValue || null),
-    'NILAI BANGUNAN /mÂ²': escapeCSVField(valuation.buildingValue || null),
+    'NILAI TANAH /m²': escapeCSVField(valuation.landValue || null),
+    'NILAI BANGUNAN /m²': escapeCSVField(valuation.buildingValue || null),
     'INDIKASI PENAWARAN/TRANSAKSI': escapeCSVField(valuation.totalValue || null),
   }));
 };
@@ -80,6 +80,7 @@ const Page = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [importSuccess, setImportSuccess] = useState(false);
 
   interface RowData {
     propertiesType?: string | null;
@@ -120,10 +121,13 @@ const Page = () => {
   };  
 
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
+    setImportSuccess(false);
     if (dataType === 'asset') {
       await importAssetData(jsonData);
+      setImportSuccess(true);
     } else if (dataType === 'data') {
       await importDataData(jsonData);
+      setImportSuccess(true);
     }
   };
   
@@ -330,7 +334,7 @@ const importDataData = async (jsonData: RowData[]) => {
 
   useEffect(() => {
     getProperties(query, currentPage, itemsPerPage, filters);
-  }, [currentPage, itemsPerPage, query, filters, getProperties]);
+  }, [currentPage, itemsPerPage, query, filters, importSuccess]);
 
   const debouncedSearch = useCallback(debounce((value: string) => {
     setQuery(value);
