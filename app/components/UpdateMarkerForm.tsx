@@ -6,7 +6,7 @@ import { DataValuationForms } from "./DataValuationForm";
 
 import DropdownInput from "./DropdownInput";
 import { AreaInput } from "./AreaInput";
-import { Property, Location, ObjectType, Valuation } from "../types/types";
+import { Property, Location, Valuation } from "../types/types";
 import { PropertyType } from "./PropertyChip";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
 import { addProperty } from "../services/dataManagement.service";
@@ -109,15 +109,15 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
       newErrors.buildingArea = "Luas Bangunan must be a number.";
       isValid = false;
     }
-    if (
-      !phoneNumber ||
-      isNaN(Number(phoneNumber)) ||
-      phoneNumber.length < 10 ||
-      phoneNumber.length > 15
-    ) {
-      newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
-      isValid = false;
-    }
+    // if (
+    //   !phoneNumber ||
+    //   isNaN(Number(phoneNumber)) ||
+    //   phoneNumber.length < 10 ||
+    //   phoneNumber.length > 15
+    // ) {
+    //   newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
+    //   isValid = false;
+    // }
 
     setErrors(newErrors);
     return isValid;
@@ -129,21 +129,23 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
       return;
     }
 
+    // console.log('landValue = ', valuations[0].landValue);
+
     // If validation passes
     try {
       const response = await addProperty({
         latitude: lat!,
         longitude: lng!,
         address: address,
-        objectTypeName: selectedObjectType,
+        objectType: selectedObjectType,
         landArea: Number(landArea),
         buildingArea: Number(buildingArea),
         phoneNumber: phoneNumber,
         propertiesType: selectedPropertyType,
         debitur: debitur,
-        landValue: 100000,
-        buildingValue: 50000,
-        totalValue: 150000,
+        landValue: 1232131,
+        buildingValue: 123213,
+        totalValue: 123123,
       });
       console.log(response);
       onClose(); // Close form on success
@@ -177,7 +179,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           placeholder="Jenis Objek"
           options={objectTypes}
           onChange={onChangeObjectType}
-          initialValue={property?.object_type.name}
+          initialValue={property?.object_type}
         />
 
         {selectedPropertyType != "aset" && (

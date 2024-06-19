@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Valuation } from "../types/types";
-import { formatRupiah } from "../utils/helper";
+import { filterNumeric, formatRupiah } from "../utils/helper";
 import { format } from "date-fns";
 
 interface AssetValuationFormProps {
@@ -18,9 +18,9 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
   valuation,
   onChange,
 }: AssetValuationDetailProps) => {
-  const [landValue, setLandValue] = useState<number>(0);
-  const [buildingValue, setBuildingValue] = useState<number>(0);
-  const [totalValue, setTotalValue] = useState<number>(0);
+  const [landValue, setLandValue] = useState<string>("");
+  const [buildingValue, setBuildingValue] = useState<string>("");
+  const [totalValue, setTotalValue] = useState<string>("");
   const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
 
@@ -32,13 +32,13 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
           value={formatRupiah(
-            valuation != null ? valuation.landValue : landValue
+            valuation != null ? valuation.landValue : Number(landValue)
           )}
           onChange={(e) => {
-            setLandValue(Number(e.target.value));
+            setLandValue(filterNumeric(e.target.value));
             onChange(
               "landValue",
-              formatRupiah(valuation != null ? valuation.landValue : landValue)
+              valuation != null ? valuation.landValue : landValue
             );
           }}
           type="text"
@@ -49,15 +49,13 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
           value={formatRupiah(
-            valuation != null ? valuation.buildingValue : buildingValue
+            valuation != null ? valuation.buildingValue : Number(buildingValue)
           )}
           onChange={(e) => {
-            setBuildingValue(Number(e.target.value));
+            setBuildingValue(filterNumeric(e.target.value));
             onChange(
               "buildingValue",
-              formatRupiah(
-                valuation != null ? valuation.buildingValue : buildingValue
-              )
+              valuation != null ? valuation.buildingValue : buildingValue
             );
           }}
           type="text"
@@ -68,28 +66,22 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
           value={formatRupiah(
-            valuation != null ? valuation.totalValue : totalValue
+            valuation != null ? valuation.totalValue : Number(totalValue)
           )}
           onChange={(e) => {
-            setTotalValue(Number(e.target.value));
+            setTotalValue(filterNumeric(e.target.value));
             onChange(
               "totalValue",
-              formatRupiah(
-                valuation != null ? valuation.totalValue : totalValue
-              )
+              valuation != null ? valuation.totalValue : totalValue
             );
           }}
-          type="text"
           placeholder="Total Nilai"
         />
         <p className="text-2sm font-thin mb-2 mt-5">Tanggal Penilaian :</p>
         <input
+          type="date"
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={
-            valuation != null
-              ? format(valuation.valuationDate, "dd/MM/yyyy")
-              : valuationDate
-          }
+          value={valuationDate}
           onChange={(e) => {
             setValuationDate(e.target.value);
             onChange(
@@ -99,9 +91,8 @@ const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
                 : valuationDate
             );
           }}
-          type="text"
-          placeholder="Tanggal Penilaian"
         />
+
         <p className="text-2sm font-thin mb-2 mt-5">No Laporan :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm mb-4 overflow-hidden whitespace-nowrap text-overflow-ellipsis"

@@ -38,6 +38,7 @@ const DropdownInput: React.FC<DropdownProps> = ({ placeholder, options, onChange
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+    setInputValue(value);
     onChange(value);
   };
 

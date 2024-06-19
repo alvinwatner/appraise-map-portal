@@ -1,5 +1,5 @@
 import { supabase } from "./../lib/supabaseClient";
-import { Property, Valuation, Location, ObjectType } from "./../types/types";
+import { Property, Valuation, Location } from "./../types/types";
 import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
 
 export const fetchProperties = async (
@@ -32,10 +32,6 @@ export const fetchProperties = async (
         longitude,
         address
       ),
-      object_type (
-        id,
-        name
-      ),
       valuations (
         id,
         valuationDate,
@@ -61,10 +57,6 @@ export const fetchProperties = async (
 
   if (filters.valuationDate) {
     query = query.eq("valuations.valuationDate", filters.valuationDate);
-  }
-
-  if (filters.objectType) {
-    query = query.eq("object_type.name", filters.objectType);
   }
 
   if (filters.minTotalValue !== undefined) {
@@ -124,7 +116,7 @@ interface AddPropertyArgs {
   latitude: number;
   longitude: number;
   address: string;
-  objectTypeName: string;
+  objectType: string;
   landArea: number;
   buildingArea: number;
   phoneNumber: string;
@@ -141,7 +133,7 @@ export const addProperty = async ({
   latitude,
   longitude,
   address,
-  objectTypeName,
+  objectType,
   landArea,
   buildingArea,
   phoneNumber,
@@ -152,61 +144,43 @@ export const addProperty = async ({
   totalValue,
   reportNumber = null,
   valuationDate = null,
-} : AddPropertyArgs) => {
-  // Insert new object type
-  const { data: objectTypeData, error: objecTypeError } = await supabase
-    .from("object_type")
-    .insert([
-      {
-        name: objectTypeName
-      },
-    ]);
+}: AddPropertyArgs) => {
+ 
+  // // Insert new location
+  // const { data: locationData, error: locationError } = await supabase
+  //   .from("locations")
+  //   .insert([
+  //     {
+  //       latitude: latitude,
+  //       longitude: longitude,
+  //       address: address,
+  //     },
+  //   ]);
 
-  if (objecTypeError) {
-    throw new Error(`Error adding object_type: ${objecTypeError.message}`);
-  }
+  // if (locationError) {
+  //   throw new Error(`Error adding location: ${locationError.message}`);
+  // }
 
-  if (objectTypeData == null) {
-    throw new Error("Object Type data is null");
-  }
+  // if (locationData == null) {
+  //   throw new Error("Location data is null or empty");
+  // }
 
-  const objectId = (objectTypeData[0] as ObjectType).id;
-
-  // Insert new location
-  const { data: locationData, error: locationError } = await supabase
-    .from("locations")
-    .insert([
-      {
-        latitude: latitude,
-        longitude: longitude,
-        address: address,
-      },
-    ]);
-
-  if (locationError) {
-    throw new Error(`Error adding location: ${locationError.message}`);
-  }
-
-  if (locationData == null) {
-    throw new Error("Location data is null or empty");
-  }
-
-  const locationId = (locationData[0] as Location).id;
+  // const locationId = (locationData[0] as Location).id;
 
   // Insert the property
   const { data: propertyData, error: propertyError } = await supabase
     .from("properties") // No type argument here
     .insert([
       {
-        UserId: 3,        
-        LocationId: locationId,   
-        ObjectId: objectId,             
+        UserId: 3,
+        LocationId: 21,
+        object_type: objectType,
         landArea: landArea,
-        buildingArea: buildingArea,        
-        phoneNumber: phoneNumber,        
+        buildingArea: buildingArea,
+        phoneNumber: phoneNumber,
         propertiesType: propertiesType,
         isDeleted: false,
-        debitur: debitur,                
+        debitur: debitur,
       },
     ]);
 
@@ -221,14 +195,16 @@ export const addProperty = async ({
   const propertyId = (propertyData[0] as Property).id;
 
   // Insert the valuations
-  const valuations = [{
-    landValue: landValue,
-    buildingValue: buildingValue,
-    totalValue: totalValue,
-    reportNumber: reportNumber,
-    valuationDate: valuationDate,
-    PropertyId: propertyId
-  }];
+  const valuations = [
+    {
+      landValue: landValue,
+      buildingValue: buildingValue,
+      totalValue: totalValue,
+      reportNumber: reportNumber,
+      valuationDate: valuationDate,
+      PropertyId: propertyId,
+    },
+  ];
 
   const { data: valuationData, error: valuationError } = await supabase
     .from("valuations")
@@ -255,5 +231,3 @@ export const updateValuation = async (id: number, changes: any) => {
   }
   return data;
 };
-
-
