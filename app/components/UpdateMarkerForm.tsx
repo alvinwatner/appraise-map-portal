@@ -129,29 +129,29 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
       return;
     }
 
-    // console.log('landValue = ', valuations[0].landValue);
+    console.log('landValue = ', valuations);
 
-    // If validation passes
-    try {
-      const response = await addProperty({
-        latitude: lat!,
-        longitude: lng!,
-        address: address,
-        objectType: selectedObjectType,
-        landArea: Number(landArea),
-        buildingArea: Number(buildingArea),
-        phoneNumber: phoneNumber,
-        propertiesType: selectedPropertyType,
-        debitur: debitur,
-        landValue: 1232131,
-        buildingValue: 123213,
-        totalValue: 123123,
-      });
-      console.log(response);
-      onClose(); // Close form on success
-    } catch (error) {
-      console.error("Failed to add property with valuations:", error);
-    }
+    // // If validation passes
+    // try {
+    //   const response = await addProperty({
+    //     latitude: lat!,
+    //     longitude: lng!,
+    //     address: address,
+    //     objectType: selectedObjectType,
+    //     landArea: Number(landArea),
+    //     buildingArea: Number(buildingArea),
+    //     phoneNumber: phoneNumber,
+    //     propertiesType: selectedPropertyType,
+    //     debitur: debitur,
+    //     landValue: 1232131,
+    //     buildingValue: 123213,
+    //     totalValue: 123123,
+    //   });
+    //   console.log(response);
+    //   onClose(); // Close form on success
+    // } catch (error) {
+    //   console.error("Failed to add property with valuations:", error);
+    // }
   };
 
   return (

@@ -14,98 +14,78 @@ interface AssetValuationDetailProps {
   onChange: (field: keyof Valuation, value: any) => void;
 }
 
-const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
-  valuation,
-  onChange,
-}: AssetValuationDetailProps) => {
-  const [landValue, setLandValue] = useState<string>("");
-  const [buildingValue, setBuildingValue] = useState<string>("");
-  const [totalValue, setTotalValue] = useState<string>("");
-  const [valuationDate, setValuationDate] = useState<string>("");
-  const [reportNumber, setReportNumber] = useState<string>("");
+// const AsetValuationForm: React.FC<AssetValuationDetailProps> = ({
+//   valuation,
+//   onChange,
+// }: AssetValuationDetailProps) => {
+const AsetValuationForm: React.FC<{
+  valuation?: Valuation | null;
+  onChange: (valuation: Valuation) => void;
+}> = ({ valuation, onChange }) => {
+  // Initialize state either from valuation or a default object
+  const [localValuation, setLocalValuation] = useState<Valuation>(
+    valuation || {
+      id: null,
+      valuationDate: new Date(),
+      landValue: 0,
+      buildingValue: 0,
+      totalValue: 0,
+      reportNumber: "",
+      appraiser: "",
+    }
+  );
+
+  // Effect to update local state if prop changes
+  useEffect(() => {
+    if (valuation) {
+      setLocalValuation(valuation);
+    }
+  }, [valuation]);
+
+  const handleInputChange = (field: keyof Valuation, value: any) => {
+    const updatedValuation = { ...localValuation, [field]: value };
+    setLocalValuation(updatedValuation);
+    onChange(updatedValuation);
+  };
 
   return (
     <div>
-      <p className="text-2sm font-thin mb-2 mt-5">Nilai:</p>
       <div className="ml-4">
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Tanah/meter :</p>
         <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(
-            valuation != null ? valuation.landValue : Number(landValue)
-          )}
-          onChange={(e) => {
-            setLandValue(filterNumeric(e.target.value));
-            onChange(
-              "landValue",
-              valuation != null ? valuation.landValue : landValue
-            );
-          }}
+          value={formatRupiah(localValuation.landValue)}
+          onChange={(e) =>
+            handleInputChange("landValue", filterNumeric(e.target.value))
+          }
           type="text"
           placeholder="Nilai Tanah"
         />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Bangunan/meter :</p>
         <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(
-            valuation != null ? valuation.buildingValue : Number(buildingValue)
-          )}
-          onChange={(e) => {
-            setBuildingValue(filterNumeric(e.target.value));
-            onChange(
-              "buildingValue",
-              valuation != null ? valuation.buildingValue : buildingValue
-            );
-          }}
+          value={formatRupiah(localValuation.buildingValue)}
+          onChange={(e) =>
+            handleInputChange("buildingValue", filterNumeric(e.target.value))
+          }
           type="text"
           placeholder="Nilai Bangunan"
         />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Total Nilai :</p>
         <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(
-            valuation != null ? valuation.totalValue : Number(totalValue)
-          )}
-          onChange={(e) => {
-            setTotalValue(filterNumeric(e.target.value));
-            onChange(
-              "totalValue",
-              valuation != null ? valuation.totalValue : totalValue
-            );
-          }}
+          value={formatRupiah(localValuation.totalValue)}
+          onChange={(e) =>
+            handleInputChange("totalValue", filterNumeric(e.target.value))
+          }
           placeholder="Total Nilai"
         />
-        <p className="text-2sm font-thin mb-2 mt-5">Tanggal Penilaian :</p>
         <input
           type="date"
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={valuationDate}
-          onChange={(e) => {
-            setValuationDate(e.target.value);
-            onChange(
-              "valuationDate",
-              valuation != null
-                ? format(valuation.valuationDate, "dd/MM/yyyy")
-                : valuationDate
-            );
-          }}
+          value={format(new Date(localValuation.valuationDate), "yyyy-MM-dd")}
+          onChange={(e) =>
+            handleInputChange("valuationDate", new Date(e.target.value))
+          }
         />
-
-        <p className="text-2sm font-thin mb-2 mt-5">No Laporan :</p>
         <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm mb-4 overflow-hidden whitespace-nowrap text-overflow-ellipsis"
-          value={valuation != null ? valuation.reportNumber : reportNumber}
+          value={localValuation.reportNumber}
+          onChange={(e) => handleInputChange("reportNumber", e.target.value)}
           type="text"
-          onChange={(e) => {
-            setReportNumber(e.target.value);
-            onChange(
-              "reportNumber",
-              valuation != null ? valuation.reportNumber : reportNumber
-            );
-          }}
-          placeholder="No Laporan :"
+          placeholder="No Laporan"
         />
       </div>
     </div>
@@ -116,52 +96,61 @@ export const AssetValuationForms: React.FC<AssetValuationFormProps> = ({
   valuations,
   isEdit,
   onUpdateValuation,
-}: AssetValuationFormProps) => {
-  const [valuationComponents, setValuationComponents] = useState(
-    valuations.map((valuation, index) => (
-      <AsetValuationForm
-        key={index}
-        valuation={valuation}
-        onChange={(field, value) => handleValuationChange(index, field, value)}
-      />
-    ))
-  );
+}) => {
+  // Initialize valuation forms from the provided valuations
+  const [localValuations, setLocalValuations] = useState<Valuation[]>([]);
 
-  const handleValuationChange = useCallback(
-    (index: number, field: keyof Valuation, value: any) => {
-      const updatedValuation = { ...valuations[index], [field]: value };
-      onUpdateValuation(index, updatedValuation);
-    },
-    [onUpdateValuation, valuations]
-  );
+  // Use a key to force re-render when valuations change from the parent
+  const [key, setKey] = useState(0);
 
-  const handleAddValuation = () => {
-    const newValuation = (
-      <AsetValuationForm
-        key={0}
-        valuation={null}
-        onChange={(field, value) =>
-          handleValuationChange(valuationComponents.length + 1, field, value)
-        }
-      />
+  useEffect(() => {
+    setKey((prev) => prev + 1); // Increment key to force re-render when props.valuations change
+  }, [valuations]);
+
+  const handleValuationChange = (
+    index: number,
+    updatedValuation: Valuation
+  ) => {
+    const updatedValuations = localValuations.map((val, idx) =>
+      idx === index ? updatedValuation : val
     );
-    setValuationComponents([newValuation, ...valuationComponents]);
+    setLocalValuations(updatedValuations);
+    onUpdateValuation(index, updatedValuation);
   };
 
   useEffect(() => {
-    const addInitialForm = async () => {
-      setValuationComponents([
-        <AsetValuationForm
-          key={1}
-          valuation={null}
-          onChange={(field, value) => handleValuationChange(1, field, value)}
-        />,
-      ]);
-    };
-    if (!isEdit) {
-      addInitialForm();
+    if (isEdit) {
+      // Sync local state with props when editing
+      setLocalValuations(valuations);
+    } else {
+      // Add an initial empty form if not editing
+      const initialValuation: Valuation = {
+        id: null,
+        valuationDate: new Date(),
+        landValue: 0,
+        buildingValue: 0,
+        totalValue: 0,
+        reportNumber: "",
+        appraiser: "",
+      };
+      setLocalValuations([initialValuation]);
     }
-  }, [handleValuationChange, isEdit, valuationComponents.length]);
+  }, [valuations, isEdit]);
+
+  const handleAddValuation = () => {
+    const newEmptyValuation: Valuation = {
+      id: null,
+      valuationDate: new Date(),
+      landValue: 0,
+      buildingValue: 0,
+      totalValue: 0,
+      reportNumber: "",
+      appraiser: "",
+    };
+    const newLocalValuations = [...localValuations, newEmptyValuation];
+    setLocalValuations(newLocalValuations);
+    onUpdateValuation(localValuations.length, newEmptyValuation);
+  };
 
   return (
     <div className="flex flex-col">
@@ -175,7 +164,17 @@ export const AssetValuationForms: React.FC<AssetValuationFormProps> = ({
           <div className="h-[2px] flex-1 bg-gray-300 group-hover:bg-blue-500 ml-2"></div>
         </button>
       )}
-      <div className="flex flex-col divide-y-2">{valuationComponents}</div>
+      <div className="flex flex-col divide-y-2" key={key}>
+        {localValuations.map((valuation, index) => (
+          <AsetValuationForm
+            key={index} // Using index as key; use a unique id if possible
+            valuation={valuation}
+            onChange={(updatedValuation) =>
+              handleValuationChange(index, updatedValuation)
+            }
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -145,27 +145,26 @@ export const addProperty = async ({
   reportNumber = null,
   valuationDate = null,
 }: AddPropertyArgs) => {
- 
-  // // Insert new location
-  // const { data: locationData, error: locationError } = await supabase
-  //   .from("locations")
-  //   .insert([
-  //     {
-  //       latitude: latitude,
-  //       longitude: longitude,
-  //       address: address,
-  //     },
-  //   ]);
+  // Insert new location
+  const { data: locationData, error: locationError } = await supabase
+    .from("locations")
+    .insert({
+      latitude: latitude,
+      longitude: longitude,
+      address: address,
+    }).select();
 
-  // if (locationError) {
-  //   throw new Error(`Error adding location: ${locationError.message}`);
-  // }
+  console.log("response add location = " + locationData);
 
-  // if (locationData == null) {
-  //   throw new Error("Location data is null or empty");
-  // }
+  if (locationError) {
+    throw new Error(`Error adding location: ${locationError.message}`);
+  }
 
-  // const locationId = (locationData[0] as Location).id;
+  if (locationData == null) {
+    throw new Error("Location data is null or empty");
+  }
+
+  const locationId = (locationData[0] as Location).id;
 
   // Insert the property
   const { data: propertyData, error: propertyError } = await supabase
@@ -173,7 +172,7 @@ export const addProperty = async ({
     .insert([
       {
         UserId: 3,
-        LocationId: 21,
+        LocationId: locationId,
         object_type: objectType,
         landArea: landArea,
         buildingArea: buildingArea,
@@ -182,7 +181,7 @@ export const addProperty = async ({
         isDeleted: false,
         debitur: debitur,
       },
-    ]);
+    ]).select();
 
   if (propertyError) {
     throw new Error(`Error adding property: ${propertyError.message}`);
@@ -208,7 +207,7 @@ export const addProperty = async ({
 
   const { data: valuationData, error: valuationError } = await supabase
     .from("valuations")
-    .insert(valuations);
+    .insert(valuations).select();
 
   if (valuationError) {
     throw new Error(`Error adding valuations: ${valuationError.message}`);
