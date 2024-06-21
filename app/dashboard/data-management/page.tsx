@@ -48,7 +48,7 @@ const escapeCSVField = (field: any): string => {
 const flattenAsset = (property: Property) => {
   return property.valuations.map((valuation) => ({
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
-    "JENIS OBJEK": escapeCSVField(property.object_type?.name || null),
+    "JENIS OBJEK": escapeCSVField(property.object_type || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     KOORDINAT: escapeCSVField(
@@ -68,7 +68,7 @@ const flattenAsset = (property: Property) => {
 const flattenData = (property: Property) => {
   return property.valuations.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
-    "JENIS OBJEK": escapeCSVField(property.object_type?.name || null),
+    "JENIS OBJEK": escapeCSVField(property.object_type || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     "NO. HP": escapeCSVField(property.phoneNumber || null),
     KOORDINAT: escapeCSVField(
@@ -183,15 +183,6 @@ const Page = () => {
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
 
-        const { data: objectType, error: errorObjectType } = await supabase
-          .from("object_type")
-          .select("id")
-          .eq("name", item.objectType);
-
-        if (errorObjectType) {
-          throw errorObjectType;
-        }
-
         const coordinatesArray = item.coordinates?.split(", ").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
@@ -207,7 +198,7 @@ const Page = () => {
           landArea: parseAndFormatFloat(item.landArea),
           buildingArea: parseAndFormatFloat(item.buildingArea),
           LocationId: formattedDataLocations.id,
-          ObjectId: objectType[0]?.id,
+          object_type: item.objectType,
           propertiesType: "asset",
         };
 
@@ -277,15 +268,6 @@ const Page = () => {
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
 
-        const { data: objectType, error: errorObjectType } = await supabase
-          .from("object_type")
-          .select("id")
-          .eq("name", item.objectType);
-
-        if (errorObjectType) {
-          throw errorObjectType;
-        }
-
         const coordinatesArray = item.coordinates?.split(", ").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
@@ -302,7 +284,7 @@ const Page = () => {
           landArea: parseAndFormatFloat(item.landArea),
           buildingArea: parseAndFormatFloat(item.buildingArea),
           LocationId: formattedDataLocations.id,
-          ObjectId: objectType[0]?.id,
+          object_type: item.objectType,
         };
 
         const formattedDataValuations = {
@@ -353,6 +335,7 @@ const Page = () => {
   const getProperties = useCallback(
     async (query: string, page: number, perPage: number, filters: any) => {
       setLoading(true);
+      console.log(filters);
       const propertiesData = await fetchProperties(
         query,
         page,

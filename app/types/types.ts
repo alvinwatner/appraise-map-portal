@@ -4,7 +4,7 @@ export interface User {
   email: string;
   username: string;
   lastLogin: Date;
-  isActive: boolean;  
+  isActive: boolean;
 }
 
 export interface Location {
@@ -39,7 +39,6 @@ export interface Property {
   isDeleted: boolean | null;
   users: User;
   locations: Location;
-  object_type: ObjectType;
+  object_type: string;
   valuations: Valuation[];
-  ObjectId: string
 }

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Property } from '@/app/types/types';
-import { formatRupiah } from '@/app/utils/helper';
-import { fetchObjectTypes } from '@/app/services/dataManagement.service';
+import React, { useEffect, useState } from "react";
+import { Property } from "@/app/types/types";
+import { formatRupiah } from "@/app/utils/helper";
+import { fetchObjectTypes } from "@/app/services/dataManagement.service";
 
 type PropertyTableProps = {
   currentData: Property[];
@@ -27,15 +27,18 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   handleChange,
   editMode,
   editedData,
-  editedValuations
+  editedValuations,
 }) => {
-  const [objectTypes, setObjectTypes] = useState<ObjectType[]>([]);
+  const [objectTypes, setObjectTypes] = useState<string[]>();
 
   useEffect(() => {
     const getObjectTypes = async () => {
-      const { data } = await fetchObjectTypes();
-      setObjectTypes(data);
+      try {
+        const types = await fetchObjectTypes();
+        setObjectTypes(types);
+      } catch (error: any) {}
     };
+
     getObjectTypes();
   }, []);
 
@@ -52,18 +55,34 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
       <table className="min-w-full divide-y divide-gray-200 table-auto">
         <thead className="bg-gray-50">
           <tr>
-          {editMode ? (
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
-              <input
-                className="block w-full rounded-md"
-                type="checkbox"
-                onChange={handleSelectAll}
-                checked={selectedRows.size === currentData.length}
-              />
-            </th>
-          ) : null}
-            {['Jenis Data', 'No. Laporan', 'Tanggal Penilaian', 'Jenis Objek', 'Nama Debitor', 'Nomor Tlp', 'Alamat', 'Luas Tanah', 'Luas Bangunan', 'Nilai Tanah / Meter', 'Nilai Bangunan / Meter', 'Nilai'].map((header, index) => (
-              <th key={index} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+            {editMode ? (
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
+                <input
+                  className="block w-full rounded-md"
+                  type="checkbox"
+                  onChange={handleSelectAll}
+                  checked={selectedRows.size === currentData.length}
+                />
+              </th>
+            ) : null}
+            {[
+              "Jenis Data",
+              "No. Laporan",
+              "Tanggal Penilaian",
+              "Jenis Objek",
+              "Nama Debitor",
+              "Nomor Tlp",
+              "Alamat",
+              "Luas Tanah",
+              "Luas Bangunan",
+              "Nilai Tanah / Meter",
+              "Nilai Bangunan / Meter",
+              "Nilai",
+            ].map((header, index) => (
+              <th
+                key={index}
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]"
+              >
                 {header}
               </th>
             ))}
@@ -71,17 +90,20 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {currentData.map((item) => (
-            <tr key={item.id} className={`${selectedRows.has(item.id) ? 'bg-gray-200' : ''}`}>
-            {editMode ? (
-              <td className="px-6 py-4 whitespace-nowrap">
-                <input
-                  className="block w-full rounded-md"
-                  type="checkbox"
-                  checked={selectedRows.has(item.id)}
-                  onChange={() => handleSelectRow(item.id)}
-                />
-              </td>
-            ) : null}
+            <tr
+              key={item.id}
+              className={`${selectedRows.has(item.id) ? "bg-gray-200" : ""}`}
+            >
+              {editMode ? (
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <input
+                    className="block w-full rounded-md"
+                    type="checkbox"
+                    checked={selectedRows.has(item.id)}
+                    onChange={() => handleSelectRow(item.id)}
+                  />
+                </td>
+              ) : null}
               {editMode && selectedRows.has(item.id) ? (
                 <>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -90,12 +112,18 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="text"
                       value={
                         editedData.get(item.id)?.propertiesType === null
-                          ? ''
-                          : editedData.get(item.id)?.propertiesType ?? item.propertiesType ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.propertiesType ??
+                            item.propertiesType ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'propertiesType', newBuildingValue);
+                        handleChange(
+                          item.id,
+                          "propertiesType",
+                          newBuildingValue
+                        );
                       }}
                     />
                   </td>
@@ -104,14 +132,25 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       className="block w-full rounded-md"
                       type="text"
                       value={
-                        editedValuations.get(item.valuations?.[0]?.id)?.reportNumber === null
-                          ? ''
-                          : editedValuations.get(item.valuations?.[0]?.id)?.reportNumber ?? item.valuations?.[0]?.reportNumber ?? ''
+                        editedValuations.get(item.valuations?.[0]?.id)
+                          ?.reportNumber === null
+                          ? ""
+                          : editedValuations.get(item.valuations?.[0]?.id)
+                              ?.reportNumber ??
+                            item.valuations?.[0]?.reportNumber ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
-                        handleChange(item.id, 'valuations', [{ ...currentValuation, reportNumber: newBuildingValue }]);
+                        const currentValuation =
+                          editedValuations.get(item.valuations?.[0]?.id) ||
+                          item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          {
+                            ...currentValuation,
+                            reportNumber: newBuildingValue,
+                          },
+                        ]);
                       }}
                     />
                   </td>
@@ -119,31 +158,42 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="date"
-                      value={editedValuations?.get(item.valuations?.[0]?.id)?.valuationDate || item.valuations?.[0]?.valuationDate || ''}
+                      value={
+                        editedValuations?.get(item.valuations?.[0]?.id)
+                          ?.valuationDate ||
+                        item.valuations?.[0]?.valuationDate ||
+                        ""
+                      }
                       onChange={(e) => {
-                        const newBuildingValue = e.target.value || '';
-                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
-                        handleChange(item.id, 'valuations', [{ ...currentValuation, valuationDate: newBuildingValue }]);
+                        const newBuildingValue = e.target.value || "";
+                        const currentValuation =
+                          editedValuations.get(item.valuations?.[0]?.id) ||
+                          item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          {
+                            ...currentValuation,
+                            valuationDate: newBuildingValue,
+                          },
+                        ]);
                       }}
-                      
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <select
+                    <input
                       className="block w-full rounded-md"
-                      value={editedData.get(item.id)?.object_type?.id || item.object_type?.id}
+                      type="text"
+                      value={
+                        editedData.get(item.id)?.object_type === null
+                          ? ""
+                          : editedData.get(item.id)?.object_type ??
+                            item.object_type ??
+                            ""
+                      }
                       onChange={(e) => {
-                        const selectedId = parseInt(e.target.value, 10);
-                        const selectedObjectType = objectTypes.find(type => type.id === selectedId);
-                        handleChange(item.id, 'ObjectId', selectedObjectType?.id);
+                        const newBuildingValue = e.target.value || null;
+                        handleChange(item.id, "object_type", newBuildingValue);
                       }}
-                    >
-                      {objectTypes.map(type => (
-                        <option key={type.id} value={type.id}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -151,12 +201,14 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="text"
                       value={
                         editedData.get(item.id)?.debitur === null
-                          ? ''
-                          : editedData.get(item.id)?.debitur ?? item.debitur ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.debitur ??
+                            item.debitur ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'debitur', newBuildingValue );
+                        handleChange(item.id, "debitur", newBuildingValue);
                       }}
                     />
                   </td>
@@ -166,12 +218,14 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="text"
                       value={
                         editedData.get(item.id)?.phoneNumber === null
-                          ? ''
-                          : editedData.get(item.id)?.phoneNumber ?? item.phoneNumber ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.phoneNumber ??
+                            item.phoneNumber ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'phoneNumber', newBuildingValue );
+                        handleChange(item.id, "phoneNumber", newBuildingValue);
                       }}
                     />
                   </td>
@@ -181,12 +235,17 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="text"
                       value={
                         editedData.get(item.id)?.locations?.address === null
-                          ? ''
-                          : editedData.get(item.id)?.locations?.address ?? item.locations?.address ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.locations?.address ??
+                            item.locations?.address ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'locations', { ...item.locations, address: newBuildingValue });
+                        handleChange(item.id, "locations", {
+                          ...item.locations,
+                          address: newBuildingValue,
+                        });
                       }}
                     />
                   </td>
@@ -196,12 +255,14 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="number"
                       value={
                         editedData.get(item.id)?.landArea === null
-                          ? ''
-                          : editedData.get(item.id)?.landArea ?? item.landArea ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.landArea ??
+                            item.landArea ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'landArea', newBuildingValue);
+                        handleChange(item.id, "landArea", newBuildingValue);
                       }}
                     />
                   </td>
@@ -211,12 +272,14 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="number"
                       value={
                         editedData.get(item.id)?.buildingArea === null
-                          ? ''
-                          : editedData.get(item.id)?.buildingArea ?? item.buildingArea ?? ''
+                          ? ""
+                          : editedData.get(item.id)?.buildingArea ??
+                            item.buildingArea ??
+                            ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
-                        handleChange(item.id, 'buildingArea', newBuildingValue);
+                        handleChange(item.id, "buildingArea", newBuildingValue);
                       }}
                     />
                   </td>
@@ -224,11 +287,18 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedValuations.get(item.valuations?.[0]?.id)?.landValue || item.valuations?.[0]?.landValue}
+                      value={
+                        editedValuations.get(item.valuations?.[0]?.id)
+                          ?.landValue || item.valuations?.[0]?.landValue
+                      }
                       onChange={(e) => {
                         const newBuildingValue = Number(e.target.value) || 0;
-                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
-                        handleChange(item.id, 'valuations', [{ ...currentValuation, landValue: newBuildingValue }]);
+                        const currentValuation =
+                          editedValuations.get(item.valuations?.[0]?.id) ||
+                          item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          { ...currentValuation, landValue: newBuildingValue },
+                        ]);
                       }}
                     />
                   </td>
@@ -236,11 +306,23 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedValuations.get(item.valuations?.[0]?.id)?.buildingValue ?? item.valuations?.[0]?.buildingValue ?? ''}
+                      value={
+                        editedValuations.get(item.valuations?.[0]?.id)
+                          ?.buildingValue ??
+                        item.valuations?.[0]?.buildingValue ??
+                        ""
+                      }
                       onChange={(e) => {
                         const newBuildingValue = Number(e.target.value) || 0;
-                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
-                        handleChange(item.id, 'valuations', [{ ...currentValuation, buildingValue: newBuildingValue }]);
+                        const currentValuation =
+                          editedValuations.get(item.valuations?.[0]?.id) ||
+                          item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          {
+                            ...currentValuation,
+                            buildingValue: newBuildingValue,
+                          },
+                        ]);
                       }}
                     />
                   </td>
@@ -248,29 +330,64 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     <input
                       className="block w-full rounded-md"
                       type="number"
-                      value={editedValuations.get(item.valuations?.[0]?.id)?.totalValue || item.valuations?.[0]?.totalValue || ''}
+                      value={
+                        editedValuations.get(item.valuations?.[0]?.id)
+                          ?.totalValue ||
+                        item.valuations?.[0]?.totalValue ||
+                        ""
+                      }
                       onChange={(e) => {
                         const newTotalValue = Number(e.target.value) || 0;
-                        const currentValuation = editedValuations.get(item.valuations?.[0]?.id) || item.valuations?.[0];
-                        handleChange(item.id, 'valuations', [{ ...currentValuation, totalValue: newTotalValue }]);
+                        const currentValuation =
+                          editedValuations.get(item.valuations?.[0]?.id) ||
+                          item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          { ...currentValuation, totalValue: newTotalValue },
+                        ]);
                       }}
                     />
                   </td>
                 </>
               ) : (
                 <>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.propertiesType}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.valuations?.[0]?.reportNumber}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{new Date(item.valuations?.[0]?.valuationDate).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.object_type?.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.debitur}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.phoneNumber}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.locations?.address}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.landArea}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.buildingArea}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(item.valuations?.[0]?.landValue)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(item.valuations?.[0]?.buildingValue)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(item.valuations?.[0]?.totalValue)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.propertiesType}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.valuations?.[0]?.reportNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {new Date(
+                      item.valuations?.[0]?.valuationDate
+                    ).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.object_type}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.debitur}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.phoneNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.locations?.address}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.landArea}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.buildingArea}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {formatRupiah(item.valuations?.[0]?.landValue)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {formatRupiah(item.valuations?.[0]?.buildingValue)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {formatRupiah(item.valuations?.[0]?.totalValue)}
+                  </td>
                 </>
               )}
             </tr>

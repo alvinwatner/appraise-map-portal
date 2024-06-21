@@ -31,10 +31,7 @@ export const fetchProperties = async (
         longitude,
         address
       ),
-      object_type (
-        id,
-        name
-      ),
+      object_type,
       valuations!inner(
         id,
         valuationDate,
@@ -59,7 +56,7 @@ export const fetchProperties = async (
   }
 
   if (filters.objectType) {
-    query = query.eq("object_type.name", filters.objectType);
+    query = query.eq("object_type", filters.objectType);
   }
 
   if (filters.minTotalValue !== undefined) {
@@ -171,10 +168,7 @@ export const fetchAllProperties = async (
         longitude,
         address
       ),
-      object_type (
-        id,
-        name
-      ),
+      object_type,
       valuations!inner(
         id,
         valuationDate,
@@ -203,7 +197,7 @@ export const fetchAllProperties = async (
   }
 
   if (filters.objectType) {
-    query = query.eq("object_type.name", filters.objectType);
+    query = query.eq("object_type", filters.objectType);
   }
 
   if (filters.minTotalValue !== undefined) {
@@ -224,18 +218,19 @@ export const fetchAllProperties = async (
   return { data: data as unknown as Property[], total: count || 0 };
 };
 
-export const fetchObjectTypes = async (): Promise<{
-  data: { id: number; name: string }[];
-  total: number;
-}> => {
-  const { data, error, count } = await supabase
-    .from("object_type")
-    .select("id, name", { count: "exact" });
+export async function fetchObjectTypes(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("properties")
+    .select("object_type");
 
   if (error) {
-    console.error("Error fetching object types:", error);
-    return { data: [], total: 0 };
+    throw new Error(error.message);
   }
 
-  return { data: data as { id: number; name: string }[], total: count || 0 };
-};
+  // Extract unique object_type values
+  const objectTypes = Array.from(
+    new Set(data.map((item: any) => item.object_type))
+  );
+
+  return objectTypes;
+}
