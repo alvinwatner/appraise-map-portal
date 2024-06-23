@@ -65,7 +65,6 @@ export default function GoogleMaps({
           );
 
           const location = { lat: latitude, lng: longitude };
-          console.log('latitude' + latitude + 'longitude' + longitude);
 
           var url = "/marker_aset.png";
 
@@ -102,7 +101,6 @@ export default function GoogleMaps({
             const lat = event.latLng?.lat();
             const lng = event.latLng?.lng();
             if (lat && lng) {
-              console.log(`Latitude: ${lat}, Longitude: ${lng}`);
               if (isAdding) {
                 onMapClick({
                   lat: lat,

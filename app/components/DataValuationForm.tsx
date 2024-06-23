@@ -47,7 +47,7 @@ export const DataValuationForm: React.FC<DataValuationFormProps> = ({
           className="w-full pl-2 py-2 rounded-lg mb-4  placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
           value={
             valuation != null
-              ? format(valuation.valuationDate, "dd MMMM yyyy")
+              ? format(valuation.valuationDate, "dd/MM/yyyy")
               : ""
           }
           type="text"

@@ -8,19 +8,14 @@ export interface User {
 }
 
 export interface Location {
-  id: number;
+  id: number | null;
   latitude: number;
   longitude: number;
   address: string;
 }
 
-export interface ObjectType {
-  id: number;
-  name: string;
-}
-
 export interface Valuation {
-  id: number;
+  id?: number | null;
   valuationDate: Date;
   landValue: number;
   buildingValue: number;
@@ -39,6 +34,6 @@ export interface Property {
   isDeleted: boolean | null;
   users: User;
   locations: Location;
-  object_type: string;
+  objectType: string;
   valuations: Valuation[];
 }

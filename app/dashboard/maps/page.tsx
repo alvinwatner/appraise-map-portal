@@ -4,7 +4,11 @@ import { Autocomplete } from "@react-google-maps/api";
 import { useMemo, useState, useRef } from "react";
 import { fetchProperties } from "@/app/services/dataManagement.service";
 
-import { IoSearchOutline } from "react-icons/io5";
+import {
+  IoCheckmarkCircleOutline,
+  IoCloseCircleOutline,
+  IoSearchOutline,
+} from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
@@ -16,6 +20,7 @@ import { useLoadScript } from "@react-google-maps/api";
 import { SearchResult } from "@/app/components/SearchResult";
 import { UpdateMarkerForm } from "@/app/components/UpdateMarkerForm";
 import { Property } from "@/app/types/types";
+import Loading from "@/app/components/Loading";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -34,6 +39,11 @@ export default function Page() {
   });
 
   const [properties, setProperties] = useState<Property[]>([]);
+  const [modalInfo, setModalInfo] = useState({
+    isOpen: false,
+    isSuccess: false,
+    message: "",
+  });
 
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
@@ -48,10 +58,9 @@ export default function Page() {
       if (isLoaded) {
         try {
           // Assume loadProperties is a function that returns a Promise<Property[]>
-          const propertiesData = await fetchProperties('', 1, 30);
+          const propertiesData = await fetchProperties("", 1, 30);
 
           setProperties(propertiesData.data);
-          console.log("Properties loaded:", properties);
         } catch (error) {
           console.error("Failed to fetch properties:", error);
         }
@@ -63,6 +72,8 @@ export default function Page() {
 
   const [onEditProperty, setOnEditProperty] = useState<Property>();
   const [isAdding, setIsAdding] = useState(false);
+  const [lat, setLat] = useState<number>(0);
+  const [lng, setLng] = useState<number>(0);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
@@ -104,7 +115,12 @@ export default function Page() {
   };
 
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
-    console.log("eeehh dikasdkakd");
+    console.log(
+      "eeehh dapat location - lat = " + location.lat + "lng" + location.lng
+    );
+    setLat(location.lat);
+    setLng(location.lng);
+
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
   };
@@ -160,6 +176,28 @@ export default function Page() {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
+            lat={lat}
+            lng={lng}
+            onShowModalSuccess={() => {
+              console.log("showing modal result");
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: true,
+                message: "Property added successfully!",
+              });
+            }}
+            onShowModalFail={() => {
+              console.log("showing modal result");
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: false,
+                message: "Failed to add property. Please try again.",
+              });
+            }}
           />
         );
       case LeftWhiteSheetComponent.edit:
@@ -169,6 +207,26 @@ export default function Page() {
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+            }}
+            onShowModalSuccess={() => {
+              console.log("showing modal result");
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: true,
+                message: "Property added successfully!",
+              });
+            }}
+            onShowModalFail={() => {
+              console.log("showing modal result");
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: false,
+                message: "Failed to add property. Please try again.",
+              });
             }}
           />
         );
@@ -200,7 +258,7 @@ export default function Page() {
   };
 
   if (!isLoaded) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
@@ -313,6 +371,40 @@ export default function Page() {
           <FiPlus className="text-3xl text-black" />
         )}
       </button>
+
+      <ModalUpdateResult
+        isOpen={modalInfo.isOpen}
+        onClose={() => setModalInfo({ ...modalInfo, isOpen: false })}
+        isSuccess={modalInfo.isSuccess}
+        message={modalInfo.message}
+      />
     </div>
   );
 }
+
+const ModalUpdateResult: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  isSuccess: boolean;
+  message: string;
+}> = ({ isOpen, onClose, isSuccess, message }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="absolute top-0 left-0  w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-5 mx-4 rounded-lg flex flex-col items-center">
+        {isSuccess ? (
+          <IoCheckmarkCircleOutline size={48} color="green" />
+        ) : (
+          <IoCloseCircleOutline size={48} color="red" />
+        )}
+        <p className="text-lg my-2">{message}</p>
+        <button
+          className="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};

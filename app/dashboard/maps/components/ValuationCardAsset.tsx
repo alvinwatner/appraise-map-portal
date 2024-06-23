@@ -53,7 +53,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           )}
         </button>
 
-        <p className="text-2sm mb-1 font-medium">{`${ format(valuation.valuationDate, 'dd MMMM yyyy')} (Kevin)`}</p>
+        <p className="text-2sm mb-1 font-medium">{`${ format(valuation.valuationDate, 'dd/MM/yyyy')} (Kevin)`}</p>
         <p className="text-2sm mb-1 font-thin font-100 italic tracking-wide">
           {" "}
           {valuation.reportNumber}
@@ -82,7 +82,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           <PropertyRowItem
             icon={MdOutlineCalendarMonth}
             title="Tanngal Penilaian :"
-            body={format(valuation.valuationDate, 'dd MMMM yyyy')}
+            body={format(valuation.valuationDate, 'dd/MM/yyyy')}
             className="mb-1"
           />
 

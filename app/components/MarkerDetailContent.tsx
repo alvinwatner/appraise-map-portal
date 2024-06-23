@@ -34,7 +34,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         />
       </button>
 
-      <h3 className="text-lg font-medium mb-2">{property.object_type.name}</h3>
+      <h3 className="text-lg font-medium mb-2">{property.objectType}</h3>
       {property.propertiesType == "asset" && (
         <h3 className="text-sm font-thin mb-2">{property.debitur}</h3>
       )}

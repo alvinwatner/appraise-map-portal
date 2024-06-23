@@ -49,7 +49,7 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
 
         <p className="text-2sm mb-1 font-medium">{`${format(
           valuation.valuationDate,
-          "dd MMMM yyyy"
+          "dd/MM/yyyy"
         )} (Kevin)`}</p>
         <p className="text-2sm mb-1 font-thin font-100 italic tracking-wide">
           {" "}
@@ -68,7 +68,7 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
           <PropertyRowItem
             icon={MdOutlineCalendarMonth}
             title="Tanngal :"
-            body={format(valuation.valuationDate, "dd MMMM yyyy")}
+            body={format(valuation.valuationDate, "dd/MM/yyyy")}
             className="mb-1"
           />
 
