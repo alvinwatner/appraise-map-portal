@@ -1,9 +1,14 @@
-import React from 'react';
+import React from "react";
 
-const Loading: React.FC = () => {
+const Loading: React.FC<{ size?: string; strokeWidth?: string }> = ({
+  size = "w-32 h-32",
+  strokeWidth = "border-8 border-t-8",
+}) => {
   return (
     <div className="flex justify-center items-center h-full">
-      <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+      <div
+        className={`loader ease-linear rounded-full ${strokeWidth} border-gray-200 ${size}`}
+      ></div>
       <style jsx>{`
         .loader {
           border-top-color: #3498db;

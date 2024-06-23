@@ -34,6 +34,6 @@ export interface Property {
   isDeleted: boolean | null;
   users: User;
   locations: Location;
-  object_type: string;
+  objectType: string;
   valuations: Valuation[];
 }

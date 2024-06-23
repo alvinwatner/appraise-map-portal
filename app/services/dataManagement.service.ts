@@ -19,6 +19,7 @@ export const fetchProperties = async (
       phoneNumber,
       propertiesType,
       isDeleted,
+      objectType,
       users (
         id,
         email,
@@ -142,8 +143,8 @@ export const addProperty = async ({
   landValue,
   buildingValue,
   totalValue,
-  reportNumber = null,
-  valuationDate = null,
+  reportNumber,
+  valuationDate,
 }: AddPropertyArgs) => {
   // Insert new location
   const { data: locationData, error: locationError } = await supabase
@@ -173,7 +174,7 @@ export const addProperty = async ({
       {
         UserId: 3,
         LocationId: locationId,
-        object_type: objectType,
+        objectType: objectType,
         landArea: landArea,
         buildingArea: buildingArea,
         phoneNumber: phoneNumber,
