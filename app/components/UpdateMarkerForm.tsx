@@ -5,7 +5,6 @@ import {
 } from "react-icons/io5";
 import Dropdown from "./Dropdown";
 import { useState } from "react";
-import { AsetValuationForm } from "./AssetValuationForm";
 import { DataValuationForms } from "./DataValuationForm";
 
 import DropdownInput from "./DropdownInput";
@@ -13,8 +12,10 @@ import { AreaInput } from "./AreaInput";
 import { Property, Location, Valuation } from "../types/types";
 import { PropertyType } from "./PropertyChip";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
-import { addProperty } from "../services/dataManagement.service";
+import { addProperty, updateProperty } from "../services/dataManagement.service";
 import Loading from "./Loading";
+import { AddAssetValuationForm } from "./AddAssetValuationForm";
+import { EditAssetValuationForms } from "./EditAssetValuationForms";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -42,20 +43,11 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
   // New state for loading and modal
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateValuation = (index: number, updatedValuation: Valuation) => {
-    console.log(`Updating valuation at index ${index}`);
-    console.log("Current valuation:", valuations[index]);
-    console.log("Updated valuation:", updatedValuation);
-    const newValuations = [...valuations];
-    newValuations[index] = updatedValuation;
-    setValuations(newValuations);
-  };
-
   const propertyTypes = ["Aset", "Data"];
   const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
 
   const [selectedPropertyType, selectPropertyType] = useState<string>(
-    property != null ? property?.propertiesType : "Aset"
+    property != null ? capitalizeFirstLetter(property?.propertiesType) : "Aset"
   );
   const [selectedObjectType, selectObjectType] = useState<string>("");
   const [landArea, setlandArea] = useState<string>("");
@@ -140,7 +132,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
     return isValid;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (isEdit: boolean) => {
     if (!validateInputs()) {
       alert("Please correct the errors in the form.");
       return;
@@ -150,29 +142,36 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
 
     // If validation passes
     try {
-      const response = await addProperty({
-        latitude: lat!,
-        longitude: lng!,
-        address: address,
-        objectType: selectedObjectType,
-        landArea: Number(landArea),
-        buildingArea: Number(buildingArea),
-        phoneNumber: phoneNumber,
-        propertiesType: selectedPropertyType.toLowerCase(),
-        debitur: debitur,
-        landValue: landValue,
-        buildingValue: buildingValue,
-        totalValue: totalValue,
-        reportNumber: reportNumber,
-        valuationDate: valuationDate,
-      });
-      console.log(response);
+      if (!isEdit) {
+        const response = await addProperty({
+          latitude: lat!,
+          longitude: lng!,
+          address: address,
+          objectType: selectedObjectType,
+          landArea: Number(landArea),
+          buildingArea: Number(buildingArea),
+          phoneNumber: phoneNumber,
+          propertiesType: selectedPropertyType.toLowerCase(),
+          debitur: debitur,
+          landValue: landValue,
+          buildingValue: buildingValue,
+          totalValue: totalValue,
+          reportNumber: reportNumber,
+          valuationDate: valuationDate,
+        });
+        console.log(response);
+      }
+      else{
+        // const response = await updateProperty(1, )
+      }
+
+
       onClose(); // Close form on success
       if (onShowModalSuccess != null) {
         onShowModalSuccess();
       }
     } catch (error) {
-      console.error("Failed to add property with valuations:", error);
+      console.error("Failed to update property with valuations:", error);
       if (onShowModalFail != null) {
         onShowModalFail();
       }
@@ -286,29 +285,36 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         )}
 
         {selectedPropertyType == "Aset" ? (
-          <AsetValuationForm
-            onChangeLandValue={(value) => {
-              setLandValue(value);
-            }}
-            onChangeBuildingValue={(value) => {
-              setBuildingValue(value);
-            }}
-            onChangeTotalValue={(value) => {
-              setTotalValue(value);
-            }}
-            onChangeValuationDate={(value) => {
-              setValuationDate(value);
-            }}
-            onChangeReportNumber={(value) => {
-              setReportNumber(value);
-            }}
-          />
+          property == null ? (
+            <AddAssetValuationForm
+              onChangeLandValue={(value) => {
+                setLandValue(value);
+              }}
+              onChangeBuildingValue={(value) => {
+                setBuildingValue(value);
+              }}
+              onChangeTotalValue={(value) => {
+                setTotalValue(value);
+              }}
+              onChangeValuationDate={(value) => {
+                setValuationDate(value);
+              }}
+              onChangeReportNumber={(value) => {
+                setReportNumber(value);
+              }}
+            />
+          ) : (
+            <EditAssetValuationForms
+              valuations={valuations}
+              onChange={(valuations) => {
+                console.log(
+                  "All valuations on change = " + JSON.stringify(valuations)
+                );
+                setValuations(valuations);
+              }}
+            />
+          )
         ) : (
-          // <AssetValuationForms
-          //   valuations={property?.valuations ?? []}
-          //   isEdit={property != null}
-          //   onUpdateValuation={updateValuation}
-          // />
           <DataValuationForms
             valuations={property?.valuations ?? []}
             isEdit={property != null}
@@ -324,7 +330,9 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           </button>
           <button
             className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2 rounded"
-            onClick={handleSubmit}
+            onClick={() => {
+              handleSubmit(property != null);
+            }}
             disabled={isLoading}
           >
             {isLoading ? (

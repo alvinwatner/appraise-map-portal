@@ -180,6 +180,7 @@ export default function Page() {
             lng={lng}
             onShowModalSuccess={() => {
               console.log("showing modal result");
+              setIsAdding(false);
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
               setModalInfo({
@@ -190,6 +191,7 @@ export default function Page() {
             }}
             onShowModalFail={() => {
               console.log("showing modal result");
+              setIsAdding(false);
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
               setModalInfo({
@@ -210,6 +212,7 @@ export default function Page() {
             }}
             onShowModalSuccess={() => {
               console.log("showing modal result");
+              setIsAdding(false);
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
               setModalInfo({
@@ -220,6 +223,7 @@ export default function Page() {
             }}
             onShowModalFail={() => {
               console.log("showing modal result");
+              setIsAdding(false);
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
               setModalInfo({

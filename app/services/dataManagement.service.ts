@@ -141,6 +141,24 @@ interface AddPropertyArgs {
   valuationDate?: string | null;
 }
 
+interface UpdatePropertyArgs {
+  latitude: number;
+  longitude: number;
+  address: string;
+  objectType: string;
+  landArea: number;
+  buildingArea: number;
+  phoneNumber: string;
+  propertiesType: string;
+  debitur: string;
+  landValue: number;
+  buildingValue: number;
+  totalValue: number;
+  reportNumber?: string | null;
+  valuationDate?: string | null;
+}
+
+
 export const addProperty = async ({
   latitude,
   longitude,
