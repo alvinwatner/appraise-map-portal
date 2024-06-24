@@ -700,17 +700,6 @@ const Page = () => {
               Cancel
             </button>
           )}
-          <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path fill="currentColor" d="m7 10l5 5l5-5z"></path>
-            </svg>
-            &nbsp;Sort
-          </button>
           <button
             className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center"
             onClick={() => setShowFilterModal(true)}
