@@ -109,6 +109,7 @@ const Page = () => {
     key: string;
     direction: "asc" | "desc";
   } | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
 
   interface RowData {
     propertiesType?: string | null;
@@ -542,6 +543,16 @@ const Page = () => {
     }
   }, [editMode, properties]);
 
+  const handleSelectProperty = (id: number | null) => {
+    setSelectedProperty(id);
+  };
+
+  const handleNavigateToMap = () => {
+    if (selectedProperty !== null) {
+      router.push(`/map/${selectedProperty}`);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -629,6 +640,16 @@ const Page = () => {
                 </svg>
                 &nbsp;Ubah
               </button>
+            )}
+            {selectedProperty !== null && (
+              <div>
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
+                  onClick={handleNavigateToMap}
+                >
+                  Go to Map
+                </button>
+              </div>
             )}
             {selectedRows.size > 0 && editMode && (
               <>
@@ -721,6 +742,7 @@ const Page = () => {
           editedValuations={editedValuations}
           handleHeaderClick={handleHeaderClick}
           sortConfig={sortConfig}
+          onSelectProperty={handleSelectProperty}
         />
       </div>
       <div className="mt-4 flex justify-between">

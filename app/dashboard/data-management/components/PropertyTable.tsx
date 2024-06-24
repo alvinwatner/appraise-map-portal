@@ -14,6 +14,7 @@ type PropertyTableProps = {
   editMode: boolean;
   editedData: Map<number, Partial<Property>>;
   editedValuations: Map<number, any>;
+  onSelectProperty: (id: number | null) => void; // New prop
 };
 
 const PropertyTable: React.FC<PropertyTableProps> = ({
@@ -27,8 +28,10 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   editMode,
   editedData,
   editedValuations,
+  onSelectProperty, // New prop
 }) => {
   const [objectTypes, setObjectTypes] = useState<string[]>();
+  const [clickedRowId, setClickedRowId] = useState<number | null>(null);
 
   useEffect(() => {
     const getObjectTypes = async () => {
@@ -77,6 +80,11 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     }
   };
 
+  const handleRowClick = (id: number) => {
+    onSelectProperty(id);
+    setClickedRowId(id);
+  };
+
   return (
     <div className="overflow-x-auto-static">
       <table className="min-w-full divide-y divide-gray-200 table-auto">
@@ -113,7 +121,10 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
           {currentData.map((item) => (
             <tr
               key={item.id}
-              className={`${selectedRows.has(item.id) ? "bg-gray-200" : ""}`}
+              className={`cursor-pointer ${
+                clickedRowId === item.id ? "!bg-blue-200" : ""
+              }`}
+              onClick={() => handleRowClick(item.id)}
             >
               {editMode ? (
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -154,7 +165,9 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       type="text"
                       value={
                         editedValuations.get(item.valuations?.[0]?.id as number)
-                          ?.reportNumber || item.valuations?.[0]?.reportNumber
+                          ?.reportNumber ||
+                        item.valuations?.[0]?.reportNumber ||
+                        ""
                       }
                       onChange={(e) => {
                         const newBuildingValue = e.target.value || null;
@@ -182,13 +195,16 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                         ""
                       }
                       onChange={(e) => {
-                        const newTotalValue = e.target.value || "";
+                        const newValuationDate = e.target.value || null;
                         const currentValuation =
                           editedValuations.get(
                             item.valuations?.[0]?.id as number
                           ) || item.valuations?.[0];
                         handleChange(item.id, "valuations", [
-                          { ...currentValuation, valuationDate: newTotalValue },
+                          {
+                            ...currentValuation,
+                            valuationDate: newValuationDate,
+                          },
                         ]);
                       }}
                     />
@@ -208,9 +224,9 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                         handleChange(item.id, "objectType", newObjectType);
                       }}
                     >
-                      <option value="">Pilih jenis objek</option>
-                      {objectTypes?.map((objectType) => (
-                        <option key={objectType} value={objectType}>
+                      <option value="">Select</option>
+                      {objectTypes?.map((objectType, index) => (
+                        <option key={index} value={objectType}>
                           {objectType}
                         </option>
                       ))}
