@@ -18,9 +18,10 @@ import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
 import { SearchResult } from "@/app/components/SearchResult";
-import { UpdateMarkerForm } from "@/app/components/UpdateMarkerForm";
 import { Property } from "@/app/types/types";
 import Loading from "@/app/components/Loading";
+import { AddMarkerForm } from "@/app/components/AddMarkerForms";
+import { EditMarkerForm } from "@/app/components/EditMarkerForm";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -158,20 +159,11 @@ export default function Page() {
             }}
           />
         );
-      case LeftWhiteSheetComponent.markerDetail:
-        return (
-          <UpdateMarkerForm
-            onClose={() => {
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-            }}
-          />
-        );
       case LeftWhiteSheetComponent.searchResult:
         return <SearchResult />;
       case LeftWhiteSheetComponent.add:
         return (
-          <UpdateMarkerForm
+          <AddMarkerForm
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -204,8 +196,8 @@ export default function Page() {
         );
       case LeftWhiteSheetComponent.edit:
         return (
-          <UpdateMarkerForm
-            property={onEditProperty}
+          <EditMarkerForm
+            property={onEditProperty!}
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);

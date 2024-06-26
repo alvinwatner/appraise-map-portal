@@ -4,7 +4,7 @@ import {
   IoCloseCircleOutline,
 } from "react-icons/io5";
 import Dropdown from "./Dropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataValuationForms } from "./DataValuationForm";
 
 import DropdownInput from "./DropdownInput";
@@ -12,55 +12,73 @@ import { AreaInput } from "./AreaInput";
 import { Property, Location, Valuation } from "../types/types";
 import { PropertyType } from "./PropertyChip";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
-import { addProperty, updateProperty } from "../services/dataManagement.service";
+import {
+  addProperty,
+  updateProperty,
+  updateValuation,
+} from "../services/dataManagement.service";
 import Loading from "./Loading";
 import { AddAssetValuationForm } from "./AddAssetValuationForm";
 import { EditAssetValuationForms } from "./EditAssetValuationForms";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
-interface UpdateMarkerFormProps {
+interface EditMarkerFormProps {
   onClose: () => void;
   onShowModalSuccess?: () => void;
   onShowModalFail?: () => void;
-  property?: Property;
+  property: Property;
   lat?: number;
   lng?: number;
 }
 
-export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
+export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   onClose,
   property,
   lat,
   lng,
   onShowModalSuccess,
   onShowModalFail,
-}: UpdateMarkerFormProps) => {
+}: EditMarkerFormProps) => {
   const [valuations, setValuations] = useState<Valuation[]>(
     property ? property.valuations : []
+  );
+  
+  const [editedProperty, setEditedProperty] = useState<
+    Map<number, Partial<Property>>
+  >(new Map());
+  const [editedValuations, setEditedValuations] = useState<Map<number, any>>(
+    new Map()
   );
 
   // New state for loading and modal
   const [isLoading, setIsLoading] = useState(false);
+  
 
   const propertyTypes = ["Aset", "Data"];
   const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
 
   const [selectedPropertyType, selectPropertyType] = useState<string>(
-    property != null ? capitalizeFirstLetter(property?.propertiesType) : "Aset"
+    capitalizeFirstLetter(property?.propertiesType)
   );
-  const [selectedObjectType, selectObjectType] = useState<string>("");
-  const [landArea, setlandArea] = useState<string>("");
-  const [debitur, setDebitur] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [buildingArea, setbuildingArea] = useState<string>("");
+  const [selectedObjectType, selectObjectType] = useState<string>(
+    property.objectType
+  );
+  const [landArea, setlandArea] = useState<number>(property.landArea);
+  const [debitur, setDebitur] = useState<string>(property.debitur);
+  const [address, setAddress] = useState<string>(property.locations.address);
+  const [phoneNumber, setPhoneNumber] = useState<string>(property.phoneNumber);
+  const [buildingArea, setbuildingArea] = useState<number>(
+    property.buildingArea
+  );
 
   const [landValue, setLandValue] = useState<number>(0);
   const [buildingValue, setBuildingValue] = useState<number>(0);
   const [totalValue, setTotalValue] = useState<number>(0);
   const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
+
+
 
   const onChangePropertyType = (propertyType: string) => {
     selectPropertyType(propertyType);
@@ -70,6 +88,50 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
   const onChangeObjectType = (objectType: string) => {
     selectObjectType(objectType);
     console.log("Selected option:", objectType);
+  };
+
+  const handleChange = (id: number, field: keyof Property, value: any) => {
+    const newEditedProperty = new Map(editedProperty);
+    const editedItem = newEditedProperty.get(id) || {};
+    editedItem[field] = value;
+    newEditedProperty.set(id, editedItem);
+    console.log(id);
+    console.log(field);
+    console.log(value);
+    console.log(newEditedProperty);
+    setEditedProperty(newEditedProperty);
+  };
+
+  const handleChangeProperty = (
+    field: keyof Valuation,
+    value: any,
+    id?: number | null
+  ) => {
+    if (id != null) {
+      setEditedValuations((prevEditedValuations) => {
+        const newEditedValuations = new Map(prevEditedValuations);
+        newEditedValuations.set(value[0].id, value[0]);
+        return newEditedValuations;
+      });
+    } else {
+    }
+
+    // if (field === "valuations") {
+    //   setEditedValuations((prevEditedValuations) => {
+    //     const newEditedValuations = new Map(prevEditedValuations);
+    //     newEditedValuations.set(value[0].id, value[0]);
+    //     return newEditedValuations;
+    //   });
+    // }
+    // const newEditedProperty = new Map(editedProperty);
+    // const editedItem = newEditedProperty.get(id) || {};
+    // editedItem[field] = value;
+    // newEditedProperty.set(id, editedItem);
+    // console.log(id);
+    // console.log(field);
+    // console.log(value);
+    // console.log(newEditedProperty);
+    // setEditedProperty(newEditedProperty);
   };
 
   const [errors, setErrors] = useState({
@@ -132,7 +194,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
     return isValid;
   };
 
-  const handleSubmit = async (isEdit: boolean) => {
+  const handleSave = async () => {
     if (!validateInputs()) {
       alert("Please correct the errors in the form.");
       return;
@@ -142,29 +204,17 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
 
     // If validation passes
     try {
-      if (!isEdit) {
-        const response = await addProperty({
-          latitude: lat!,
-          longitude: lng!,
-          address: address,
-          objectType: selectedObjectType,
-          landArea: Number(landArea),
-          buildingArea: Number(buildingArea),
-          phoneNumber: phoneNumber,
-          propertiesType: selectedPropertyType.toLowerCase(),
-          debitur: debitur,
-          landValue: landValue,
-          buildingValue: buildingValue,
-          totalValue: totalValue,
-          reportNumber: reportNumber,
-          valuationDate: valuationDate,
-        });
-        console.log(response);
-      }
-      else{
-        // const response = await updateProperty(1, )
+      for (const [id, changes] of Array.from(editedProperty.entries())) {
+        await updateProperty(id, changes);
       }
 
+      for (const [id, changes] of Array.from(editedValuations.entries())) {
+        await updateValuation(id, changes);
+      }
+
+      // check new valuations
+      // if newValuations is not empty
+      // addValutions(valuations)
 
       onClose(); // Close form on success
       if (onShowModalSuccess != null) {
@@ -214,7 +264,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nomor HP :</p>
             <input
-              value={property != null ? property.phoneNumber : phoneNumber}
+              value={phoneNumber}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
@@ -262,7 +312,7 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
 
         <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah :</p>
         <AreaInput
-          initialValue={property != null ? property.landArea?.toString() : ""}
+          initialValue={landArea}
           onChange={(value) => {
             setlandArea(value);
           }}
@@ -273,11 +323,10 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
 
         <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
         <AreaInput
-          initialValue={
-            property != null ? property.buildingArea?.toString() : buildingArea
-          }
+          initialValue={buildingArea}
           onChange={(value) => {
             setbuildingArea(value);
+            handleChange(property?.id, "buildingArea", value);
           }}
         />
         {errors.buildingArea && (
@@ -285,35 +334,25 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
         )}
 
         {selectedPropertyType == "Aset" ? (
-          property == null ? (
-            <AddAssetValuationForm
-              onChangeLandValue={(value) => {
-                setLandValue(value);
-              }}
-              onChangeBuildingValue={(value) => {
-                setBuildingValue(value);
-              }}
-              onChangeTotalValue={(value) => {
-                setTotalValue(value);
-              }}
-              onChangeValuationDate={(value) => {
-                setValuationDate(value);
-              }}
-              onChangeReportNumber={(value) => {
-                setReportNumber(value);
-              }}
-            />
-          ) : (
-            <EditAssetValuationForms
-              valuations={valuations}
-              onChange={(valuations) => {
-                console.log(
-                  "All valuations on change = " + JSON.stringify(valuations)
-                );
-                setValuations(valuations);
-              }}
-            />
-          )
+          <EditAssetValuationForms
+            valuations={property.valuations}
+            onChangeValuations={(id, field, value) => {
+              console.log(
+                "Existing valuations on change id : " +
+                  id +
+                  " field : " +
+                  field +
+                  " value : " +
+                  value
+              );
+              // setValuations(valuations);
+            }}
+            onChangeNewValuations={(newValuations) => {
+              console.log(
+                "All valuations on change = " + JSON.stringify(valuations)
+              );
+            }}
+          />
         ) : (
           <DataValuationForms
             valuations={property?.valuations ?? []}
@@ -326,19 +365,19 @@ export const UpdateMarkerForm: React.FC<UpdateMarkerFormProps> = ({
             className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             onClick={onClose}
           >
-            Cancel
+            Batal
           </button>
           <button
             className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2 rounded"
             onClick={() => {
-              handleSubmit(property != null);
+              handleSave();
             }}
             disabled={isLoading}
           >
             {isLoading ? (
               <Loading size="w-4 h-4" strokeWidth="border-2 border-t-2" />
             ) : (
-              "Submit"
+              "Simpan"
             )}
           </button>
         </div>

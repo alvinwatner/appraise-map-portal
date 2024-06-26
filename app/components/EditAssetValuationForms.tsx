@@ -1,9 +1,11 @@
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { Valuation } from "../types/types";
 import { filterNumeric, formatRupiah } from "../utils/helper";
+import { AddAssetValuationForm } from "./AddAssetValuationForm";
+import { AddAssetValuationFormOnEdit } from "./AddAssetValuationFormOnEdit";
 
 const EMPTY_VALUATION = {
-  id: null,
+  id: 0,
   valuationDate: new Date(),
   landValue: 0,
   buildingValue: 0,
@@ -14,37 +16,33 @@ const EMPTY_VALUATION = {
 
 interface EditAssetValuationFormsProps {
   valuations: Valuation[];
-  onChange: (valuations: Valuation[]) => void;
+  onChangeNewValuations: (valuations: Valuation[]) => void;
+  onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
 
 interface EditAssetValuationFormProps {
-  index: number;
-  valuation?: Valuation | null;
-  onChange: (valuation: Valuation, index: number) => void;
+  id: number;
+  initialValuation: Valuation;
+  onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
 
 export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
-  index,
-  valuation,
-  onChange,
+  id,
+  initialValuation,
+  onChangeValuations,
 }: EditAssetValuationFormProps) => {
-  const [landValue, setLandValue] = useState<number>(
-    valuation != null ? valuation.landValue : 0
-  );
+  const [landValue, setLandValue] = useState<number>(initialValuation.landValue);
   const [buildingValue, setBuildingValue] = useState<number>(
-    valuation != null ? valuation.buildingValue : 0
+    initialValuation.buildingValue
   );
   const [totalValue, setTotalValue] = useState<number>(
-    valuation != null ? valuation.totalValue : 0
+    initialValuation.totalValue
   );
   const [valuationDate, setValuationDate] = useState<string>(
-    valuation != null ? valuation.valuationDate.toString() : ""
+    initialValuation.valuationDate?.toString()
   );
   const [reportNumber, setReportNumber] = useState<string>(
-    valuation != null ? valuation.reportNumber.toString() : ""
-  );
-  const [localValuation, setLocalValuation] = useState<Valuation>(
-    valuation != null ? valuation : EMPTY_VALUATION
+    initialValuation.reportNumber
   );
 
   return (
@@ -58,8 +56,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setLandValue(value);
-            localValuation.landValue = value;
-            onChange(localValuation, index);
+            onChangeValuations(id, "landValue", value);
           }}
           type="text"
           placeholder="Nilai Tanah"
@@ -72,6 +69,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setBuildingValue(value);
+            onChangeValuations(id, "buildingValue", value);
           }}
           type="text"
           placeholder="Nilai Bangunan"
@@ -84,6 +82,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setTotalValue(value);
+            onChangeValuations(id, "totalValue", value);
           }}
           type="text"
           placeholder="Total Nilai"
@@ -95,6 +94,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = e.target.value;
             setValuationDate(value);
+            onChangeValuations(id, "valuationDate", value);
           }}
           type="date"
           placeholder="Tanggal Penilaian"
@@ -107,6 +107,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = e.target.value;
             setReportNumber(value);
+            onChangeValuations(id, "reportNumber", value);
           }}
           placeholder="No Laporan :"
         />
@@ -117,55 +118,53 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
 
 export const EditAssetValuationForms: React.FC<
   EditAssetValuationFormsProps
-> = ({ valuations, onChange }: EditAssetValuationFormsProps) => {
-  const [localValuations, setLocalValuations] = useState(valuations);
-  const [valuationComponents, setValuationComponents] = useState(
-    valuations.map((valuation, index) => (
-      <EditAssetValuationForm
-        key={index}
-        index={index}
-        valuation={valuation}
-        onChange={(valuation, index) => {
-          console.log(
-            "valuation on change = " +
-              JSON.stringify(valuation) +
-              "index " +
-              index
-          );
-
-          localValuations[index] = valuation;
-
-          onChange(localValuations);
-        }}
-      />
-    ))
+> = ({
+  valuations,
+  onChangeNewValuations,
+  onChangeValuations,
+}: EditAssetValuationFormsProps) => {
+  const [newValuations, setNewValuations] = useState<Valuation[]>([]);
+  const [newValuationComponents, setNewValuationComponents] = useState<
+    JSX.Element[]
+  >([]);
+  const [valuationComponents, setValuationComponents] = useState<JSX.Element[]>(
+    []
   );
+
+  useEffect(() => {
+    const components = Array.from(valuations.entries()).map(
+      ([id, valuation]) => (
+        <EditAssetValuationForm
+          key={id}
+          id={id}
+          initialValuation={valuation}
+          onChangeValuations={(id, field, value) => {
+            onChangeValuations(id, field, value);
+          }}
+        />
+      )
+    );
+
+    setValuationComponents(components);
+  }, [onChangeValuations, valuations]);
 
   const handleAddValuation = () => {
     const index = valuationComponents.length;
     const newValuationComponent = (
-      <EditAssetValuationForm
+      <AddAssetValuationFormOnEdit
         key={index}
         index={index}
-        valuation={null}
         onChange={(valuation, index) => {
-          console.log(
-            "valuation on change = " +
-              JSON.stringify(valuation) +
-              "index " +
-              index
-          );
-
-          localValuations[index] = valuation;
-
-          onChange(localValuations);
+          newValuations[index] = valuation;
+          onChangeNewValuations(newValuations);
         }}
       />
     );
-    setLocalValuations([...localValuations, EMPTY_VALUATION]);
-    setValuationComponents(
-      [...valuationComponents, newValuationComponent].reverse()
-    );
+    setNewValuations([EMPTY_VALUATION, ...newValuations]);
+    setNewValuationComponents([
+      newValuationComponent,
+      ...newValuationComponents,
+    ]);
   };
 
   return (
@@ -178,7 +177,10 @@ export const EditAssetValuationForms: React.FC<
         <div className="text-sm whitespace-nowrap">+ Tambahkan Nilai</div>
         <div className="h-[2px] flex-1 bg-gray-300 group-hover:bg-blue-500 ml-2"></div>
       </button>
-      <div className="flex flex-col divide-y-2">{valuationComponents}</div>
+      <div className="flex flex-col divide-y-2">
+        {newValuationComponents}
+        {valuationComponents}
+      </div>
     </div>
   );
 };
