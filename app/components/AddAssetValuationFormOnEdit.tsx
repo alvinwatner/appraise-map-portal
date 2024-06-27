@@ -2,31 +2,22 @@ import { useCallback, useState } from "react";
 import { Valuation } from "../types/types";
 import { filterNumeric, formatRupiah } from "../utils/helper";
 
-const EMPTY_VALUATION = {
-  id: 0,
-  valuationDate: new Date(),
-  landValue: 0,
-  buildingValue: 0,
-  totalValue: 0,
-  reportNumber: "",
-  appraiser: "",
-};
-
 interface AddAssetValuationFormOnEditProps {
   index: number;
-  onChange: (valuation: Valuation, index: number) => void;
+  valuation: Valuation;
+  onChange: (field: keyof Valuation, value: any, index: number) => void;
 }
 
 export const AddAssetValuationFormOnEdit: React.FC<
   AddAssetValuationFormOnEditProps
-> = ({ index, onChange }: AddAssetValuationFormOnEditProps) => {
+> = ({ index, valuation, onChange }: AddAssetValuationFormOnEditProps) => {
   const [landValue, setLandValue] = useState<number>(0);
   const [buildingValue, setBuildingValue] = useState<number>(0);
   const [totalValue, setTotalValue] = useState<number>(0);
   const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
   const [localValuation, setLocalValuation] =
-    useState<Valuation>(EMPTY_VALUATION);
+    useState<Valuation>(valuation);
 
   return (
     <div>
@@ -39,8 +30,8 @@ export const AddAssetValuationFormOnEdit: React.FC<
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setLandValue(value);
-            localValuation.landValue = value;
-            onChange(localValuation, index);
+            localValuation.landValue = value;            
+            onChange("landValue", value, index);
           }}
           type="text"
           placeholder="Nilai Tanah"
@@ -54,7 +45,7 @@ export const AddAssetValuationFormOnEdit: React.FC<
             var value = Number(filterNumeric(e.target.value));
             setBuildingValue(value);
             localValuation.buildingValue = value;
-            onChange(localValuation, index);
+            onChange("buildingValue", value, index);
           }}
           type="text"
           placeholder="Nilai Bangunan"
@@ -68,7 +59,7 @@ export const AddAssetValuationFormOnEdit: React.FC<
             var value = Number(filterNumeric(e.target.value));
             setTotalValue(value);
             localValuation.totalValue = value;
-            onChange(localValuation, index);
+            onChange("totalValue", value, index);
           }}
           type="text"
           placeholder="Total Nilai"
@@ -81,7 +72,7 @@ export const AddAssetValuationFormOnEdit: React.FC<
             var value = e.target.value;
             setValuationDate(value);
             localValuation.valuationDate = new Date(value);
-            onChange(localValuation, index);
+            onChange("valuationDate", value, index);
           }}
           type="date"
           placeholder="Tanggal Penilaian"
@@ -95,7 +86,7 @@ export const AddAssetValuationFormOnEdit: React.FC<
             var value = e.target.value;
             setReportNumber(value);
             localValuation.reportNumber = value;
-            onChange(localValuation, index);
+            onChange("reportNumber", value, index);
           }}
           placeholder="No Laporan :"
         />

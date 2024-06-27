@@ -43,17 +43,16 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   const [valuations, setValuations] = useState<Valuation[]>(
     property ? property.valuations : []
   );
-  
+
   const [editedProperty, setEditedProperty] = useState<
     Map<number, Partial<Property>>
   >(new Map());
-  const [editedValuations, setEditedValuations] = useState<Map<number, any>>(
-    new Map()
-  );
+  const [editedValuations, setEditedValuations] = useState<
+    Map<number, Partial<Valuation>>
+  >(new Map());
 
   // New state for loading and modal
   const [isLoading, setIsLoading] = useState(false);
-  
 
   const propertyTypes = ["Aset", "Data"];
   const objectTypes = ["Tanah Kosong", "Ruko/Rukan", "Rumah Tinggal"];
@@ -78,8 +77,6 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
 
-
-
   const onChangePropertyType = (propertyType: string) => {
     selectPropertyType(propertyType);
     console.log("Selected option:", propertyType);
@@ -101,6 +98,36 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
     console.log(newEditedProperty);
     setEditedProperty(newEditedProperty);
   };
+
+  const onChangeValuations = (
+    id: number,
+    field: keyof Valuation,
+    value: any
+  ) => {
+    console.log(
+      "Existing valuations on change id: " +
+        id +
+        " field: " +
+        field +
+        " value: " +
+        value
+    );
+
+    setEditedValuations((prevMap) => {
+      const updatedMap = new Map(prevMap); // Create a new map for immutability
+      const existingValuation = updatedMap.get(id) || {};
+
+      updatedMap.set(id, { ...existingValuation, [field]: value });
+      return updatedMap;
+    });
+  };
+
+  useEffect(() => {
+    console.log(
+      "Updated Edited Valuations:",
+      JSON.stringify(Array.from(editedValuations.entries()))
+    );
+  }, [editedValuations]); // Dependency array includes editedValuations
 
   const handleChangeProperty = (
     field: keyof Valuation,
@@ -336,21 +363,11 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
         {selectedPropertyType == "Aset" ? (
           <EditAssetValuationForms
             valuations={property.valuations}
-            onChangeValuations={(id, field, value) => {
-              console.log(
-                "Existing valuations on change id : " +
-                  id +
-                  " field : " +
-                  field +
-                  " value : " +
-                  value
-              );
-              // setValuations(valuations);
-            }}
+            onChangeValuations={onChangeValuations}
             onChangeNewValuations={(newValuations) => {
-              console.log(
-                "All valuations on change = " + JSON.stringify(valuations)
-              );
+              // console.log(
+              //   "All valuations on change = " + JSON.stringify(newValuations)
+              // );
             }}
           />
         ) : (

@@ -21,17 +21,17 @@ interface EditAssetValuationFormsProps {
 }
 
 interface EditAssetValuationFormProps {
-  id: number;
   initialValuation: Valuation;
   onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
 
 export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
-  id,
   initialValuation,
   onChangeValuations,
 }: EditAssetValuationFormProps) => {
-  const [landValue, setLandValue] = useState<number>(initialValuation.landValue);
+  const [landValue, setLandValue] = useState<number>(
+    initialValuation.landValue
+  );
   const [buildingValue, setBuildingValue] = useState<number>(
     initialValuation.buildingValue
   );
@@ -56,7 +56,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setLandValue(value);
-            onChangeValuations(id, "landValue", value);
+            onChangeValuations(initialValuation.id, "landValue", value);
           }}
           type="text"
           placeholder="Nilai Tanah"
@@ -69,7 +69,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setBuildingValue(value);
-            onChangeValuations(id, "buildingValue", value);
+            onChangeValuations(initialValuation.id, "buildingValue", value);
           }}
           type="text"
           placeholder="Nilai Bangunan"
@@ -82,7 +82,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = Number(filterNumeric(e.target.value));
             setTotalValue(value);
-            onChangeValuations(id, "totalValue", value);
+            onChangeValuations(initialValuation.id, "totalValue", value);
           }}
           type="text"
           placeholder="Total Nilai"
@@ -94,7 +94,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = e.target.value;
             setValuationDate(value);
-            onChangeValuations(id, "valuationDate", value);
+            onChangeValuations(initialValuation.id, "valuationDate", value);
           }}
           type="date"
           placeholder="Tanggal Penilaian"
@@ -107,7 +107,7 @@ export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           onChange={(e) => {
             var value = e.target.value;
             setReportNumber(value);
-            onChangeValuations(id, "reportNumber", value);
+            onChangeValuations(initialValuation.id, "reportNumber", value);
           }}
           placeholder="No Laporan :"
         />
@@ -124,11 +124,21 @@ export const EditAssetValuationForms: React.FC<
   onChangeValuations,
 }: EditAssetValuationFormsProps) => {
   const [newValuations, setNewValuations] = useState<Valuation[]>([]);
+  const [currentNewValuation, setCurrentNewValuation] = useState<Valuation>();
+  const [newValuationsIndex, setNewValuationsIndex] = useState<number>(0);
   const [newValuationComponents, setNewValuationComponents] = useState<
     JSX.Element[]
   >([]);
-  const [valuationComponents, setValuationComponents] = useState<JSX.Element[]>(
-    []
+  const [valuationComponents, setValuationComponents] = useState(
+    valuations.map((valuation, index) => (
+      <EditAssetValuationForm
+        key={index}
+        initialValuation={valuation}
+        onChangeValuations={(id, field, value) => {
+          onChangeValuations(id, field, value);
+        }}
+      />
+    ))
   );
 
   useEffect(() => {
@@ -136,7 +146,6 @@ export const EditAssetValuationForms: React.FC<
       ([id, valuation]) => (
         <EditAssetValuationForm
           key={id}
-          id={id}
           initialValuation={valuation}
           onChangeValuations={(id, field, value) => {
             onChangeValuations(id, field, value);
@@ -148,22 +157,35 @@ export const EditAssetValuationForms: React.FC<
     setValuationComponents(components);
   }, [onChangeValuations, valuations]);
 
+  useEffect(() => {
+    console.log(`adding new valuations `, JSON.stringify(newValuations));
+  }, [newValuations]);
+
+  const handleChange = (field: keyof Valuation, value: any, index: number) => {
+    console.log(`CISIII new valuations `, JSON.stringify(newValuations));
+    // const updatedValue = { ...newValuations[index], [field]: value };
+    // console.log(`after update valuation = ${JSON.stringify(updatedValue)}`);
+  };
+
   const handleAddValuation = () => {
-    const index = valuationComponents.length;
-    const newValuationComponent = (
+    const newValuation = { ...EMPTY_VALUATION, id: Date.now() }; // Ensure unique id for key
+
+    setNewValuations((prevValuations) => {
+      // console.log("Previous valuations before adding new:", prevValuations);
+      console.log(`CUBUUU AHAI new valuations `, JSON.stringify(prevValuations));
+      const updatedValuations = [...prevValuations, newValuation];
+      // console.log("Updated valuations after adding new:", updatedValuations);
+      return updatedValuations;
+    });
+
+    setNewValuationComponents((prevComponents) => [
       <AddAssetValuationFormOnEdit
-        key={index}
-        index={index}
-        onChange={(valuation, index) => {
-          newValuations[index] = valuation;
-          onChangeNewValuations(newValuations);
-        }}
-      />
-    );
-    setNewValuations([EMPTY_VALUATION, ...newValuations]);
-    setNewValuationComponents([
-      newValuationComponent,
-      ...newValuationComponents,
+        key={newValuation.id}
+        index={prevComponents.length} // index is the position in the array
+        valuation={newValuation}
+        onChange={handleChange}
+      />,
+      ...prevComponents,
     ]);
   };
 
