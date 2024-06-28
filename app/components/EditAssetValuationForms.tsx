@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Valuation } from "../types/types";
 import { filterNumeric, formatRupiah } from "../utils/helper";
-import { AddAssetValuationForm } from "./AddAssetValuationForm";
-import { AddAssetValuationFormOnEdit } from "./AddAssetValuationFormOnEdit";
 
-const EMPTY_VALUATION = {
+const EMPTY_VALUATION: Valuation = {
   id: 0,
   valuationDate: new Date(),
   landValue: 0,
@@ -25,169 +23,101 @@ interface EditAssetValuationFormProps {
   onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
 
-export const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
+const ValuationInput: React.FC<{
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  placeholder: string;
+}> = ({ label, value, onChange, type = "text", placeholder }) => (
+  <div className="ml-4">
+    <p className="text-2sm font-thin mb-2 mt-5">{label} :</p>
+    <input
+      className="w-full pl-2 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+      value={value}
+      onChange={onChange}
+      type={type}
+      placeholder={placeholder}
+    />
+  </div>
+);
+
+const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
   initialValuation,
   onChangeValuations,
-}: EditAssetValuationFormProps) => {
-  const [landValue, setLandValue] = useState<number>(
-    initialValuation.landValue
-  );
-  const [buildingValue, setBuildingValue] = useState<number>(
-    initialValuation.buildingValue
-  );
-  const [totalValue, setTotalValue] = useState<number>(
-    initialValuation.totalValue
-  );
-  const [valuationDate, setValuationDate] = useState<string>(
-    initialValuation.valuationDate?.toString()
-  );
-  const [reportNumber, setReportNumber] = useState<string>(
-    initialValuation.reportNumber
-  );
+}) => {
+  const [valuation, setValuation] = useState(initialValuation);
+
+  const handleInputChange =
+    (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value =
+        field === "valuationDate"
+          ? e.target.value
+          : Number(filterNumeric(e.target.value));
+      setValuation((prev) => ({ ...prev, [field]: value }));
+      onChangeValuations(initialValuation.id, field, value);
+    };
 
   return (
     <div>
-      <p className="text-2sm font-thin mb-2 mt-5">Nilai:</p>
-      <div className="ml-4">
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Tanah/meter :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(landValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setLandValue(value);
-            onChangeValuations(initialValuation.id, "landValue", value);
-          }}
-          type="text"
-          placeholder="Nilai Tanah"
-        />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Bangunan/meter :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(buildingValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setBuildingValue(value);
-            onChangeValuations(initialValuation.id, "buildingValue", value);
-          }}
-          type="text"
-          placeholder="Nilai Bangunan"
-        />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Total Nilai :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(totalValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setTotalValue(value);
-            onChangeValuations(initialValuation.id, "totalValue", value);
-          }}
-          type="text"
-          placeholder="Total Nilai"
-        />
-        <p className="text-2sm font-thin mb-2 mt-5">Tanggal Penilaian :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={valuationDate}
-          onChange={(e) => {
-            var value = e.target.value;
-            setValuationDate(value);
-            onChangeValuations(initialValuation.id, "valuationDate", value);
-          }}
-          type="date"
-          placeholder="Tanggal Penilaian"
-        />
-        <p className="text-2sm font-thin mb-2 mt-5">No Laporan :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm mb-4 overflow-hidden whitespace-nowrap text-overflow-ellipsis"
-          value={reportNumber}
-          type="text"
-          onChange={(e) => {
-            var value = e.target.value;
-            setReportNumber(value);
-            onChangeValuations(initialValuation.id, "reportNumber", value);
-          }}
-          placeholder="No Laporan :"
-        />
-      </div>
+      <ValuationInput
+        label="Nilai Tanah/meter"
+        value={formatRupiah(valuation.landValue)}
+        onChange={handleInputChange("landValue")}
+        placeholder="Nilai Tanah"
+      />
+      <ValuationInput
+        label="Nilai Bangunan/meter"
+        value={formatRupiah(valuation.buildingValue)}
+        onChange={handleInputChange("buildingValue")}
+        placeholder="Nilai Bangunan"
+      />
+      <ValuationInput
+        label="Total Nilai"
+        value={formatRupiah(valuation.totalValue)}
+        onChange={handleInputChange("totalValue")}
+        placeholder="Total Nilai"
+      />
+      <ValuationInput
+        label="Tanggal Penilaian"
+        value={valuation.valuationDate.toString()}
+        onChange={handleInputChange("valuationDate")}
+        type="date"
+        placeholder="Tanggal Penilaian"
+      />
+      <ValuationInput
+        label="No Laporan"
+        value={valuation.reportNumber}
+        onChange={handleInputChange("reportNumber")}
+        placeholder="No Laporan"
+      />
     </div>
   );
 };
 
 export const EditAssetValuationForms: React.FC<
   EditAssetValuationFormsProps
-> = ({
-  valuations,
-  onChangeNewValuations,
-  onChangeValuations,
-}: EditAssetValuationFormsProps) => {
+> = ({ valuations, onChangeNewValuations, onChangeValuations }) => {
   const [newValuations, setNewValuations] = useState<Valuation[]>([]);
-  const [currentNewValuation, setCurrentNewValuation] = useState<Valuation>();
-  const [newValuationsIndex, setNewValuationsIndex] = useState<number>(0);
-  const [newValuationComponents, setNewValuationComponents] = useState<
-    JSX.Element[]
-  >([]);
-  const [valuationComponents, setValuationComponents] = useState(
-    valuations.map((valuation, index) => (
-      <EditAssetValuationForm
-        key={index}
-        initialValuation={valuation}
-        onChangeValuations={(id, field, value) => {
-          onChangeValuations(id, field, value);
-        }}
-      />
-    ))
-  );
 
   useEffect(() => {
-    const components = Array.from(valuations.entries()).map(
-      ([id, valuation]) => (
-        <EditAssetValuationForm
-          key={id}
-          initialValuation={valuation}
-          onChangeValuations={(id, field, value) => {
-            onChangeValuations(id, field, value);
-          }}
-        />
-      )
-    );
-
-    setValuationComponents(components);
-  }, [onChangeValuations, valuations]);
-
-  useEffect(() => {
-    console.log(`adding new valuations `, JSON.stringify(newValuations));
+    console.log(`Adding new valuations: `, JSON.stringify(newValuations));
   }, [newValuations]);
 
-  const handleChange = (field: keyof Valuation, value: any, index: number) => {
-    console.log(`CISIII new valuations `, JSON.stringify(newValuations));
-    // const updatedValue = { ...newValuations[index], [field]: value };
-    // console.log(`after update valuation = ${JSON.stringify(updatedValue)}`);
-  };
-
   const handleAddValuation = () => {
-    const newValuation = { ...EMPTY_VALUATION, id: Date.now() }; // Ensure unique id for key
-
-    setNewValuations((prevValuations) => {
-      // console.log("Previous valuations before adding new:", prevValuations);
-      console.log(`CUBUUU AHAI new valuations `, JSON.stringify(prevValuations));
-      const updatedValuations = [...prevValuations, newValuation];
-      // console.log("Updated valuations after adding new:", updatedValuations);
-      return updatedValuations;
-    });
-
-    setNewValuationComponents((prevComponents) => [
-      <AddAssetValuationFormOnEdit
-        key={newValuation.id}
-        index={prevComponents.length} // index is the position in the array
-        valuation={newValuation}
-        onChange={handleChange}
-      />,
-      ...prevComponents,
-    ]);
+    const newValuation = { ...EMPTY_VALUATION, id: Date.now() };
+    setNewValuations((prevValuations) => [newValuation, ...prevValuations]);
   };
+
+  const handleNewValuationChange = useCallback(
+    (field: keyof Valuation, value: any, index: number) => {
+      setNewValuations((prev) =>
+        prev.map((val, i) => (i === index ? { ...val, [field]: value } : val))
+      );
+      onChangeNewValuations(newValuations);
+    },
+    [newValuations, onChangeNewValuations]
+  );
 
   return (
     <div className="flex flex-col">
@@ -200,9 +130,77 @@ export const EditAssetValuationForms: React.FC<
         <div className="h-[2px] flex-1 bg-gray-300 group-hover:bg-blue-500 ml-2"></div>
       </button>
       <div className="flex flex-col divide-y-2">
-        {newValuationComponents}
-        {valuationComponents}
+        {newValuations.map((valuation, index) => (
+          <AddAssetValuationFormOnEdit
+            key={valuation.id}
+            index={index}
+            valuation={valuation}
+            onChange={handleNewValuationChange}
+          />
+        ))}
+        {valuations.map((valuation, index) => (
+          <EditAssetValuationForm
+            key={index}
+            initialValuation={valuation}
+            onChangeValuations={onChangeValuations}
+          />
+        ))}
       </div>
+    </div>
+  );
+};
+
+interface AddAssetValuationFormOnEditProps {
+  index: number;
+  valuation: Valuation;
+  onChange: (field: keyof Valuation, value: any, index: number) => void;
+}
+
+const AddAssetValuationFormOnEdit: React.FC<
+  AddAssetValuationFormOnEditProps
+> = ({ index, valuation, onChange }) => {
+  const handleInputChange =
+    (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value =
+        field === "valuationDate"
+          ? e.target.value
+          : Number(filterNumeric(e.target.value));
+      onChange(field, value, index);
+    };
+
+  return (
+    <div className="mb-8">
+      <ValuationInput
+        label="Nilai Tanah/meter"
+        value={formatRupiah(valuation.landValue)}
+        onChange={handleInputChange("landValue")}
+        placeholder="Nilai Tanah"
+      />
+      <ValuationInput
+        label="Nilai Bangunan/meter"
+        value={formatRupiah(valuation.buildingValue)}
+        onChange={handleInputChange("buildingValue")}
+        placeholder="Nilai Bangunan"
+      />
+      <ValuationInput
+        label="Total Nilai"
+        value={formatRupiah(valuation.totalValue)}
+        onChange={handleInputChange("totalValue")}
+        placeholder="Total Nilai"
+      />
+      <ValuationInput
+        label="Tanggal Penilaian"
+        value={valuation.valuationDate.toString()}
+        onChange={handleInputChange("valuationDate")}
+        type="date"
+        placeholder="Tanggal Penilaian"
+      />
+      <ValuationInput
+        label="No Laporan"
+        value={valuation.reportNumber}
+        onChange={handleInputChange("reportNumber")}
+        placeholder="No Laporan"
+      />
     </div>
   );
 };
