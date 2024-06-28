@@ -48,7 +48,7 @@ const escapeCSVField = (field: any): string => {
 const flattenAsset = (property: Property) => {
   return property.valuations.map((valuation) => ({
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
-    "JENIS OBJEK": escapeCSVField(property.object_type || null),
+    "JENIS OBJEK": escapeCSVField(property.objectType || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     KOORDINAT: escapeCSVField(
@@ -68,7 +68,7 @@ const flattenAsset = (property: Property) => {
 const flattenData = (property: Property) => {
   return property.valuations.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
-    "JENIS OBJEK": escapeCSVField(property.object_type || null),
+    "JENIS OBJEK": escapeCSVField(property.objectType || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     "NO. HP": escapeCSVField(property.phoneNumber || null),
     KOORDINAT: escapeCSVField(
@@ -105,6 +105,11 @@ const Page = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "asc" | "desc";
+  } | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
 
   interface RowData {
     propertiesType?: string | null;
@@ -198,7 +203,7 @@ const Page = () => {
           landArea: parseAndFormatFloat(item.landArea),
           buildingArea: parseAndFormatFloat(item.buildingArea),
           LocationId: formattedDataLocations.id,
-          object_type: item.objectType,
+          objectType: item.objectType,
           propertiesType: "asset",
         };
 
@@ -284,7 +289,7 @@ const Page = () => {
           landArea: parseAndFormatFloat(item.landArea),
           buildingArea: parseAndFormatFloat(item.buildingArea),
           LocationId: formattedDataLocations.id,
-          object_type: item.objectType,
+          objectType: item.objectType,
         };
 
         const formattedDataValuations = {
@@ -333,25 +338,45 @@ const Page = () => {
   const itemsPerPage = parseInt(searchParams?.get("perPage") as string) || 10;
 
   const getProperties = useCallback(
-    async (query: string, page: number, perPage: number, filters: any) => {
+    async (
+      query: string,
+      page: number,
+      perPage: number,
+      filters: any,
+      sortField: string | undefined,
+      sort: string | undefined
+    ) => {
       setLoading(true);
-      console.log(filters);
-      const propertiesData = await fetchProperties(
-        query,
-        page,
-        perPage,
-        filters
-      );
-      setProperties(propertiesData.data);
-      setTotalItems(propertiesData.total);
-      setLoading(false);
+      try {
+        const propertiesData = await fetchProperties(
+          query,
+          page,
+          perPage,
+          filters,
+          sortField,
+          sort
+        );
+        setProperties(propertiesData.data);
+        setTotalItems(propertiesData.total);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      } finally {
+        setLoading(false);
+      }
     },
     []
   );
 
   useEffect(() => {
-    getProperties(query, currentPage, itemsPerPage, filters);
-  }, [currentPage, itemsPerPage, query, filters, importSuccess]);
+    getProperties(
+      query,
+      currentPage,
+      itemsPerPage,
+      filters,
+      sortConfig?.key,
+      sortConfig?.direction
+    );
+  }, [currentPage, itemsPerPage, query, filters, importSuccess, sortConfig]);
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
@@ -518,11 +543,33 @@ const Page = () => {
     }
   }, [editMode, properties]);
 
+  const handleSelectProperty = (id: number | null) => {
+    setSelectedProperty(id);
+  };
+
+  const handleNavigateToMap = () => {
+    if (selectedProperty !== null) {
+      router.push(`/map/${selectedProperty}`);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const handleHeaderClick = (field: string) => {
+    let direction: "asc" | "desc" = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === field &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
+    }
+    setSortConfig({ key: field, direction });
+  };
 
   return (
     <div className="container mx-auto py-10 px-10 mt-20 border border-inherit">
@@ -594,6 +641,16 @@ const Page = () => {
                 &nbsp;Ubah
               </button>
             )}
+            {selectedProperty !== null && (
+              <div>
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
+                  onClick={handleNavigateToMap}
+                >
+                  Go to Map
+                </button>
+              </div>
+            )}
             {selectedRows.size > 0 && editMode && (
               <>
                 {editMode && (
@@ -643,17 +700,6 @@ const Page = () => {
               Cancel
             </button>
           )}
-          <button className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path fill="currentColor" d="m7 10l5 5l5-5z"></path>
-            </svg>
-            &nbsp;Sort
-          </button>
           <button
             className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center"
             onClick={() => setShowFilterModal(true)}
@@ -683,6 +729,9 @@ const Page = () => {
           editMode={editMode}
           editedData={editedData}
           editedValuations={editedValuations}
+          handleHeaderClick={handleHeaderClick}
+          sortConfig={sortConfig}
+          onSelectProperty={handleSelectProperty}
         />
       </div>
       <div className="mt-4 flex justify-between">

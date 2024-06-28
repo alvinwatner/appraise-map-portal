@@ -6,7 +6,9 @@ export const fetchProperties = async (
   search: string = "",
   page: number = 1,
   perPage: number = 10,
-  filters: any = {}
+  filters: any = {},
+  sortField: string = "id",
+  sort: string = "asc"
 ): Promise<{ data: Property[]; total: number }> => {
   let query = supabase
     .from("properties")
@@ -42,32 +44,34 @@ export const fetchProperties = async (
         reportNumber,
         appraiser
       )
-    `, { count: 'exact' })
-    .is('isDeleted', null)
-    .order('id', { ascending: true });
+    `,
+      { count: "exact" }
+    )
+    .is("isDeleted", null)
+    .order(sortField, { ascending: sort === "asc" });
 
   if (search) {
-    query = query.ilike('name', `%${search}%`);
+    query = query.ilike("name", `%${search}%`);
   }
 
   if (filters.propertyType) {
-    query = query.eq('propertiesType', filters.propertyType);
+    query = query.eq("propertiesType", filters.propertyType);
   }
 
   if (filters.valuationDate) {
-    query = query.eq('valuations.valuationDate', filters.valuationDate);
+    query = query.eq("valuations.valuationDate", filters.valuationDate);
   }
 
   if (filters.objectType) {
-    query = query.eq('object_type.name', filters.objectType);
+    query = query.eq("objectType.name", filters.objectType);
   }
 
   if (filters.minTotalValue !== undefined) {
-    query = query.gte('valuations.totalValue', filters.minTotalValue);
+    query = query.gte("valuations.totalValue", filters.minTotalValue);
   }
 
   if (filters.maxTotalValue !== undefined) {
-    query = query.lte('valuations.totalValue', filters.maxTotalValue);
+    query = query.lte("valuations.totalValue", filters.maxTotalValue);
   }
 
   const from = (page - 1) * perPage;
@@ -78,16 +82,19 @@ export const fetchProperties = async (
   const { data, error, count } = await query;
 
   if (error) {
-    console.error('Error fetching properties:', error);
+    console.error("Error fetching properties:", error);
     return { data: [], total: 0 };
   }
-  
+
   return { data: data as unknown as Property[], total: count || 0 };
 };
 
-export const updatePropertiesIsDeleted = async (ids: number[], isDeleted: boolean) => {
+export const updatePropertiesIsDeleted = async (
+  ids: number[],
+  isDeleted: boolean
+) => {
   const { data, error } = await supabase
-    .from('properties')
+    .from("properties")
     .update({ isDeleted })
     .in("id", ids);
 
@@ -114,7 +121,7 @@ export const updateProperty = async (
   delete changes.locations;
   delete changes.valuations;
   const { data, error } = await supabase
-    .from('properties')
+    .from("properties")
     .update(changes)
     .eq("id", id);
 
@@ -182,7 +189,8 @@ export const addProperty = async ({
       latitude: latitude,
       longitude: longitude,
       address: address,
-    }).select();
+    })
+    .select();
 
   console.log("response add location = " + locationData);
 
@@ -211,7 +219,8 @@ export const addProperty = async ({
         isDeleted: false,
         debitur: debitur,
       },
-    ]).select();
+    ])
+    .select();
 
   if (propertyError) {
     throw new Error(`Error adding property: ${propertyError.message}`);
@@ -237,7 +246,8 @@ export const addProperty = async ({
 
   const { data: valuationData, error: valuationError } = await supabase
     .from("valuations")
-    .insert(valuations).select();
+    .insert(valuations)
+    .select();
 
   if (valuationError) {
     throw new Error(`Error adding valuations: ${valuationError.message}`);
@@ -289,7 +299,7 @@ export const fetchAllProperties = async (
         longitude,
         address
       ),
-      object_type,
+      objectType,
       valuations!inner(
         id,
         valuationDate,
@@ -318,7 +328,7 @@ export const fetchAllProperties = async (
   }
 
   if (filters.objectType) {
-    query = query.eq("object_type", filters.objectType);
+    query = query.eq("objectType", filters.objectType);
   }
 
   if (filters.minTotalValue !== undefined) {
@@ -342,7 +352,7 @@ export const fetchAllProperties = async (
 export async function fetchObjectTypes(): Promise<string[]> {
   const { data, error } = await supabase
     .from("properties")
-    .select("object_type");
+    .select("objectType");
 
   if (error) {
     throw new Error(error.message);
@@ -350,7 +360,7 @@ export async function fetchObjectTypes(): Promise<string[]> {
 
   // Extract unique object_type values
   const objectTypes = Array.from(
-    new Set(data.map((item: any) => item.object_type))
+    new Set(data.map((item: any) => item.objectType))
   );
 
   return objectTypes;
