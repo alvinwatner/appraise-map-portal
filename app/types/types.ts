@@ -16,6 +16,7 @@ export interface Location {
 
 export interface Valuation {
   id: number;
+  PropertyId: number;
   valuationDate: Date;
   landValue: number;
   buildingValue: number;

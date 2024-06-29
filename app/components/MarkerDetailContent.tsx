@@ -3,7 +3,10 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { PiPencilSimpleLight } from "react-icons/pi";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
-import { PropertyRowItem, PropertyRowItemWithIcon } from "@/app/components/PropertyRowItem";
+import {
+  PropertyRowItem,
+  PropertyRowItemWithIcon,
+} from "@/app/components/PropertyRowItem";
 import { Property } from "../types/types";
 import { MdPhone } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
@@ -12,10 +15,16 @@ import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 
 import { ValuationCardAsset } from "../dashboard/maps/components/ValuationCardAsset";
 import { ValuationCardData } from "../dashboard/maps/components/ValuationCardData";
+import { updatePropertiesIsDeleted } from "../services/dataManagement.service";
+import Loading from "./Loading";
+import { useState } from "react";
 
 interface MarkerDetailContentProps {
   onClose: () => void;
   onEditClicked: (property: Property) => void;
+  onShowModalSuccess?: () => void;
+  onShowModalFail?: () => void;
+
   property: Property;
 }
 
@@ -23,7 +32,29 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
   property,
   onClose,
   onEditClicked,
+  onShowModalSuccess,
+  onShowModalFail,
 }: MarkerDetailContentProps) => {
+  // New state for loading and modal
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDeleteSelected = async () => {
+    setIsLoading(true);
+    try {
+      await updatePropertiesIsDeleted([property.id], true);
+      onClose(); // Close form on success
+      if (onShowModalSuccess != null) {
+        onShowModalSuccess();
+      }
+    } catch (error) {
+      console.error("Failed to delete property ", error);
+      if (onShowModalFail != null) {
+        onShowModalFail();
+      }
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="relative w-full z-10 px-12 ">
       <button onClick={onClose}>
@@ -35,7 +66,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       </button>
 
       <h3 className="text-lg font-medium mb-2">{property.objectType}</h3>
-      {property.propertiesType == "asset" && (
+      {property.propertiesType == "aset" && (
         <h3 className="text-sm font-thin mb-2">{property.debitur}</h3>
       )}
       <PropertyChip
@@ -107,8 +138,17 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         >
           Edit <PiPencilSimpleLight className="ml-2" />
         </button>
-        <button className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          Delete <RiDeleteBin5Line className="ml-2" />
+        <button
+          className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleDeleteSelected}
+        >
+          {isLoading ? (
+            <Loading size="w-4 h-4" strokeWidth="border-2 border-t-2" />
+          ) : (
+            <>
+              Delete <RiDeleteBin5Line className="ml-2" />
+            </>
+          )}
         </button>
       </div>
     </div>

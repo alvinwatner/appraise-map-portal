@@ -165,7 +165,6 @@ interface UpdatePropertyArgs {
   valuationDate?: string | null;
 }
 
-
 export const addProperty = async ({
   latitude,
   longitude,
@@ -255,6 +254,22 @@ export const addProperty = async ({
 
   return {
     property: propertyData as Property[],
+    valuations: valuationData as unknown as Valuation[],
+  };
+};
+
+export const addValuations = async (
+  valuations: Valuation[]
+) => {
+  const { data: valuationData, error: valuationError } = await supabase
+    .from("valuations")
+    .insert(valuations)
+    .select();
+
+  if (valuationError) {
+    throw new Error(`Error adding valuations: ${valuationError.message}`);
+  }
+  return {
     valuations: valuationData as unknown as Valuation[],
   };
 };

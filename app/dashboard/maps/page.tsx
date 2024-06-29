@@ -153,6 +153,28 @@ export default function Page() {
           <MarkerDetailContent
             property={selectedProperty!}
             onEditClicked={handleOnEditClick}
+            onShowModalSuccess={() => {
+              console.log("showing modal result");
+              setIsAdding(false);
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: true,
+                message: "Property delete successfully!",
+              });
+            }}
+            onShowModalFail={() => {
+              console.log("showing modal result");
+              setIsAdding(false);
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              setModalInfo({
+                isOpen: true,
+                isSuccess: false,
+                message: "Failed to delete property. Please try again.",
+              });
+            }}
             onClose={() => {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
@@ -210,7 +232,7 @@ export default function Page() {
               setModalInfo({
                 isOpen: true,
                 isSuccess: true,
-                message: "Property added successfully!",
+                message: "Property edit successfully!",
               });
             }}
             onShowModalFail={() => {
@@ -221,7 +243,7 @@ export default function Page() {
               setModalInfo({
                 isOpen: true,
                 isSuccess: false,
-                message: "Failed to add property. Please try again.",
+                message: "Failed to edit property. Please try again.",
               });
             }}
           />

@@ -14,11 +14,11 @@ import { PropertyType } from "./PropertyChip";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
 import {
   addProperty,
+  addValuations,
   updateProperty,
   updateValuation,
 } from "../services/dataManagement.service";
 import Loading from "./Loading";
-import { AddAssetValuationForm } from "./AddAssetValuationForm";
 import { EditAssetValuationForms } from "./EditAssetValuationForms";
 
 // If the property is null, then it is on edit mode
@@ -40,13 +40,12 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   onShowModalSuccess,
   onShowModalFail,
 }: EditMarkerFormProps) => {
-  const [valuations, setValuations] = useState<Valuation[]>(
-    property ? property.valuations : []
-  );
+  const [newValuations, setNewValuations] = useState<Valuation[]>([]);
 
-  const [editedProperty, setEditedProperty] = useState<
-    Map<number, Partial<Property>>
-  >(new Map());
+  const [editedProperty, setEditedProperty] = useState<Partial<Property>>({
+    id: property.id,
+  });
+
   const [editedValuations, setEditedValuations] = useState<
     Map<number, Partial<Valuation>>
   >(new Map());
@@ -63,19 +62,6 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   const [selectedObjectType, selectObjectType] = useState<string>(
     property.objectType
   );
-  const [landArea, setlandArea] = useState<number>(property.landArea);
-  const [debitur, setDebitur] = useState<string>(property.debitur);
-  const [address, setAddress] = useState<string>(property.locations.address);
-  const [phoneNumber, setPhoneNumber] = useState<string>(property.phoneNumber);
-  const [buildingArea, setbuildingArea] = useState<number>(
-    property.buildingArea
-  );
-
-  const [landValue, setLandValue] = useState<number>(0);
-  const [buildingValue, setBuildingValue] = useState<number>(0);
-  const [totalValue, setTotalValue] = useState<number>(0);
-  const [valuationDate, setValuationDate] = useState<string>("");
-  const [reportNumber, setReportNumber] = useState<string>("");
 
   const onChangePropertyType = (propertyType: string) => {
     selectPropertyType(propertyType);
@@ -83,20 +69,15 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   };
 
   const onChangeObjectType = (objectType: string) => {
+    handleOnChangeProperty("objectType", objectType);
     selectObjectType(objectType);
     console.log("Selected option:", objectType);
   };
 
-  const handleChange = (id: number, field: keyof Property, value: any) => {
-    const newEditedProperty = new Map(editedProperty);
-    const editedItem = newEditedProperty.get(id) || {};
-    editedItem[field] = value;
-    newEditedProperty.set(id, editedItem);
-    console.log(id);
-    console.log(field);
-    console.log(value);
-    console.log(newEditedProperty);
-    setEditedProperty(newEditedProperty);
+  const handleOnChangeProperty = (field: keyof Property, value: any) => {
+    setEditedProperty((prev) => {
+      return { ...prev, [field]: value };
+    });
   };
 
   const onChangeValuations = (
@@ -123,43 +104,15 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   };
 
   useEffect(() => {
+    console.log("All valuations on change = " + JSON.stringify(newValuations));
+  }, [newValuations]);
+
+  useEffect(() => {
     console.log(
       "Updated Edited Valuations:",
       JSON.stringify(Array.from(editedValuations.entries()))
     );
   }, [editedValuations]); // Dependency array includes editedValuations
-
-  const handleChangeProperty = (
-    field: keyof Valuation,
-    value: any,
-    id?: number | null
-  ) => {
-    if (id != null) {
-      setEditedValuations((prevEditedValuations) => {
-        const newEditedValuations = new Map(prevEditedValuations);
-        newEditedValuations.set(value[0].id, value[0]);
-        return newEditedValuations;
-      });
-    } else {
-    }
-
-    // if (field === "valuations") {
-    //   setEditedValuations((prevEditedValuations) => {
-    //     const newEditedValuations = new Map(prevEditedValuations);
-    //     newEditedValuations.set(value[0].id, value[0]);
-    //     return newEditedValuations;
-    //   });
-    // }
-    // const newEditedProperty = new Map(editedProperty);
-    // const editedItem = newEditedProperty.get(id) || {};
-    // editedItem[field] = value;
-    // newEditedProperty.set(id, editedItem);
-    // console.log(id);
-    // console.log(field);
-    // console.log(value);
-    // console.log(newEditedProperty);
-    // setEditedProperty(newEditedProperty);
-  };
 
   const [errors, setErrors] = useState({
     debitur: "",
@@ -190,28 +143,51 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       newErrors.debitur = "Object type is required.";
       isValid = false;
     }
-    if (!debitur) {
+    if ("debitur" in editedProperty && !editedProperty.debitur) {
       newErrors.debitur = "Debitur is required.";
       isValid = false;
     }
-    if (!address) {
+    if (
+      "locations" in editedProperty &&
+      editedProperty.locations !== undefined &&
+      "address" in editedProperty.locations &&
+      !editedProperty.locations.address
+    ) {
       newErrors.address = "Address is required.";
       isValid = false;
     }
-    if (!landArea || isNaN(Number(landArea))) {
+    if (
+      "landArea" in editedProperty &&
+      !editedProperty.landArea &&
+      isNaN(Number(editedProperty.landArea))
+    ) {
       newErrors.landArea = "Luas Tanah must be a number.";
       isValid = false;
     }
-    if (!buildingArea || isNaN(Number(buildingArea))) {
+    if (
+      "buildingArea" in editedProperty &&
+      !editedProperty.buildingArea &&
+      isNaN(Number(editedProperty.buildingArea))
+    ) {
+      console.log(
+        `editedProperty.buildingArea ${
+          "buildingArea" in editedProperty && !editedProperty.buildingArea
+        } isNaN(Number(editedProperty.buildingArea) ${isNaN(
+          Number(editedProperty.buildingArea)
+        )}`
+      );
+      console.log("building area value " + editedProperty.buildingArea);
       newErrors.buildingArea = "Luas Bangunan must be a number.";
       isValid = false;
     }
     if (
       selectedPropertyType == "Data" &&
-      (!phoneNumber ||
-        isNaN(Number(phoneNumber)) ||
-        phoneNumber.length < 10 ||
-        phoneNumber.length > 15)
+      "phoneNumber" in editedProperty &&
+      !editedProperty.phoneNumber &&
+      editedProperty.phoneNumber !== undefined &&
+      (isNaN(Number(editedProperty.phoneNumber)) ||
+        editedProperty.phoneNumber.length < 10 ||
+        editedProperty.phoneNumber.length > 15)
     ) {
       newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
       isValid = false;
@@ -231,24 +207,22 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
     // If validation passes
     try {
-      for (const [id, changes] of Array.from(editedProperty.entries())) {
-        await updateProperty(id, changes);
-      }
+      updateProperty(property.id, editedProperty);
 
       for (const [id, changes] of Array.from(editedValuations.entries())) {
         await updateValuation(id, changes);
       }
 
-      // check new valuations
-      // if newValuations is not empty
-      // addValutions(valuations)
+      if (newValuations.length > 0) {
+        addValuations(newValuations);
+      }
 
       onClose(); // Close form on success
       if (onShowModalSuccess != null) {
         onShowModalSuccess();
       }
     } catch (error) {
-      console.error("Failed to update property with valuations:", error);
+      console.error("Failed to update property", error);
       if (onShowModalFail != null) {
         onShowModalFail();
       }
@@ -291,11 +265,11 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nomor HP :</p>
             <input
-              value={phoneNumber}
+              value={property.phoneNumber}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
-                setPhoneNumber(event.target.value);
+                handleOnChangeProperty("phoneNumber", event.target.value);
               }}
               placeholder="Nomor HP"
             />
@@ -309,12 +283,11 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
             <input
-              value={property != null ? property.debitur : debitur}
+              value={property.debitur}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
-                console.log("Input changed: ", event.target.value);
-                setDebitur(event.target.value);
+                handleOnChangeProperty("debitur", event.target.value);
               }}
               placeholder="Nama Debitur"
             />
@@ -325,11 +298,15 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
         )}
         <p className="text-2sm font-thin mb-2 mt-5">Alamat:</p>
         <textarea
-          value={property != null ? property.locations.address : address}
+          value={property.locations.address}
           className="w-full pl-2 py-2 h-20 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm resize-none"
           rows={4}
           onChange={(event) => {
-            setAddress(event.target.value);
+            handleOnChangeProperty("locations", {
+              ...editedProperty.locations,
+              address: event.target.value,
+            });
+            handleOnChangeProperty("landArea", event.target.value);
           }}
           placeholder="Alamat"
         ></textarea>
@@ -339,21 +316,20 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
         <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah :</p>
         <AreaInput
-          initialValue={landArea}
+          initialValue={property.landArea}
           onChange={(value) => {
-            setlandArea(value);
+            handleOnChangeProperty("landArea", value);
           }}
         />
         {errors.address && (
-          <p className="text-red-500 text-xs">{errors.address}</p>
+          <p className="text-red-500 text-xs">{errors.landArea}</p>
         )}
 
         <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
         <AreaInput
-          initialValue={buildingArea}
+          initialValue={property.buildingArea}
           onChange={(value) => {
-            setbuildingArea(value);
-            handleChange(property?.id, "buildingArea", value);
+            handleOnChangeProperty("buildingArea", value);
           }}
         />
         {errors.buildingArea && (
@@ -362,12 +338,11 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
         {selectedPropertyType == "Aset" ? (
           <EditAssetValuationForms
+            propertyId={property.id}
             valuations={property.valuations}
             onChangeValuations={onChangeValuations}
             onChangeNewValuations={(newValuations) => {
-              // console.log(
-              //   "All valuations on change = " + JSON.stringify(newValuations)
-              // );
+              setNewValuations(newValuations);
             }}
           />
         ) : (

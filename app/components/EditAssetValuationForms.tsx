@@ -4,6 +4,7 @@ import { filterNumeric, formatRupiah } from "../utils/helper";
 
 const EMPTY_VALUATION: Valuation = {
   id: 0,
+  PropertyId: 0,
   valuationDate: new Date(),
   landValue: 0,
   buildingValue: 0,
@@ -14,6 +15,7 @@ const EMPTY_VALUATION: Valuation = {
 
 interface EditAssetValuationFormsProps {
   valuations: Valuation[];
+  propertyId: number;
   onChangeNewValuations: (valuations: Valuation[]) => void;
   onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
@@ -97,26 +99,33 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
 
 export const EditAssetValuationForms: React.FC<
   EditAssetValuationFormsProps
-> = ({ valuations, onChangeNewValuations, onChangeValuations }) => {
+> = ({ valuations, propertyId, onChangeNewValuations, onChangeValuations }) => {
   const [newValuations, setNewValuations] = useState<Valuation[]>([]);
 
   useEffect(() => {
-    console.log(`Adding new valuations: `, JSON.stringify(newValuations));
+    // console.log(`Adding new valuations: `, JSON.stringify(newValuations));
   }, [newValuations]);
 
   const handleAddValuation = () => {
-    const newValuation = { ...EMPTY_VALUATION, id: Date.now() };
+    console.log("property id inside edit aset valuation form " + propertyId);
+    const newValuation = {
+      ...EMPTY_VALUATION,
+      PropertyId: propertyId,
+    };
     setNewValuations((prevValuations) => [newValuation, ...prevValuations]);
   };
 
   const handleNewValuationChange = useCallback(
     (field: keyof Valuation, value: any, index: number) => {
-      setNewValuations((prev) =>
-        prev.map((val, i) => (i === index ? { ...val, [field]: value } : val))
-      );
-      onChangeNewValuations(newValuations);
+      setNewValuations((prev) => {
+        const updated = prev.map((val, i) =>
+          i === index ? { ...val, [field]: value } : val
+        );
+        onChangeNewValuations(updated);
+        return updated;
+      });
     },
-    [newValuations, onChangeNewValuations]
+    [onChangeNewValuations]
   );
 
   return (
@@ -133,6 +142,7 @@ export const EditAssetValuationForms: React.FC<
         {newValuations.map((valuation, index) => (
           <AddAssetValuationFormOnEdit
             key={valuation.id}
+            propertyId={propertyId}
             index={index}
             valuation={valuation}
             onChange={handleNewValuationChange}
@@ -152,6 +162,7 @@ export const EditAssetValuationForms: React.FC<
 
 interface AddAssetValuationFormOnEditProps {
   index: number;
+  propertyId: number;
   valuation: Valuation;
   onChange: (field: keyof Valuation, value: any, index: number) => void;
 }
@@ -159,12 +170,22 @@ interface AddAssetValuationFormOnEditProps {
 const AddAssetValuationFormOnEdit: React.FC<
   AddAssetValuationFormOnEditProps
 > = ({ index, valuation, onChange }) => {
+  // const handleInputChange =
+  //   (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const value =
+  //       field === "valuationDate"
+  //         ? e.target.value
+  //         : Number(filterNumeric(e.target.value));
+  //     onChange(field, value, index);
+  //   };
   const handleInputChange =
     (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value =
-        field === "valuationDate"
-          ? e.target.value
-          : Number(filterNumeric(e.target.value));
+        field === "landValue" ||
+        field === "buildingValue" ||
+        field === "totalValue"
+          ? Number(filterNumeric(e.target.value))
+          : e.target.value;
       onChange(field, value, index);
     };
 
