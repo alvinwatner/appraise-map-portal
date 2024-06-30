@@ -1,5 +1,3 @@
-import Head from "next/head";
-
 import { IconType } from "react-icons";
 import { FaRegCopy } from "react-icons/fa";
 import { twMerge } from "tailwind-merge";

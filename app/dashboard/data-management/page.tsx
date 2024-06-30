@@ -110,6 +110,7 @@ const Page = () => {
     direction: "asc" | "desc";
   } | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
+  const { replace } = useRouter();
 
   interface RowData {
     propertiesType?: string | null;
@@ -381,7 +382,7 @@ const Page = () => {
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       setQuery(value);
-      router.push(`?search=${value}&page=1&perPage=${itemsPerPage}`);
+      replace(`?search=${value}&page=1&perPage=${itemsPerPage}`);
     }, 500),
     [router, itemsPerPage]
   );
@@ -397,19 +398,19 @@ const Page = () => {
   ) => {
     if (event.key === "Enter") {
       setQuery(search);
-      router.push(`?search=${search}&page=1&perPage=${itemsPerPage}`);
+      replace(`?search=${search}&page=1&perPage=${itemsPerPage}`);
     }
   };
 
   const handlePageChange = (page: number) => {
-    router.push(`?search=${query}&page=${page}&perPage=${itemsPerPage}`);
+    replace(`?search=${query}&page=${page}&perPage=${itemsPerPage}`);
   };
 
   const handleItemsPerPageChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const newPerPage = parseInt(event.target.value);
-    router.push(`?search=${query}&page=1&perPage=${newPerPage}`);
+    replace(`?search=${query}&page=1&perPage=${newPerPage}`);
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
