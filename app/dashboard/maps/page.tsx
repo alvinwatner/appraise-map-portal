@@ -1,7 +1,7 @@
 "use client";
 import GoogleMaps from "@/app/dashboard/maps/components/GoogleMaps";
 import { Autocomplete } from "@react-google-maps/api";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, Suspense } from "react";
 import { fetchProperties } from "@/app/services/dataManagement.service";
 
 import {
@@ -17,11 +17,12 @@ import { MarkerDetailContent } from "@/app/dashboard/maps/components/MarkerDetai
 import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
-import { SearchResult } from "@/app/dashboard/maps/components/SearchResult";
+import SearchResult from "@/app/dashboard/maps/components/SearchResult";
 import { Property } from "@/app/types/types";
 import Loading from "@/app/components/Loading";
 import { AddMarkerForm } from "@/app/dashboard/maps/components/AddMarkerForms";
 import { EditMarkerForm } from "@/app/dashboard/maps/components/EditMarkerForm";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -32,6 +33,10 @@ enum LeftWhiteSheetComponent {
 }
 
 export default function Page() {
+  const searchParams = useSearchParams();
+
+  const pathname = usePathname();
+  const { replace } = useRouter();
   const libraries = useMemo(() => ["places"], []);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [mapCenter, setMapCenter] = useState({
@@ -115,6 +120,18 @@ export default function Page() {
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.edit);
   };
 
+  function handleSearch(term: string) {
+    console.log(`Searching... ${term}`);
+
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set("search", term);
+    } else {
+      params.delete("search");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }
+
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
     console.log(
       "eeehh dapat location - lat = " + location.lat + "lng" + location.lng
@@ -182,7 +199,8 @@ export default function Page() {
           />
         );
       case LeftWhiteSheetComponent.searchResult:
-        return <SearchResult />;
+        <SearchResult query={searchParams.get("query")?.toString() ?? ""} />;
+
       case LeftWhiteSheetComponent.add:
         return (
           <AddMarkerForm
@@ -316,6 +334,10 @@ export default function Page() {
               className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               placeholder="       Search Property"
+              onChange={(e) => {
+                handleSearch(e.target.value);
+              }}
+              defaultValue={searchParams.get("query")?.toString()}
             />
           </form>
           <IoSearchOutline className="absolute left-2 top-2" color="grey" />
@@ -426,3 +448,6 @@ const ModalUpdateResult: React.FC<{
     </div>
   );
 };
+function useDebouncedCallback(arg0: (term: any) => void, arg1: number) {
+  throw new Error("Function not implemented.");
+}
