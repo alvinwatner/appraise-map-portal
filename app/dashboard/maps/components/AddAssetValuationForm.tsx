@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Valuation } from "../types/types";
-import { filterNumeric, formatRupiah } from "../utils/helper";
+import { Valuation } from "../../../types/types";
+import { filterNumeric, formatRupiah } from "../../../utils/helper";
 import { format } from "date-fns";
 
 

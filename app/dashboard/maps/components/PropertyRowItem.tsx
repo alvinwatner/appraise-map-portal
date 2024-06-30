@@ -4,7 +4,7 @@ import { IconType } from "react-icons";
 import { FaRegCopy } from "react-icons/fa";
 import { twMerge } from "tailwind-merge";
 import copy from 'clipboard-copy';
-import useSnackbar from "../lib/hooks/useSnackbar";
+import useSnackbar from "../../../lib/hooks/useSnackbar";
 import { FaCheck } from "react-icons/fa";
 
 

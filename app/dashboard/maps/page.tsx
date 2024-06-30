@@ -1,5 +1,5 @@
 "use client";
-import GoogleMaps from "@/app/components/GoogleMaps";
+import GoogleMaps from "@/app/dashboard/maps/components/GoogleMaps";
 import { Autocomplete } from "@react-google-maps/api";
 import { useMemo, useState, useRef } from "react";
 import { fetchProperties } from "@/app/services/dataManagement.service";
@@ -12,16 +12,16 @@ import {
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
-import { MarkerDetailContent } from "@/app/components/MarkerDetailContent";
+import { MarkerDetailContent } from "@/app/dashboard/maps/components/MarkerDetailContent";
 
 import React, { useEffect } from "react";
 
 import { useLoadScript } from "@react-google-maps/api";
-import { SearchResult } from "@/app/components/SearchResult";
+import { SearchResult } from "@/app/dashboard/maps/components/SearchResult";
 import { Property } from "@/app/types/types";
 import Loading from "@/app/components/Loading";
-import { AddMarkerForm } from "@/app/components/AddMarkerForms";
-import { EditMarkerForm } from "@/app/components/EditMarkerForm";
+import { AddMarkerForm } from "@/app/dashboard/maps/components/AddMarkerForms";
+import { EditMarkerForm } from "@/app/dashboard/maps/components/EditMarkerForm";
 
 enum LeftWhiteSheetComponent {
   markerDetail,

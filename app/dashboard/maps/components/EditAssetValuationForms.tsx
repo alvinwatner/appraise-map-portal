@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { Valuation } from "../types/types";
-import { filterNumeric, formatRupiah } from "../utils/helper";
+import { Valuation } from "../../../types/types";
+import { filterNumeric, formatRupiah } from "../../../utils/helper";
 
 const EMPTY_VALUATION: Valuation = {
   id: 0,
@@ -24,25 +24,6 @@ interface EditAssetValuationFormProps {
   initialValuation: Valuation;
   onChangeValuations: (id: number, field: keyof Valuation, value: any) => void;
 }
-
-const ValuationInput: React.FC<{
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: string;
-  placeholder: string;
-}> = ({ label, value, onChange, type = "text", placeholder }) => (
-  <div className="ml-4">
-    <p className="text-2sm font-thin mb-2 mt-5">{label} :</p>
-    <input
-      className="w-full pl-2 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-      value={value}
-      onChange={onChange}
-      type={type}
-      placeholder={placeholder}
-    />
-  </div>
-);
 
 const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
   initialValuation,
@@ -170,14 +151,6 @@ interface AddAssetValuationFormOnEditProps {
 const AddAssetValuationFormOnEdit: React.FC<
   AddAssetValuationFormOnEditProps
 > = ({ index, valuation, onChange }) => {
-  // const handleInputChange =
-  //   (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const value =
-  //       field === "valuationDate"
-  //         ? e.target.value
-  //         : Number(filterNumeric(e.target.value));
-  //     onChange(field, value, index);
-  //   };
   const handleInputChange =
     (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value =

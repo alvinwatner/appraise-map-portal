@@ -3,22 +3,22 @@ import {
   IoClose,
   IoCloseCircleOutline,
 } from "react-icons/io5";
-import Dropdown from "./Dropdown";
+import Dropdown from "../../../components/Dropdown";
 import { useEffect, useState } from "react";
-import { DataValuationForms } from "./DataValuationForm";
+import { DataValuationForms } from "../../../components/DataValuationForm";
 
-import DropdownInput from "./DropdownInput";
-import { AreaInput } from "./AreaInput";
-import { Property, Location, Valuation } from "../types/types";
-import { PropertyType } from "./PropertyChip";
+import DropdownInput from "../../../components/DropdownInput";
+import { AreaInput } from "../../../components/AreaInput";
+import { Property, Location, Valuation } from "../../../types/types";
+import { PropertyType } from "../../../components/PropertyChip";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
 import {
   addProperty,
   addValuations,
   updateProperty,
   updateValuation,
-} from "../services/dataManagement.service";
-import Loading from "./Loading";
+} from "../../../services/dataManagement.service";
+import Loading from "../../../components/Loading";
 import { EditAssetValuationForms } from "./EditAssetValuationForms";
 
 // If the property is null, then it is on edit mode

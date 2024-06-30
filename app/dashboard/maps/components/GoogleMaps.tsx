@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { Property } from "../types/types";
+import { Property } from "../../../types/types";
 import { GoStarFill } from "react-icons/go";
 
 interface GoogleMapProps {

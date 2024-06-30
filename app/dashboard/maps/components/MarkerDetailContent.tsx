@@ -6,17 +6,17 @@ import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import {
   PropertyRowItem,
   PropertyRowItemWithIcon,
-} from "@/app/components/PropertyRowItem";
-import { Property } from "../types/types";
+} from "@/app/dashboard/maps/components/PropertyRowItem";
+import { Property } from "../../../types/types";
 import { MdPhone } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { PiMapPinArea } from "react-icons/pi";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 
-import { ValuationCardAsset } from "../dashboard/maps/components/ValuationCardAsset";
-import { ValuationCardData } from "../dashboard/maps/components/ValuationCardData";
-import { updatePropertiesIsDeleted } from "../services/dataManagement.service";
-import Loading from "./Loading";
+import { ValuationCardAsset } from "./ValuationCardAsset";
+import { ValuationCardData } from "./ValuationCardData";
+import { updatePropertiesIsDeleted } from "../../../services/dataManagement.service";
+import Loading from "../../../components/Loading";
 import { useState } from "react";
 
 interface MarkerDetailContentProps {

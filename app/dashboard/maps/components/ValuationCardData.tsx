@@ -3,7 +3,7 @@ import { MdOutlineCalendarMonth, MdOutlineKeyboardArrowDown, MdOutlineKeyboardAr
 import { formatRupiah } from "@/app/utils/helper";
 import { format } from "date-fns";
 import { PiArrowBendDownRightLight } from "react-icons/pi";
-import { PropertyRowItem } from "@/app/components/PropertyRowItem";
+import { PropertyRowItem } from "@/app/dashboard/maps/components/PropertyRowItem";
 import { TbReportMoney } from "react-icons/tb";
 import { BsBuildingCheck } from "react-icons/bs";
 import { TiChartAreaOutline } from "react-icons/ti";
