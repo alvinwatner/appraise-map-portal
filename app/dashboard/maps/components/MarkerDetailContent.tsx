@@ -129,7 +129,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         </>
       ))}
 
-      <div className="grid grid-cols-2 gap-2 mb-10">
+      <div className="grid grid-cols-2 gap-2 mb-10 mt-8 ">
         <button
           className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded"
           onClick={() => {

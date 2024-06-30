@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Valuation } from "../../../types/types";
 import { filterNumeric, formatRupiah } from "../../../utils/helper";
+import { ValuationInput } from "./ValuationInput";
 
 const EMPTY_VALUATION: Valuation = {
   id: 0,
@@ -38,7 +39,7 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
           ? e.target.value
           : Number(filterNumeric(e.target.value));
       setValuation((prev) => ({ ...prev, [field]: value }));
-      onChangeValuations(initialValuation.id, field, value);
+      onChangeValuations(initialValuation.id ?? 0, field, value);
     };
 
   return (

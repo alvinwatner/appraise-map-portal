@@ -1,11 +1,6 @@
-import {
-  IoCheckmarkCircleOutline,
-  IoClose,
-  IoCloseCircleOutline,
-} from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import Dropdown from "../../../components/Dropdown";
 import { useEffect, useState } from "react";
-import { DataValuationForms } from "../../../components/DataValuationForm";
 
 import DropdownInput from "../../../components/DropdownInput";
 import { AreaInput } from "../../../components/AreaInput";
@@ -20,6 +15,7 @@ import {
 } from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
 import { EditAssetValuationForms } from "./EditAssetValuationForms";
+import { EditDataValuationForms } from "./EditDataValuationForms";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -346,9 +342,13 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
             }}
           />
         ) : (
-          <DataValuationForms
-            valuations={property?.valuations ?? []}
-            isEdit={property != null}
+          <EditDataValuationForms
+            propertyId={property.id}
+            valuations={property.valuations}
+            onChangeValuations={onChangeValuations}
+            onChangeNewValuations={(newValuations) => {
+              setNewValuations(newValuations);
+            }}
           />
         )}
 

@@ -27,7 +27,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
   const [isExpand, setIsExpand] = useState<boolean>(false);
 
   return (
-    <div className="mb-10">
+    <div className="mb-5">
       <div className="relative flex flex-col bg-[#FFEBBF] py-2 pl-3 rounded-lg mb-3 shadow-lg">
         <p className="text-base mb-1">
           {valuation.totalValue != null

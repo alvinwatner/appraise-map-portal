@@ -15,7 +15,7 @@ export interface Location {
 }
 
 export interface Valuation {
-  id: number;
+  id?: number | undefined;
   PropertyId: number;
   valuationDate: Date;
   landValue: number;
