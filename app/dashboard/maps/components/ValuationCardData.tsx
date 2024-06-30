@@ -1,5 +1,9 @@
 import { Valuation } from "@/app/types/types";
-import { MdOutlineCalendarMonth, MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
+import {
+  MdOutlineCalendarMonth,
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
 import { formatRupiah } from "@/app/utils/helper";
 import { format } from "date-fns";
 import { PiArrowBendDownRightLight } from "react-icons/pi";
@@ -16,10 +20,8 @@ interface ValuationCardDataProps {
 export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
   valuation,
 }: ValuationCardDataProps) => {
-
   const [isExpand, setIsExpand] = useState<boolean>(false);
 
-  
   return (
     <div className="mb-5">
       <div className="relative flex flex-col bg-[#FFEBBF] py-2 pl-3 rounded-lg mb-3 shadow-lg">
@@ -47,10 +49,10 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
           )}
         </button>
 
-        <p className="text-2sm mb-1 font-medium">{`${format(
+        <p className="text-2sm mb-1 font-medium">{`Tanggal : ${format(
           valuation.valuationDate,
           "dd/MM/yyyy"
-        )} (Kevin)`}</p>
+        )}`}</p>
         <p className="text-2sm mb-1 font-thin font-100 italic tracking-wide">
           {" "}
           {valuation.reportNumber}
@@ -64,10 +66,9 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
             size={22}
           />
 
-
           <PropertyRowItem
             icon={MdOutlineCalendarMonth}
-            title="Tanngal :"
+            title="Tanggal :"
             body={format(valuation.valuationDate, "dd/MM/yyyy")}
             className="mb-1"
           />

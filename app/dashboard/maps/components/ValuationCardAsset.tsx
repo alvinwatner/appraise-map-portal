@@ -1,6 +1,5 @@
 import { PropertyRowItem } from "@/app/dashboard/maps/components/PropertyRowItem";
 import { Valuation } from "@/app/types/types";
-import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { format } from 'date-fns';
 import {
   MdOutlineCalendarMonth,
@@ -9,7 +8,7 @@ import {
 } from "react-icons/md";
 
 import { PiArrowBendDownRightLight } from "react-icons/pi";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TbReportAnalytics, TbReportMoney } from "react-icons/tb";
 import { IoPersonSharp } from "react-icons/io5";
 import { BsBuildingCheck } from "react-icons/bs";
@@ -53,7 +52,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           )}
         </button>
 
-        <p className="text-2sm mb-1 font-medium">{`${ format(valuation.valuationDate, 'dd/MM/yyyy')} (Kevin)`}</p>
+        <p className="text-2sm mb-1 font-medium">{`${ format(valuation.valuationDate, 'dd/MM/yyyy')} (${valuation.appraiser})`}</p>
         <p className="text-2sm mb-1 font-thin font-100 italic tracking-wide">
           {" "}
           {valuation.reportNumber}
@@ -75,7 +74,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           <PropertyRowItem
             icon={IoPersonSharp}
             title="Dinilai Oleh :"
-            body="Kevin"
+            body={valuation.appraiser}
             className="mb-1"
           />
 

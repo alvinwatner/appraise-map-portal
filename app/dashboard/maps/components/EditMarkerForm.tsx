@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 
 import DropdownInput from "../../../components/DropdownInput";
 import { AreaInput } from "../../../components/AreaInput";
-import { Property, Location, Valuation } from "../../../types/types";
-import { PropertyType } from "../../../components/PropertyChip";
+import { Property, Valuation } from "../../../types/types";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
 import {
-  addProperty,
   addValuations,
   updateProperty,
   updateValuation,
@@ -31,8 +29,6 @@ interface EditMarkerFormProps {
 export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   onClose,
   property,
-  lat,
-  lng,
   onShowModalSuccess,
   onShowModalFail,
 }: EditMarkerFormProps) => {
@@ -81,17 +77,8 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
     field: keyof Valuation,
     value: any
   ) => {
-    console.log(
-      "Existing valuations on change id: " +
-        id +
-        " field: " +
-        field +
-        " value: " +
-        value
-    );
-
     setEditedValuations((prevMap) => {
-      const updatedMap = new Map(prevMap); // Create a new map for immutability
+      const updatedMap = new Map(prevMap); 
       const existingValuation = updatedMap.get(id) || {};
 
       updatedMap.set(id, { ...existingValuation, [field]: value });
@@ -165,13 +152,6 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       !editedProperty.buildingArea &&
       isNaN(Number(editedProperty.buildingArea))
     ) {
-      console.log(
-        `editedProperty.buildingArea ${
-          "buildingArea" in editedProperty && !editedProperty.buildingArea
-        } isNaN(Number(editedProperty.buildingArea) ${isNaN(
-          Number(editedProperty.buildingArea)
-        )}`
-      );
       console.log("building area value " + editedProperty.buildingArea);
       newErrors.buildingArea = "Luas Bangunan must be a number.";
       isValid = false;
