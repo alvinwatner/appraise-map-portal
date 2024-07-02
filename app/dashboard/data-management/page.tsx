@@ -18,6 +18,8 @@ import { supabase } from "@/app/lib/supabaseClient";
 import ExportPopup from "./components/ExportPopup";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { createClient } from "@/app/utils/supabase/server";
+import { User } from "@supabase/supabase-js";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -87,6 +89,25 @@ const flattenData = (property: Property) => {
 };
 
 const Page = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await (await supabase).auth.getSession();
+      setUser(session?.user || null);
+
+      if (!session?.user) {
+        router.push("/login");
+      }
+    };
+
+    fetchSession();
+  }, [supabase, router]);
+
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState(new Set<number>());
@@ -165,21 +186,28 @@ const Page = () => {
   const importAssetData = async (jsonData: RowData[]) => {
     try {
       const { count: totalCountProperties, error: countErrorProperties } =
-        await supabase.from("properties").select("id", { count: "exact" });
+        await (await supabase)
+          .from("properties")
+          .select("id", { count: "exact" });
 
       if (countErrorProperties) {
         throw countErrorProperties;
       }
 
       const { count: totalCountValuations, error: countErrorValuations } =
-        await supabase.from("valuations").select("id", { count: "exact" });
+        await (await supabase)
+          .from("valuations")
+          .select("id", { count: "exact" });
 
       if (countErrorValuations) {
         throw countErrorValuations;
       }
 
-      const { count: totalCountLocations, error: countErrorLocations } =
-        await supabase.from("locations").select("id", { count: "exact" });
+      const { count: totalCountLocations, error: countErrorLocations } = await (
+        await supabase
+      )
+        .from("locations")
+        .select("id", { count: "exact" });
 
       if (countErrorLocations) {
         throw countErrorLocations;
@@ -218,17 +246,17 @@ const Page = () => {
           appraiser: item.appraiser,
         };
 
-        const insertLocations = await supabase
+        const insertLocations = await (await supabase)
           .from("locations")
           .insert([formattedDataLocations])
           .select();
 
-        const insertProperties = await supabase
+        const insertProperties = await (await supabase)
           .from("properties")
           .insert([formattedDataProperties])
           .select();
 
-        const insertValuations = await supabase
+        const insertValuations = await (await supabase)
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
@@ -250,21 +278,28 @@ const Page = () => {
   const importDataData = async (jsonData: RowData[]) => {
     try {
       const { count: totalCountProperties, error: countErrorProperties } =
-        await supabase.from("properties").select("id", { count: "exact" });
+        await (await supabase)
+          .from("properties")
+          .select("id", { count: "exact" });
 
       if (countErrorProperties) {
         throw countErrorProperties;
       }
 
       const { count: totalCountValuations, error: countErrorValuations } =
-        await supabase.from("valuations").select("id", { count: "exact" });
+        await (await supabase)
+          .from("valuations")
+          .select("id", { count: "exact" });
 
       if (countErrorValuations) {
         throw countErrorValuations;
       }
 
-      const { count: totalCountLocations, error: countErrorLocations } =
-        await supabase.from("locations").select("id", { count: "exact" });
+      const { count: totalCountLocations, error: countErrorLocations } = await (
+        await supabase
+      )
+        .from("locations")
+        .select("id", { count: "exact" });
 
       if (countErrorLocations) {
         throw countErrorLocations;
@@ -303,17 +338,17 @@ const Page = () => {
           appraiser: item.appraiser,
         };
 
-        const insertLocations = await supabase
+        const insertLocations = await (await supabase)
           .from("locations")
           .insert([formattedDataLocations])
           .select();
 
-        const insertProperties = await supabase
+        const insertProperties = await (await supabase)
           .from("properties")
           .insert([formattedDataProperties])
           .select();
 
-        const insertValuations = await supabase
+        const insertValuations = await (await supabase)
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
@@ -332,7 +367,6 @@ const Page = () => {
     }
   };
 
-  const router = useRouter();
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams?.get("page") as string) || 1;
   const itemsPerPage = parseInt(searchParams?.get("perPage") as string) || 10;
