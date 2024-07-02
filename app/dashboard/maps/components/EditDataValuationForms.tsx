@@ -3,8 +3,7 @@ import { Valuation } from "../../../types/types";
 import { filterNumeric, formatRupiah } from "../../../utils/helper";
 import { ValuationInput } from "./ValuationInput";
 
-const EMPTY_VALUATION: Valuation = {
-  
+const EMPTY_VALUATION: Valuation = {  
   PropertyId: 0,
   valuationDate: new Date(),
   landValue: 0,
@@ -43,7 +42,7 @@ const EditDataValuationForm: React.FC<EditDataValuationFormProps> = ({
     };
 
   return (
-    <div>
+    <div className="mb-4">
       <ValuationInput
         label="Nilai Tanah/meter"
         value={formatRupiah(valuation.landValue)}
@@ -163,7 +162,7 @@ const AddDataValuationFormOnEdit: React.FC<AddDataValuationFormOnEditProps> = ({
     };
 
   return (
-    <div className="mb-8">
+    <div className="mb-4">
       <ValuationInput
         label="Nilai Tanah/meter"
         value={formatRupiah(valuation.landValue)}

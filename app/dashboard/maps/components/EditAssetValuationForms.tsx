@@ -4,7 +4,6 @@ import { filterNumeric, formatRupiah } from "../../../utils/helper";
 import { ValuationInput } from "./ValuationInput";
 
 const EMPTY_VALUATION: Valuation = {
-  id: 0,
   PropertyId: 0,
   valuationDate: new Date(),
   landValue: 0,
@@ -43,7 +42,7 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
     };
 
   return (
-    <div>
+    <div className="mb-4">
       <ValuationInput
         label="Nilai Tanah/meter"
         value={formatRupiah(valuation.landValue)}
@@ -68,6 +67,12 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
         onChange={handleInputChange("valuationDate")}
         type="date"
         placeholder="Tanggal Penilaian"
+      />
+      <ValuationInput
+        label="Penilai"
+        value={valuation.appraiser}
+        onChange={handleInputChange("appraiser")}
+        placeholder="Penilai"
       />
       <ValuationInput
         label="No Laporan"
@@ -120,6 +125,7 @@ export const EditAssetValuationForms: React.FC<
         <div className="text-sm whitespace-nowrap">+ Tambahkan Nilai</div>
         <div className="h-[2px] flex-1 bg-gray-300 group-hover:bg-blue-500 ml-2"></div>
       </button>
+
       <div className="flex flex-col divide-y-2">
         {newValuations.map((valuation, index) => (
           <AddAssetValuationFormOnEdit
@@ -164,7 +170,7 @@ const AddAssetValuationFormOnEdit: React.FC<
     };
 
   return (
-    <div className="mb-8">
+    <div className="mb-4">
       <ValuationInput
         label="Nilai Tanah/meter"
         value={formatRupiah(valuation.landValue)}
@@ -189,6 +195,12 @@ const AddAssetValuationFormOnEdit: React.FC<
         onChange={handleInputChange("valuationDate")}
         type="date"
         placeholder="Tanggal Penilaian"
+      />
+      <ValuationInput
+        label="Penilai"
+        value={valuation.appraiser}
+        onChange={handleInputChange("appraiser")}
+        placeholder="Penilai"
       />
       <ValuationInput
         label="No Laporan"

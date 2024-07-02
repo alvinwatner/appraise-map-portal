@@ -2,6 +2,30 @@ import { supabase } from "./../lib/supabaseClient";
 import { Property, Valuation, Location } from "./../types/types";
 import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
 
+/**
+ * Fetch properties with search and filter options.
+ * 
+ * This function queries the `properties` table and joins with related tables to fetch property data
+ * with support for search, filters, pagination, and sorting. The search and filter criteria are designed 
+ * for the following columns in the database:
+ * 
+ * - Table: `properties`, Column: `propertiesType`
+ * - Table: `valuation`, Column: `reportNumber`
+ * - Table: `valuation`, Column: `valuationDate`
+ * - Table: `properties`, Column: `objectType`
+ * - Table: `properties`, Column: `debitur`
+ * - Table: `properties`, Column: `phoneNumber`
+ * - Table: `locations`, Column: `address`
+ * 
+ * @param {string} [search=""] - The search keyword to filter results.
+ * @param {number} [page=1] - The current page number for pagination.
+ * @param {number} [perPage=10] - The number of results per page.
+ * @param {any} [filters={}] - The filters to apply to the query.
+ * @param {string} [sortField="id"] - The field to sort results by.
+ * @param {string} [sort="asc"] - The sort order (ascending or descending).
+ * 
+ * @returns {Promise<{ data: Property[]; total: number }>} - A promise that resolves to the fetched property data and total count.
+ */
 export const fetchProperties = async (
   search: string = "",
   page: number = 1,
@@ -10,6 +34,7 @@ export const fetchProperties = async (
   sortField: string = "id",
   sort: string = "asc"
 ): Promise<{ data: Property[]; total: number }> => {
+
   let query = supabase
     .from("properties")
     .select(
