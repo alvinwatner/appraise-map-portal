@@ -18,8 +18,6 @@ import { supabase } from "@/app/lib/supabaseClient";
 import ExportPopup from "./components/ExportPopup";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { createClient } from "@/app/utils/supabase/server";
-import { User } from "@supabase/supabase-js";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -89,24 +87,27 @@ const flattenData = (property: Property) => {
 };
 
 const Page = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await (await supabase).auth.getSession();
-      setUser(session?.user || null);
-
-      if (!session?.user) {
+    const fetchSession = async (): Promise<void> => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) {
+          throw error;
+        }
+      } catch (error: any) {
         router.push("/login");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchSession();
-  }, [supabase, router]);
+  }, [router]);
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);

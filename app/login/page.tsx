@@ -1,55 +1,52 @@
-import React from "react";
-import SupabaseLogo from "../components/SupabaseLogo";
-import { login } from "./action";
+"use client";
 
-const LoginPage: React.FC = () => {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-100">
-      <div className="bg-white rounded-md shadow-lg p-8 border border-gray-200 w-80">
-        <div className="flex justify-center mb-6">
-          <SupabaseLogo />
-        </div>
-        <form className="flex flex-col gap-4">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" required />
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" required />
-          <Separator />
-          <Button type="submit" formAction={login}>
-            Log in
-          </Button>
-        </form>
-      </div>
-    </main>
-  );
+import React, { useState, useEffect } from "react";
+import { Session } from "@supabase/supabase-js";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "../lib/supabaseClient";
+import { useRouter } from "next/navigation";
+
+const useRedirectToDashboard = (session: Session | null) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
 };
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
-interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
+const LoginPage: React.FC = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  useRedirectToDashboard(session);
 
-const Button: React.FC<ButtonProps> = ({ children, ...rest }) => (
-  <button
-    className="rounded-md bg-blue-600 text-white font-semibold px-4 py-2 border border-transparent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-    {...rest}
-  >
-    {children}
-  </button>
-);
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      setSession(sessionData?.session ?? null);
+    };
 
-const Input: React.FC<InputProps> = ({ ...rest }) => (
-  <input
-    className="rounded-md px-4 py-2 border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition duration-150 ease-in-out"
-    {...rest}
-  />
-);
+    fetchSession();
 
-const Label: React.FC<LabelProps> = ({ children, ...rest }) => (
-  <label {...rest} className="text-sm text-gray-600">
-    {children}
-  </label>
-);
+    const authListener = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
-const Separator: React.FC = () => <hr className="border-gray-300 my-4" />;
+    return () => authListener.data.subscription.unsubscribe();
+  }, []);
+
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+      <div className="w-full max-w-md px-4">
+        <Auth
+          supabaseClient={supabase}
+          appearance={{ theme: ThemeSupa }}
+          providers={[]}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default LoginPage;

@@ -56,6 +56,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     { label: "Jenis Data", field: "propertiesType", sortable: true },
     { label: "No. Laporan", field: "reportNumber", sortable: false },
     { label: "Tanggal Penilaian", field: "valuationDate", sortable: false },
+    { label: "Penilai", field: "appraiser", sortable: true },
     { label: "Jenis Objek", field: "objectType", sortable: true },
     { label: "Nama Debitor", field: "debitur", sortable: true },
     { label: "Nomor Tlp", field: "phoneNumber", sortable: true },
@@ -204,6 +205,31 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                           {
                             ...currentValuation,
                             valuationDate: newValuationDate,
+                          },
+                        ]);
+                      }}
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      className="block w-full rounded-md"
+                      type="text"
+                      value={
+                        editedValuations.get(item.valuations?.[0]?.id as number)
+                          ?.appraiser ||
+                        item.valuations?.[0]?.appraiser ||
+                        ""
+                      }
+                      onChange={(e) => {
+                        const newAppraiser = e.target.value || null;
+                        const currentValuation =
+                          editedValuations.get(
+                            item.valuations?.[0]?.id as number
+                          ) || item.valuations?.[0];
+                        handleChange(item.id, "valuations", [
+                          {
+                            ...currentValuation,
+                            appraiser: newAppraiser,
                           },
                         ]);
                       }}
@@ -400,6 +426,9 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     {new Date(
                       item.valuations?.[0]?.valuationDate
                     ).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.valuations?.[0]?.appraiser}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {item.objectType}
