@@ -1,3 +1,5 @@
+"use_client";
+
 import React from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FiMap, FiDatabase, FiHome } from "react-icons/fi";

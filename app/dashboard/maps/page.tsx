@@ -1,29 +1,39 @@
 "use client";
-import GoogleMaps from "@/app/dashboard/maps/components/GoogleMaps";
-import { Autocomplete } from "@react-google-maps/api";
-import { useMemo, useState, useRef, Suspense } from "react";
-import { fetchProperties } from "@/app/services/dataManagement.service";
 
+// React imports
+import React, { useEffect, useMemo, useState, useRef } from "react";
+
+// Next.js utilities
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+// Google Maps related imports
+import { Autocomplete, useLoadScript } from "@react-google-maps/api";
+
+// Service and utility imports
+import { fetchProperties } from "@/app/services/dataManagement.service";
+import { supabase } from "@/app/lib/supabaseClient";
+
+// Component imports
+import GoogleMaps from "@/app/dashboard/maps/components/GoogleMaps";
+import { MarkerDetailContent } from "@/app/dashboard/maps/components/MarkerDetailContent";
+import { SearchResult } from "@/app/dashboard/maps/components/SearchResult";
+import { AddMarkerForm } from "@/app/dashboard/maps/components/AddMarkerForms";
+import { EditMarkerForm } from "@/app/dashboard/maps/components/EditMarkerForm";
+import Loading from "@/app/components/Loading";
+import { Search } from "./components/Search";
+
+// Type imports
+import { Property } from "@/app/types/types";
+
+// Icon imports
 import {
   IoCheckmarkCircleOutline,
   IoCloseCircleOutline,
   IoSearchOutline,
+  IoClose,
 } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
-import { IoClose } from "react-icons/io5";
-import { MarkerDetailContent } from "@/app/dashboard/maps/components/MarkerDetailContent";
-
-import React, { useEffect } from "react";
-
-import { useLoadScript } from "@react-google-maps/api";
-import SearchResult from "@/app/dashboard/maps/components/SearchResult";
-import { Property } from "@/app/types/types";
-import Loading from "@/app/components/Loading";
-import { AddMarkerForm } from "@/app/dashboard/maps/components/AddMarkerForms";
-import { EditMarkerForm } from "@/app/dashboard/maps/components/EditMarkerForm";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/app/lib/supabaseClient";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -34,71 +44,20 @@ enum LeftWhiteSheetComponent {
 }
 
 export default function Page() {
+  // 1. State and Reference Hooks
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchSession = async (): Promise<void> => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
-      } catch (error: any) {
-        router.push("/login");
-      } finally {
-        // setLoading(false);
-      }
-    };
-
-    fetchSession();
-  }, [router]);
-
   const searchParams = useSearchParams();
-
-  const pathname = usePathname();
-  const { replace } = useRouter();
-  const libraries = useMemo(() => ["places"], []);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [mapCenter, setMapCenter] = useState({
     lat: -8.7932639,
     lng: 115.1499561,
   });
-
   const [properties, setProperties] = useState<Property[]>([]);
   const [modalInfo, setModalInfo] = useState({
     isOpen: false,
     isSuccess: false,
     message: "",
   });
-
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "",
-    // googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
-    libraries: libraries as any,
-  });
-
-  useEffect(() => {
-    const getData = async () => {
-      if (isLoaded) {
-        try {
-          // Assume loadProperties is a function that returns a Promise<Property[]>
-          const propertiesData = await fetchProperties("", 1, 30);
-
-          setProperties(propertiesData.data);
-        } catch (error) {
-          console.error("Failed to fetch properties:", error);
-        }
-      }
-    };
-
-    getData();
-  }, [isLoaded, properties]);
-
   const [onEditProperty, setOnEditProperty] = useState<Property>();
   const [isAdding, setIsAdding] = useState(false);
   const [lat, setLat] = useState<number>(0);
@@ -107,65 +66,53 @@ export default function Page() {
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
   );
-
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   );
-
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
-  const [markerDetail, setMarkerDetail] =
-    useState<null | google.maps.LatLngLiteral>(null);
+  // 2. Utility Hooks
+  const libraries = useMemo(() => ["places"], []);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "", // Should be process.env.NEXT_PUBLIC_MAPS_API_KEY,
+    libraries: libraries as any,
+  });
 
-  const [activeMarker, setActiveMarker] =
-    useState<null | google.maps.LatLngLiteral>(null);
+  // 3. Effect Hooks
+  // Authentication and session management
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) throw error;
+      } catch (error) {
+        router.push("/login");
+      }
+    };
+    fetchSession();
+  }, [router]);
 
-  const toggleAddingMode = () => {
-    setIsAdding(!isAdding);
-    setClickCoordinates(null);
-    if (isAdding) {
-      setLeftWhiteSheet(false);
-      setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-    }
-  };
+  // Data fetching after the script is loaded
+  useEffect(() => {
+    const getData = async () => {
+      if (isLoaded) {
+        try {
+          const propertiesData = await fetchProperties("", 1, 30);
+          setProperties(propertiesData.data);
+        } catch (error) {
+          console.error("Failed to fetch properties:", error);
+        }
+      }
+    };
+    getData();
+  }, [isLoaded]);
 
-  const handleMarkerClick = (property: Property) => {
-    console.log("is this executeed");
-    setSelectedProperty(property);
-    setLeftWhiteSheet(true);
-    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
-    setClickCoordinates(null);
-  };
-
-  const handleOnEditClick = (property: Property) => {
-    setOnEditProperty(property);
-    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.edit);
-  };
-
-  function handleSearch(term: string) {
-    console.log(`Searching... ${term}`);
-
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("search", term);
-    } else {
-      params.delete("search");
-    }
-    replace(`${pathname}?${params.toString()}`);
-  }
-
-  const handleMapClick = (location: google.maps.LatLngLiteral) => {
-    console.log(
-      "eeehh dapat location - lat = " + location.lat + "lng" + location.lng
-    );
-    setLat(location.lat);
-    setLng(location.lng);
-
-    setLeftWhiteSheet(true);
-    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
-  };
-
+  // Keydown event handling for 'Escape' to close forms/modals
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -182,10 +129,58 @@ export default function Page() {
     }
   }, [isAdding]);
 
+  // 4. Handler Functions
+  // Functions to handle UI interactions
+  const handleMarkerClick = (property: Property) => {
+    setSelectedProperty(property);
+    setLeftWhiteSheet(true);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
+    setClickCoordinates(null);
+  };
+
+  const handleOnEditClick = (property: Property) => {
+    setOnEditProperty(property);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.edit);
+  };
+
+  const handleMapClick = (location: google.maps.LatLngLiteral) => {
+    setLat(location.lat);
+    setLng(location.lng);
+    setLeftWhiteSheet(true);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
+  };
+
+  const toggleAddingMode = () => {
+    setIsAdding(!isAdding);
+    setClickCoordinates(null);
+    if (isAdding) {
+      setLeftWhiteSheet(false);
+      setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+    }
+  };
+
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
     autocompleteRef.current = autocomplete;
   };
 
+  const onPlaceChanged = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place && place.geometry && place.geometry.location) {
+        const location = place.geometry.location;
+        setMapCenter({ lat: location.lat(), lng: location.lng() });
+        if (map) {
+          map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
+        }
+      } else {
+        console.log(
+          "No geometry found for this place, cannot navigate to location."
+        );
+      }
+    }
+  };
+
+  // 5. Render Function
   const renderLeftWhiteSheetComponent = () => {
     switch (leftWhiteSheetComponent) {
       case LeftWhiteSheetComponent.markerDetail:
@@ -221,8 +216,11 @@ export default function Page() {
             }}
           />
         );
+
       case LeftWhiteSheetComponent.searchResult:
-        <SearchResult query={searchParams.get("query")?.toString() ?? ""} />;
+        return (
+          <SearchResult query={searchParams.get("search")?.toString() ?? ""} />
+        );
 
       case LeftWhiteSheetComponent.add:
         return (
@@ -257,6 +255,7 @@ export default function Page() {
             }}
           />
         );
+
       case LeftWhiteSheetComponent.edit:
         return (
           <EditMarkerForm
@@ -291,28 +290,7 @@ export default function Page() {
         );
 
       default:
-        return null;
-    }
-  };
-
-  const onPlaceChanged = () => {
-    console.log("sedang terjadi");
-
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-      console.log("place = " + place);
-      if (place && place.geometry && place.geometry.location) {
-        const location = place.geometry.location;
-        setMapCenter({ lat: location.lat(), lng: location.lng() });
-        if (map) {
-          map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
-        }
-      } else {
-        console.log(
-          "No geometry found for this place, cannot navigate to location."
-        );
-        // Optionally, handle the lack of geometry (e.g., show an error message to the user)
-      }
+        return null; // For any unhandled case, return null
     }
   };
 
@@ -345,25 +323,15 @@ export default function Page() {
       >
         <div className="relative w-72 h-10">
           <div className=""></div>
-          <form
+          <Search
             onSubmit={(e) => {
               e.preventDefault();
               console.log("keluarkan sesuatu");
               setLeftWhiteSheet(true);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.searchResult);
             }}
-          >
-            <input
-              className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-              type="text"
-              placeholder="       Search Property"
-              onChange={(e) => {
-                handleSearch(e.target.value);
-              }}
-              defaultValue={searchParams.get("query")?.toString()}
-            />
-          </form>
-          <IoSearchOutline className="absolute left-2 top-2" color="grey" />
+          />
+
           <button
             onClick={() => {
               setLeftWhiteSheet(false);
@@ -471,6 +439,4 @@ const ModalUpdateResult: React.FC<{
     </div>
   );
 };
-function useDebouncedCallback(arg0: (term: any) => void, arg1: number) {
-  throw new Error("Function not implemented.");
-}
+

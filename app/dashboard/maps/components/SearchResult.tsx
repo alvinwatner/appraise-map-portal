@@ -4,9 +4,44 @@ import { GoArrowRight } from "react-icons/go";
 import { PropertyChip, PropertyType } from "@/app/components/PropertyChip";
 import { Property } from "@/app/types/types";
 import { fetchProperties } from "@/app/services/dataManagement.service";
+import { useEffect, useState } from "react";
 
-export default async function SearchResult({ query }: { query: string }) {
-  const properties = await fetchProperties(query);
+export const SearchResult: React.FC<{ query: string }> = ({ query }) => {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log("loading properties");
+    const loadProperties = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetchProperties(query);
+        setProperties(response.data); // Assuming response is structured as { data: Property[] }
+      } catch (err) {
+        setError("Failed to fetch properties");
+        console.error(err); // Logging the error might be useful for debugging
+      } finally {
+        console.log("finally capung get executed");
+        setIsLoading(false);
+      }
+    };
+
+    if (query) {
+      console.log("is load proprerties ");
+      loadProperties();
+    }
+  }, [query]);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show a loading indicator while data is loading
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>; // Show an error message if there is an error
+  }
+
   return (
     <div className="relative w-full z-10">
       <div className="flex justify-between items-center mb-4 px-12">
@@ -18,7 +53,7 @@ export default async function SearchResult({ query }: { query: string }) {
         </div>
       </div>
       <div className="grid grid-cols-1 divide-y divide-gray-400">
-        {properties.data?.map((property) => (
+        {properties.map((property) => (
           <SearchResultItem key={property.id} property={property} />
         ))}
       </div>
@@ -26,7 +61,7 @@ export default async function SearchResult({ query }: { query: string }) {
       <div className=""></div>
     </div>
   );
-}
+};
 
 const SearchResultItem: React.FC<{ property: Property }> = ({ property }) => {
   return (
