@@ -11,7 +11,8 @@ import Loading from "@/app/components/Loading";
 export const SearchResult: React.FC<{
   query: string;
   onDetailClicked: (property: Property) => void;
-}> = ({ query, onDetailClicked }) => {
+  onNavigateClicked: (lat: number, lng: number) => void;
+}> = ({ query, onDetailClicked, onNavigateClicked }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +91,7 @@ export const SearchResult: React.FC<{
             key={property.id}
             property={property}
             onDetailClicked={onDetailClicked}
+            onNavigateClicked={onNavigateClicked}
           />
         ))}
       </div>
@@ -102,7 +104,8 @@ export const SearchResult: React.FC<{
 const SearchResultItem: React.FC<{
   property: Property;
   onDetailClicked: (property: Property) => void;
-}> = ({ property, onDetailClicked }) => {
+  onNavigateClicked: (lat: number, lng: number) => void;
+}> = ({ property, onDetailClicked, onNavigateClicked }) => {
   return (
     <div className="py-4">
       <div className="grid grid-cols-8 h-32 mt-2 px-12 ">
@@ -136,7 +139,9 @@ const SearchResultItem: React.FC<{
           <div className="flex flex-col justify-center items-center">
             <div
               className="rounded-full w-6 h-6 flex items-center justify-center bg-white ring-1 ring-black hover:ring-1 hover:ring-c-blue transition duration-100 p-1 mb-1"
-              onClick={() => {}}
+              onClick={() => {
+                onNavigateClicked(property.locations.latitude, property.locations.longitude);
+              }}
               style={{ cursor: "pointer", outline: "none" }}
             >
               <GoArrowRight size={20} />

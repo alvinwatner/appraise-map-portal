@@ -72,11 +72,12 @@ export default function Page() {
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapRef = useRef<any>();
 
   // 2. Utility Hooks
   const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "", // Should be process.env.NEXT_PUBLIC_MAPS_API_KEY,
+    googleMapsApiKey: "",
     libraries: libraries as any,
   });
 
@@ -173,10 +174,11 @@ export default function Page() {
       const place = autocompleteRef.current.getPlace();
       if (place && place.geometry && place.geometry.location) {
         const location = place.geometry.location;
-        setMapCenter({ lat: location.lat(), lng: location.lng() });
-        if (map) {
-          map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
-        }
+        mapRef.current.setMapCenter(location.lat(), location.lng());
+        // setMapCenter({ lat: location.lat(), lng: location.lng() });
+        // if (map) {
+        //   map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
+        // }
       } else {
         console.log(
           "No geometry found for this place, cannot navigate to location."
@@ -228,6 +230,11 @@ export default function Page() {
             query={searchParams.get("search")?.toString() ?? ""}
             onDetailClicked={(property: Property) => {
               handleShowMarkerDetail(property);
+            }}
+            onNavigateClicked={(lat, lng) => {
+              setLeftWhiteSheet(false);
+              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+              mapRef.current.setMapCenter(lat, lng);
             }}
           />
         );
@@ -367,6 +374,7 @@ export default function Page() {
         <Autocomplete
           onLoad={onLoad}
           onPlaceChanged={onPlaceChanged}
+
           options={{ types: ["address"] }}
         >
           <div className="relative w-full ">
@@ -392,6 +400,7 @@ export default function Page() {
 
       {properties.length > 0 && (
         <GoogleMaps
+          ref={mapRef}
           properties={properties}
           isAdding={isAdding}
           onMarkerClick={handleMarkerClick}

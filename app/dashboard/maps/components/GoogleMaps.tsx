@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Property } from "../../../types/types";
-import { GoStarFill } from "react-icons/go";
 
 interface GoogleMapProps {
   properties: Property[];
@@ -10,18 +9,31 @@ interface GoogleMapProps {
   onMapClick: (location: google.maps.LatLngLiteral) => void;
 }
 
-export default function GoogleMaps({
-  properties,
-  isAdding,
-  onMarkerClick,
-  onMapClick,
-}: GoogleMapProps) {
+function GoogleMaps(
+  {
+    properties,
+    isAdding,
+    onMarkerClick,
+    onMapClick,
+  }: GoogleMapProps,
+  ref: React.Ref<any>
+) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
 
+  // Expose setMapCenter method using ref
+  useImperativeHandle(ref, () => ({
+    setMapCenter: (lat: number, lng: number) => {
+      if (mapInstance.current) {
+        mapInstance.current.setCenter({ lat, lng });
+      }
+    },
+  }));
+
   useEffect(() => {
     const loader = new Loader({
-      apiKey: "", // Add your Google Maps API key here
+      apiKey: "",
+      // apiKey: "AIzaSyDAV8Ih-E6v-_g9qPNcoKcd1hRkk0Vn7N0",
       version: "quarterly",
     });
 
@@ -29,7 +41,7 @@ export default function GoogleMaps({
       if (!properties || properties.length === 0) {
         console.error("No properties available to initialize map markers.");
         return;
-      }      
+      }
       const { Map } = await loader.importLibrary("maps");
 
       // const locations = [
@@ -68,8 +80,8 @@ export default function GoogleMaps({
 
           var url = "/marker_aset.png";
 
-          if (property.propertiesType == "data"){
-            url = "/marker_data.png"
+          if (property.propertiesType == "data") {
+            url = "/marker_data.png";
           }
 
           const marker = new google.maps.Marker({
@@ -78,8 +90,7 @@ export default function GoogleMaps({
             icon: {
               url: url,
               // url: `{ ${property.propertiesType == "data" ?  "/marker_data.png" : "/marker_aset.png"}}`,
-              scaledSize: new google.maps.Size(52, 52) 
-              
+              scaledSize: new google.maps.Size(52, 52),
             },
           });
 
@@ -118,3 +129,5 @@ export default function GoogleMaps({
 
   return <div className="h-full  " ref={mapRef} />;
 }
+
+export default React.forwardRef(GoogleMaps);
