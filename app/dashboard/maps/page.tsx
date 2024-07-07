@@ -131,11 +131,16 @@ export default function Page() {
 
   // 4. Handler Functions
   // Functions to handle UI interactions
-  const handleMarkerClick = (property: Property) => {
+
+  const handleShowMarkerDetail = (property: Property) => {
     setSelectedProperty(property);
     setLeftWhiteSheet(true);
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.markerDetail);
     setClickCoordinates(null);
+  };
+
+  const handleMarkerClick = (property: Property) => {
+    handleShowMarkerDetail(property);
   };
 
   const handleOnEditClick = (property: Property) => {
@@ -219,7 +224,12 @@ export default function Page() {
 
       case LeftWhiteSheetComponent.searchResult:
         return (
-          <SearchResult query={searchParams.get("search")?.toString() ?? ""} />
+          <SearchResult
+            query={searchParams.get("search")?.toString() ?? ""}
+            onDetailClicked={(property: Property) => {
+              handleShowMarkerDetail(property);
+            }}
+          />
         );
 
       case LeftWhiteSheetComponent.add:
@@ -326,7 +336,10 @@ export default function Page() {
           <Search
             onSubmit={(e) => {
               e.preventDefault();
-              console.log("keluarkan sesuatu");
+              if (!searchParams.get("search")?.trim()) {
+                return;
+              }
+
               setLeftWhiteSheet(true);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.searchResult);
             }}
@@ -439,4 +452,3 @@ const ModalUpdateResult: React.FC<{
     </div>
   );
 };
-

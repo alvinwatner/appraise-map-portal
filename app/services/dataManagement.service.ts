@@ -58,7 +58,7 @@ export const fetchProperties = async (
         latitude,
         longitude,
         address
-      )
+      ),
       valuations (
         id,
         valuationDate,
@@ -79,8 +79,8 @@ export const fetchProperties = async (
     query = query
       .or(
         `debitur.ilike.%${search}%,propertiesType.ilike.%${search}%,objectType.ilike.%${search}%,phoneNumber.ilike.%${search}%`
-      )
-      .or(`address.ilike.%${search}%`, { foreignTable: "locations" })
+      )    
+      // .or(`address.ilike.%${search}%`, { foreignTable: "locations" })
   }
 
   if (filters.propertyType) {

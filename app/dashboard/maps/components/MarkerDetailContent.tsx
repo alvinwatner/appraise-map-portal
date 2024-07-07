@@ -117,17 +117,18 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         </div>
       </div>
 
-      {property.valuations.map((valuation) => (
-        <>
-          {property.propertiesType == "aset" && (
-            <ValuationCardAsset valuation={valuation} />
-          )}
+      {property.valuations.length != 0 &&
+        property.valuations.map((valuation) => (
+          <>
+            {property.propertiesType == "aset" && (
+              <ValuationCardAsset valuation={valuation} />
+            )}
 
-          {property.propertiesType == "data" && (
-            <ValuationCardData valuation={valuation} />
-          )}
-        </>
-      ))}
+            {property.propertiesType == "data" && (
+              <ValuationCardData valuation={valuation} />
+            )}
+          </>
+        ))}
 
       <div className="grid grid-cols-2 gap-2 mb-10 mt-8 ">
         <button

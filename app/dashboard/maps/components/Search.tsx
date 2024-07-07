@@ -1,5 +1,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormEvent } from "react";
+import { IoSearchOutline } from "react-icons/io5";
 
 export const Search: React.FC<{
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
@@ -31,6 +32,7 @@ export const Search: React.FC<{
         }}
         defaultValue={searchParams.get("query")?.toString()}
       />
+      <IoSearchOutline className="absolute left-2 top-2 " color="grey" />
     </form>
   );
 };
