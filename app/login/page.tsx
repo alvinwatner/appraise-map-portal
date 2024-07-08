@@ -29,9 +29,55 @@ const LoginPage: React.FC = () => {
 
     fetchSession();
 
-    const authListener = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const authListener = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+
+        if (session) {
+          const user = session.user;
+          // Check if user exists
+          const { data: existingUser, error } = await supabase
+            .from("users")
+            .select("*")
+            .eq("auth_id", user.id)
+            .single();
+
+          if (error && error.code === "PGRST116") {
+            // If user doesn't exist, create one
+            const { error: insertError } = await supabase.from("users").insert({
+              auth_id: user.id,
+              email: user.email,
+              username: user.user_metadata.username || "",
+              password: "",
+              lastLogin: new Date(),
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              name: user.user_metadata.name || "",
+            });
+
+            if (insertError) {
+              console.error("Error creating user:", insertError);
+            }
+          } else if (error) {
+            console.error("Error fetching user:", error);
+          } else {
+            // Update last login and other details
+            const { error: updateError } = await supabase
+              .from("users")
+              .update({
+                lastLogin: new Date(),
+                updatedAt: new Date(),
+              })
+              .eq("auth_id", user.id);
+
+            if (updateError) {
+              console.error("Error updating user:", updateError);
+            }
+          }
+        }
+      }
+    );
 
     return () => authListener.data.subscription.unsubscribe();
   }, []);
