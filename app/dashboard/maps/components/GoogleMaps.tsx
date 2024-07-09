@@ -1,25 +1,43 @@
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Property } from "../../../types/types";
 
 interface GoogleMapProps {
+  initLatitude: number;
+  initLongitude: number;
   properties: Property[];
   isAdding: boolean;
   onMarkerClick: (property: Property) => void;
   onMapClick: (location: google.maps.LatLngLiteral) => void;
+  onBoundsChange: (
+    swLat: number,
+    swLng: number,
+    neLat: number,
+    neLng: number
+  ) => void;
 }
 
 function GoogleMaps(
   {
+    initLatitude,
+    initLongitude,
     properties,
     isAdding,
     onMarkerClick,
     onMapClick,
+    onBoundsChange,
   }: GoogleMapProps,
   ref: React.Ref<any>
 ) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+
+  const [internalProperties, setInternalProperties] = useState<Property[]>([]);
+
+  useEffect(() => {
+    setInternalProperties([...properties]);
+  }, [properties]);
 
   // Expose setMapCenter method using ref
   useImperativeHandle(ref, () => ({
@@ -38,24 +56,7 @@ function GoogleMaps(
     });
 
     const initializeMap = async () => {
-      if (!properties || properties.length === 0) {
-        console.error("No properties available to initialize map markers.");
-        return;
-      }
       const { Map } = await loader.importLibrary("maps");
-
-      // const locations = [
-      //   { lat: -8.7932639, lng: 115.1499561 },
-      //   { lat: -8.7902898, lng: 115.1539977 },
-      //   { lat: -8.789535, lng: 115.163359 },
-      // ];
-
-      const initLatitude = parseFloat(
-        properties[0]?.locations.latitude.toString().replace(",", ".")
-      );
-      const initLongitude = parseFloat(
-        properties[0]?.locations.longitude.toString().replace(",", ".")
-      );
 
       const initLoc = { lat: initLatitude, lng: initLongitude };
 
@@ -66,39 +67,43 @@ function GoogleMaps(
           mapId: "NEXT_MAPS_TUTS",
           disableDefaultUI: true,
         });
-
-        properties.forEach((property) => {
-          // Ensure latitude and longitude are converted to numbers with period as decimal separator
-          const latitude = parseFloat(
-            property.locations.latitude.toString().replace(",", ".")
-          );
-          const longitude = parseFloat(
-            property.locations.longitude.toString().replace(",", ".")
-          );
-
-          const location = { lat: latitude, lng: longitude };
-
-          var url = "/marker_aset.png";
-
-          if (property.propertiesType == "data") {
-            url = "/marker_data.png";
-          }
-
-          const marker = new google.maps.Marker({
-            position: location,
-            map: mapInstance.current,
-            icon: {
-              url: url,
-              // url: `{ ${property.propertiesType == "data" ?  "/marker_data.png" : "/marker_aset.png"}}`,
-              scaledSize: new google.maps.Size(52, 52),
-            },
-          });
-
-          marker.addListener("click", () => {
-            onMarkerClick(property);
-          });
-        });
       }
+
+      clearMarkers();
+
+      internalProperties.forEach((property) => {
+        const latitude = parseFloat(
+          property.locations.latitude.toString().replace(",", ".")
+        );
+        const longitude = parseFloat(
+          property.locations.longitude.toString().replace(",", ".")
+        );
+
+        const location = { lat: latitude, lng: longitude };
+
+        var url = "/marker_aset.png";
+
+        if (property.propertiesType == "data") {
+          url = "/marker_data.png";
+        }
+
+        const marker = new google.maps.Marker({
+          position: location,
+          map: mapInstance.current,
+          icon: {
+            url: url,
+            // url: `{ ${property.propertiesType == "data" ?  "/marker_data.png" : "/marker_aset.png"}}`,
+            scaledSize: new google.maps.Size(52, 52),
+          },
+        });
+
+        marker.addListener("click", () => {
+          onMarkerClick(property);
+        });
+
+        markersRef.current.push(marker);
+
+      });
 
       if (mapInstance.current) {
         mapInstance.current.setOptions({
@@ -121,11 +126,36 @@ function GoogleMaps(
             }
           }
         );
+
+        // Listener for updating bounds after map moves
+        google.maps.event.addListener(mapInstance.current, "idle", () => {
+          if (mapInstance != null) {
+            const bounds = mapInstance!.current!.getBounds();
+            const ne = bounds!.getNorthEast();
+            const sw = bounds!.getSouthWest();
+            onBoundsChange(sw.lat(), sw.lng(), ne.lat(), ne.lng());
+          }
+        });
       }
     };
 
     initializeMap();
-  }, [onMarkerClick, isAdding, properties, onMapClick]);
+  }, [
+    onMarkerClick,
+    isAdding,
+    properties,
+    onMapClick,
+    onBoundsChange,
+    initLatitude,
+    initLongitude,
+    internalProperties,
+  ]);
+
+  // Function to clear all markers from the map
+  const clearMarkers = () => {
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+  };
 
   return <div className="h-full  " ref={mapRef} />;
 }

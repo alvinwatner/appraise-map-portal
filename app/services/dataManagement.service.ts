@@ -76,11 +76,10 @@ export const fetchProperties = async (
 
   if (search) {
     // Update to handle logical 'OR' correctly
-    query = query
-      .or(
-        `debitur.ilike.%${search}%,propertiesType.ilike.%${search}%,objectType.ilike.%${search}%,phoneNumber.ilike.%${search}%`
-      )    
-      // .or(`address.ilike.%${search}%`, { foreignTable: "locations" })
+    query = query.or(
+      `debitur.ilike.%${search}%,propertiesType.ilike.%${search}%,objectType.ilike.%${search}%,phoneNumber.ilike.%${search}%`
+    );
+    // .or(`address.ilike.%${search}%`, { foreignTable: "locations" })
   }
 
   if (filters.propertyType) {
@@ -116,6 +115,52 @@ export const fetchProperties = async (
   }
 
   return { data: data as unknown as Property[], total: count || 0 };
+};
+
+export const fetchPropertiesByBoundingBox = async (
+  swLat: number,
+  swLng: number,
+  neLat: number,
+  neLng: number,
+  filters: {
+    propertyType?: string;
+    objectType?: string;
+    valuationDate?: string;
+    minTotalValue?: number;
+    maxTotalValue?: number;
+  } = {}
+): Promise<{ data: Property[]; total: number }> => {
+  const rpcFilters = {
+    min_lat: swLat,
+    min_long: swLng,
+    max_lat: neLat,
+    max_long: neLng,
+    property_type:
+      filters.propertyType && filters.propertyType !== ""
+        ? filters.propertyType
+        : null,
+    object_type:
+      filters.objectType && filters.objectType !== ""
+        ? filters.objectType
+        : null,
+    valuation_date:
+      filters.valuationDate && filters.valuationDate !== ""
+        ? filters.valuationDate
+        : null,
+    min_total_value: filters.minTotalValue || null,
+    max_total_value: filters.maxTotalValue || null,
+  };
+
+  let { data, error } = await supabase.rpc("properties_in_view", rpcFilters);
+
+  console.log(`result data = ${JSON.stringify(data)}`);
+
+  if (error) {
+    console.error("Error fetching properties:", error);
+    return { data: [], total: 0 };
+  }
+
+  return { data: data as unknown as Property[], total: data.length };
 };
 
 export const updatePropertiesIsDeleted = async (

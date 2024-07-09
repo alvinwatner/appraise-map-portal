@@ -11,7 +11,7 @@ import Loading from "@/app/components/Loading";
 export const SearchResult: React.FC<{
   query: string;
   onDetailClicked: (property: Property) => void;
-  onNavigateClicked: (lat: number, lng: number) => void;
+  onNavigateClicked: (lat: number, lng: number) => void;  
 }> = ({ query, onDetailClicked, onNavigateClicked }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,13 +76,15 @@ export const SearchResult: React.FC<{
 
   return (
     <div className="relative w-full z-10">
-      <div className="sticky top-0 z-50 bg-white px-12 py-4 shadow-md">
+      <div className="sticky -top-2 z-50 bg-white px-12 ">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Results</h3>
-          <div className="flex">
+          <h3 className="text-lg font-medium ">Results</h3>
+          {/* <button className="flex hover:cursor-pointer" onClick={() => {
+
+          }}>
             <HiAdjustmentsHorizontal className="mr-2" />
             <p className="text-sm">Filter</p>
-          </div>
+          </button> */}
         </div>
       </div>
       <div className="grid grid-cols-1 divide-y divide-gray-400">
@@ -140,7 +142,10 @@ const SearchResultItem: React.FC<{
             <div
               className="rounded-full w-6 h-6 flex items-center justify-center bg-white ring-1 ring-black hover:ring-1 hover:ring-c-blue transition duration-100 p-1 mb-1"
               onClick={() => {
-                onNavigateClicked(property.locations.latitude, property.locations.longitude);
+                onNavigateClicked(
+                  property.locations.latitude,
+                  property.locations.longitude
+                );
               }}
               style={{ cursor: "pointer", outline: "none" }}
             >

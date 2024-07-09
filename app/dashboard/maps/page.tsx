@@ -1,7 +1,13 @@
 "use client";
 
 // React imports
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 
 // Next.js utilities
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -10,7 +16,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 
 // Service and utility imports
-import { fetchProperties } from "@/app/services/dataManagement.service";
+import {
+  fetchProperties,
+  fetchPropertiesByBoundingBox,
+} from "@/app/services/dataManagement.service";
 import { supabase } from "@/app/lib/supabaseClient";
 
 // Component imports
@@ -34,6 +43,7 @@ import {
 } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
+import FilterModal from "../data-management/components/FilterModal";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -44,25 +54,30 @@ enum LeftWhiteSheetComponent {
 }
 
 export default function Page() {
-  // 1. State and Reference Hooks
+  // State and Reference Hooks
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapCenter, setMapCenter] = useState({
-    lat: -8.7932639,
-    lng: 115.1499561,
-  });
   const [properties, setProperties] = useState<Property[]>([]);
   const [modalInfo, setModalInfo] = useState({
     isOpen: false,
     isSuccess: false,
     message: "",
   });
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [onEditProperty, setOnEditProperty] = useState<Property>();
+  const [bounds, setBounds] = useState({
+    swLat: 0,
+    swLng: 0,
+    neLat: 0,
+    neLng: 0,
+  });
+
+  const [filters, setFilters] = useState({});
   const [isAdding, setIsAdding] = useState(false);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
+  const [googleMapKey, setgoogleMapKey] = useState(Date.now());
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
     LeftWhiteSheetComponent.hide
   );
@@ -74,14 +89,14 @@ export default function Page() {
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapRef = useRef<any>();
 
-  // 2. Utility Hooks
+  // Utility Hooks
   const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "",
     libraries: libraries as any,
   });
 
-  // 3. Effect Hooks
+  // Effect Hooks
   // Authentication and session management
   useEffect(() => {
     const fetchSession = async () => {
@@ -98,20 +113,43 @@ export default function Page() {
     fetchSession();
   }, [router]);
 
-  // Data fetching after the script is loaded
+  // Define the callback to update bounds
+  const handleBoundsChange = useCallback(
+    (swLat: number, swLng: number, neLat: number, neLng: number) => {
+      setBounds({ swLat, swLng, neLat, neLng });
+    },
+    []
+  );
+
+  const fetchData = useCallback(async () => {
+    console.log("Refreshing data for new bounds");
+    try {
+
+      const propertiesData = await fetchPropertiesByBoundingBox(
+        bounds.swLat,
+        bounds.swLng,
+        bounds.neLat,
+        bounds.neLng,
+        filters
+      );
+      console.log(`properties data successfully fetched`);
+      setProperties(propertiesData.data);
+    } catch (error) {
+      console.error("Failed to fetch properties:", error);
+    }
+  }, [bounds.neLat, bounds.neLng, bounds.swLat, bounds.swLng, filters]);
+
+  // Fetch data based on bounds
   useEffect(() => {
-    const getData = async () => {
-      if (isLoaded) {
-        try {
-          const propertiesData = await fetchProperties("", 1, 30);
-          setProperties(propertiesData.data);
-        } catch (error) {
-          console.error("Failed to fetch properties:", error);
-        }
-      }
-    };
-    getData();
-  }, [isLoaded]);
+    if (bounds.neLat !== 0) {
+      fetchData();
+    }
+  }, [bounds, fetchData]);
+
+  const refreshData = () => {
+    setProperties([]);
+    fetchData().then(() => setgoogleMapKey(Date.now()));
+  };
 
   // Keydown event handling for 'Escape' to close forms/modals
   useEffect(() => {
@@ -132,6 +170,40 @@ export default function Page() {
 
   // 4. Handler Functions
   // Functions to handle UI interactions
+
+  useEffect(() => {
+    console.log(`filters = ${JSON.stringify(filters)}`);
+  }, [filters]);
+
+  const handleFilterApply = (filters: any) => {
+    setFilters(filters);
+    setShowFilterModal(false);
+    refreshData();
+  };
+
+  const handleModalSuccess = (message: string) => {
+    setIsAdding(false);
+    setLeftWhiteSheet(false);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+    setModalInfo({
+      isOpen: true,
+      isSuccess: true,
+      message: message,
+    });
+    refreshData();
+  };
+
+  const handleModalFailure = (message: string) => {
+    setIsAdding(false);
+    setLeftWhiteSheet(false);
+    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+    setModalInfo({
+      isOpen: true,
+      isSuccess: true,
+      message: message,
+    });
+    refreshData();
+  };
 
   const handleShowMarkerDetail = (property: Property) => {
     setSelectedProperty(property);
@@ -175,10 +247,6 @@ export default function Page() {
       if (place && place.geometry && place.geometry.location) {
         const location = place.geometry.location;
         mapRef.current.setMapCenter(location.lat(), location.lng());
-        // setMapCenter({ lat: location.lat(), lng: location.lng() });
-        // if (map) {
-        //   map.panTo(new google.maps.LatLng(location.lat(), location.lng()));
-        // }
       } else {
         console.log(
           "No geometry found for this place, cannot navigate to location."
@@ -196,26 +264,12 @@ export default function Page() {
             property={selectedProperty!}
             onEditClicked={handleOnEditClick}
             onShowModalSuccess={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: true,
-                message: "Property delete successfully!",
-              });
+              handleModalSuccess("Property deleted successfully!");
             }}
             onShowModalFail={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: false,
-                message: "Failed to delete property. Please try again.",
-              });
+              handleModalSuccess(
+                "Failed to delete property. Contact customer support."
+              );
             }}
             onClose={() => {
               setLeftWhiteSheet(false);
@@ -249,26 +303,12 @@ export default function Page() {
             lat={lat}
             lng={lng}
             onShowModalSuccess={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: true,
-                message: "Property added successfully!",
-              });
+              handleModalSuccess("Property edited successfully!");
             }}
             onShowModalFail={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: false,
-                message: "Failed to add property. Please try again.",
-              });
+              handleModalFailure(
+                "Failed to edit property. Contact customer support."
+              );
             }}
           />
         );
@@ -282,26 +322,12 @@ export default function Page() {
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
             onShowModalSuccess={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: true,
-                message: "Property edit successfully!",
-              });
+              handleModalSuccess("Property added successfully!");
             }}
             onShowModalFail={() => {
-              console.log("showing modal result");
-              setIsAdding(false);
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-              setModalInfo({
-                isOpen: true,
-                isSuccess: false,
-                message: "Failed to edit property. Please try again.",
-              });
+              handleModalFailure(
+                "Failed to add property. Contact customer support."
+              );
             }}
           />
         );
@@ -374,7 +400,6 @@ export default function Page() {
         <Autocomplete
           onLoad={onLoad}
           onPlaceChanged={onPlaceChanged}
-
           options={{ types: ["address"] }}
         >
           <div className="relative w-full ">
@@ -388,7 +413,13 @@ export default function Page() {
         </Autocomplete>
       </div>
 
-      <div className="absolute top-[15px] left-[750px] z-10 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400">
+      <button
+        className="absolute top-[15px] left-[750px] z-50 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400"
+        onClick={() => setShowFilterModal(true)}
+        // onClick={() => {
+        //   setShowFilterModal(true);
+        // }}
+      >
         <div className="relative w-full h-full flex items-center justify-center">
           <>
             <BsSliders className="mr-2" />
@@ -396,17 +427,19 @@ export default function Page() {
             <p className="text-sm">Filter</p>
           </>
         </div>
-      </div>
+      </button>
 
-      {properties.length > 0 && (
-        <GoogleMaps
-          ref={mapRef}
-          properties={properties}
-          isAdding={isAdding}
-          onMarkerClick={handleMarkerClick}
-          onMapClick={handleMapClick}
-        />
-      )}
+      <GoogleMaps
+        initLatitude={3.560506}
+        initLongitude={98.636445}
+        key={googleMapKey}
+        ref={mapRef}
+        properties={properties}
+        isAdding={isAdding}
+        onMarkerClick={handleMarkerClick}
+        onMapClick={handleMapClick}
+        onBoundsChange={handleBoundsChange}
+      />
 
       {/* Floating action button */}
       <button
@@ -424,6 +457,14 @@ export default function Page() {
           <FiPlus className="text-3xl text-black" />
         )}
       </button>
+
+      {showFilterModal && (
+        <FilterModal
+          onApply={handleFilterApply}
+          onClose={() => setShowFilterModal(false)}
+          defaultFilters={filters}
+        />
+      )}
 
       <ModalUpdateResult
         isOpen={modalInfo.isOpen}
