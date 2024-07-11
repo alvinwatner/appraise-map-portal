@@ -26,95 +26,137 @@ import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
  *
  * @returns {Promise<{ data: Property[]; total: number }>} - A promise that resolves to the fetched property data and total count.
  */
+// export const fetchProperties = async (
+//   search: string = "",
+//   page: number = 1,
+//   perPage: number = 10,
+//   filters: any = {},
+//   sortField: string = "id",
+//   sort: string = "asc"
+// ): Promise<{ data: Property[]; total: number }> => {
+//   let query = supabase
+//     .from("properties")
+//     .select(
+//       `
+//       id,
+//       debitur,
+//       landArea,
+//       buildingArea,
+//       phoneNumber,
+//       propertiesType,
+//       isDeleted,
+//       objectType,
+//       users (
+//         id,
+//         email,
+//         username,
+//         lastLogin,
+//         isActive
+//       ),
+//       locations:LocationId!inner (
+//         id,
+//         latitude,
+//         longitude,
+//         address
+//       ),
+//       valuations (
+//         id,
+//         valuationDate,
+//         landValue,
+//         buildingValue,
+//         totalValue,
+//         reportNumber,
+//         appraiser
+//       )
+//     `,
+//       { count: "exact" }
+//     )
+//     .is("isDeleted", null)
+//     .order(sortField, { ascending: sort === "asc" });
+
+//   if (search) {
+//     // Update to handle logical 'OR' correctly
+//     query = query.or(
+//       `debitur.ilike.%${search}%,propertiesType.ilike.%${search}%,objectType.ilike.%${search}%,phoneNumber.ilike.%${search}%`
+//     );
+//   }
+
+//   if (filters.propertyType) {
+//     query = query.eq("propertiesType", filters.propertyType);
+//   }
+
+//   if (filters.valuationDate) {
+//     query = query.eq("valuations.valuationDate", filters.valuationDate);
+//   }
+
+//   if (filters.objectType) {
+//     query = query.eq("objectType.name", filters.objectType);
+//   }
+
+//   if (filters.minTotalValue !== undefined) {
+//     query = query.gte("valuations.totalValue", filters.minTotalValue);
+//   }
+
+//   if (filters.maxTotalValue !== undefined) {
+//     query = query.lte("valuations.totalValue", filters.maxTotalValue);
+//   }
+
+//   const from = (page - 1) * perPage;
+//   const to = from + perPage - 1;
+
+//   query = query.range(from, to);
+
+//   const { data, error, count } = await query;
+
+//   if (error) {
+//     console.error("Error fetching properties:", error);
+//     return { data: [], total: 0 };
+//   }
+
+//   return { data: data as unknown as Property[], total: count || 0 };
+// };
+
 export const fetchProperties = async (
-  search: string = "",
+  search?: string,
   page: number = 1,
   perPage: number = 10,
   filters: any = {},
   sortField: string = "id",
   sort: string = "asc"
 ): Promise<{ data: Property[]; total: number }> => {
-  let query = supabase
-    .from("properties")
-    .select(
-      `
-      id,
-      debitur,
-      landArea,
-      buildingArea,
-      phoneNumber,
-      propertiesType,
-      isDeleted,
-      objectType,
-      users (
-        id,
-        email,
-        username,
-        lastLogin,
-        isActive
-      ),
-      locations:LocationId!inner (
-        id,
-        latitude,
-        longitude,
-        address
-      ),
-      valuations (
-        id,
-        valuationDate,
-        landValue,
-        buildingValue,
-        totalValue,
-        reportNumber,
-        appraiser
-      )
-    `,
-      { count: "exact" }
-    )
-    .is("isDeleted", null)
-    .order(sortField, { ascending: sort === "asc" });
+  console.log(`fetching properties data`);
+  const {
+    propertyType,
+    objectType,
+    valuationDate,
+    minTotalValue,
+    maxTotalValue,
+  } = filters;
 
-  if (search) {
-    // Update to handle logical 'OR' correctly
-    query = query.or(
-      `debitur.ilike.%${search}%,propertiesType.ilike.%${search}%,objectType.ilike.%${search}%,phoneNumber.ilike.%${search}%`
-    );
-    // .or(`address.ilike.%${search}%`, { foreignTable: "locations" })
-  }
+  const rpcParams = {
+    page: page,
+    per_page : perPage,
+    search_query: search && search !== "" ? search : null,
+    property_type: propertyType && propertyType !== "" ? propertyType : null,
+    object_type: objectType && objectType !== "" ? objectType : null,
+    valuation_date:
+      valuationDate && valuationDate !== "" ? valuationDate : null,
+    min_total_value: minTotalValue || null,
+    max_total_value: maxTotalValue || null,
+    sort_field : sortField,
+    sort_order : sort
+  };
 
-  if (filters.propertyType) {
-    query = query.eq("propertiesType", filters.propertyType);
-  }
+  let { data, error } = await supabase.rpc("fetch_properties", rpcParams);
 
-  if (filters.valuationDate) {
-    query = query.eq("valuations.valuationDate", filters.valuationDate);
-  }
-
-  if (filters.objectType) {
-    query = query.eq("objectType.name", filters.objectType);
-  }
-
-  if (filters.minTotalValue !== undefined) {
-    query = query.gte("valuations.totalValue", filters.minTotalValue);
-  }
-
-  if (filters.maxTotalValue !== undefined) {
-    query = query.lte("valuations.totalValue", filters.maxTotalValue);
-  }
-
-  const from = (page - 1) * perPage;
-  const to = from + perPage - 1;
-
-  query = query.range(from, to);
-
-  const { data, error, count } = await query;
+  console.log(`fetched properties data = ${JSON.stringify(data)}`);
 
   if (error) {
     console.error("Error fetching properties:", error);
     return { data: [], total: 0 };
   }
 
-  return { data: data as unknown as Property[], total: count || 0 };
+  return { data: data as unknown as Property[], total: data.length };
 };
 
 export const fetchPropertiesByBoundingBox = async (
@@ -259,8 +301,7 @@ export const addProperty = async ({
   const { data: locationData, error: locationError } = await supabase
     .from("locations")
     .insert({
-      latitude: latitude,
-      longitude: longitude,
+      coordinate: `POINT(${longitude} ${latitude})`,
       address: address,
     })
     .select();

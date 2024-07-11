@@ -53,23 +53,23 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   }
 
   const headers = [
-    { label: "Jenis Data", field: "propertiesType", sortable: true },
+    { label: "Jenis Data", field: "propertiesType", sortable: false },
     { label: "No. Laporan", field: "reportNumber", sortable: false },
     { label: "Tanggal Penilaian", field: "valuationDate", sortable: false },
-    { label: "Penilai", field: "appraiser", sortable: true },
-    { label: "Jenis Objek", field: "objectType", sortable: true },
-    { label: "Nama Debitor", field: "debitur", sortable: true },
-    { label: "Nomor Tlp", field: "phoneNumber", sortable: true },
-    { label: "Alamat", field: "locations(address)", sortable: true },
+    { label: "Penilai", field: "appraiser", sortable: false },
+    { label: "Jenis Objek", field: "objectType", sortable: false },
+    { label: "Nama Debitor", field: "debitur", sortable: false },
+    { label: "Nomor Tlp", field: "phoneNumber", sortable: false },
+    { label: "Alamat", field: "locations(address)", sortable: false },
     { label: "Luas Tanah", field: "landArea", sortable: true },
     { label: "Luas Bangunan", field: "buildingArea", sortable: true },
-    { label: "Nilai Tanah / Meter", field: "landValue", sortable: false },
+    { label: "Nilai Tanah / Meter", field: "landValue", sortable: true },
     {
       label: "Nilai Bangunan / Meter",
       field: "buildingValue",
-      sortable: false,
+      sortable: true,
     },
-    { label: "Nilai", field: "totalValue", sortable: false },
+    { label: "Nilai", field: "totalValue", sortable: true },
   ];
 
   const renderSortIcon = (field: string) => {
