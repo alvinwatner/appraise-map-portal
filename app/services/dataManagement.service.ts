@@ -124,7 +124,6 @@ export const fetchProperties = async (
   sortField: string = "id",
   sort: string = "asc"
 ): Promise<{ data: Property[]; total: number }> => {
-  console.log(`fetching properties data`);
   const {
     propertyType,
     objectType,
