@@ -8,6 +8,7 @@ import {
   updatePropertiesIsDeleted,
   updateProperty,
   updateValuation,
+  users,
 } from "@/app/services/dataManagement.service";
 import { Property } from "@/app/types/types";
 import PropertyTable from "./components/PropertyTable";
@@ -113,6 +114,7 @@ const Page = () => {
   } | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
   const { replace } = useRouter();
+  const [roleId, setRoleId] = useState<number | null>(null);
 
   interface RowData {
     propertiesType?: string | null;
@@ -130,6 +132,28 @@ const Page = () => {
     coordinates?: string | null;
     appraiser?: string | null;
   }
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const { data: session, error } = await supabase.auth.getSession();
+        if (error) {
+          throw error;
+        }
+
+        // Fetch user data and extract RoleId
+        const dataUser = await users(session.session?.user.id);
+        const userRoleId = dataUser?.data?.RoleId ?? null;
+
+        // Update state with RoleId
+        setRoleId(userRoleId);
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
+    };
+
+    fetchSession();
+  }, []);
 
   const handleImportClick = () => {
     setShowImportModal(true);
@@ -599,46 +623,50 @@ const Page = () => {
             onChange={handleSearchChange}
             onKeyPress={handleSearchKeyPress}
           />
-          <button
-            className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-            style={{ backgroundColor: "#20744A" }}
-            onClick={handleImportClick}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1m-9.71 1.71a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42L13 12.59V3a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42Z"
-              ></path>
-            </svg>
-            &nbsp;Import
-          </button>
-          <button
-            className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-            style={{ backgroundColor: "#20744A" }}
-            onClick={handleExportClick}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 0 0 1.42 1.42m6.58 8.58L13 18.59V9a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42l4 4a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42Z"
-              ></path>
-            </svg>
-            &nbsp;Export
-          </button>
+          {roleId === 1 && (
+            <>
+              <button
+                className="text-white px-4 py-2 rounded btn-rounded flex items-center"
+                style={{ backgroundColor: "#20744A" }}
+                onClick={handleImportClick}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1m-9.71 1.71a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42L13 12.59V3a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42Z"
+                  ></path>
+                </svg>
+                &nbsp;Import
+              </button>
+              <button
+                className="text-white px-4 py-2 rounded btn-rounded flex items-center"
+                style={{ backgroundColor: "#20744A" }}
+                onClick={handleExportClick}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 0 0 1.42 1.42m6.58 8.58L13 18.59V9a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42l4 4a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42Z"
+                  ></path>
+                </svg>
+                &nbsp;Export
+              </button>
+            </>
+          )}
         </div>
         <div className="flex space-x-2">
           <div className="flex space-x-2">
-            {!editMode && (
+            {(roleId === 1 || roleId === 2) && !editMode && (
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
                 onClick={() => handleEditSelected(true)}

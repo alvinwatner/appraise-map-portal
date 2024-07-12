@@ -1,5 +1,5 @@
 import { supabase } from "./../lib/supabaseClient";
-import { Property, Valuation, Location } from "./../types/types";
+import { Property, Valuation, Location, User } from "./../types/types";
 import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
 
 /**
@@ -134,7 +134,7 @@ export const fetchProperties = async (
 
   const rpcParams = {
     page: page,
-    per_page : perPage,
+    per_page: perPage,
     search_query: search && search !== "" ? search : null,
     property_type: propertyType && propertyType !== "" ? propertyType : null,
     object_type: objectType && objectType !== "" ? objectType : null,
@@ -142,13 +142,11 @@ export const fetchProperties = async (
       valuationDate && valuationDate !== "" ? valuationDate : null,
     min_total_value: minTotalValue || null,
     max_total_value: maxTotalValue || null,
-    sort_field : sortField,
-    sort_order : sort
+    sort_field: sortField,
+    sort_order: sort,
   };
 
   let { data, error } = await supabase.rpc("fetch_properties", rpcParams);
-
-  console.log(`fetched properties data = ${JSON.stringify(data)}`);
 
   if (error) {
     console.error("Error fetching properties:", error);
@@ -492,3 +490,13 @@ export async function fetchObjectTypes(): Promise<string[]> {
 
   return objectTypes;
 }
+
+export const users = async (userId?: string): Promise<{ data: User }> => {
+  let query = supabase.from("users").select().eq("auth_id", userId).single();
+  const { data, error, count } = await query;
+  if (error) {
+    console.error("Error fetching properties:", error);
+    return { data: null as any };
+  }
+  return { data: data as unknown as User };
+};

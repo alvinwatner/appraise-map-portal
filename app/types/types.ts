@@ -1,12 +1,3 @@
-// types.ts
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-  lastLogin: Date;
-  isActive: boolean;
-}
-
 export interface Location {
   id: number | null;
   latitude: number;
@@ -37,4 +28,18 @@ export interface Property {
   locations: Location;
   objectType: string;
   valuations: Valuation[];
+}
+
+export interface User {
+  id: number;
+  RoleId: number;
+  email: string;
+  username: string;
+  password: string;
+  lastLogin?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  auth_id?: string;
 }
