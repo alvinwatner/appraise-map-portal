@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,8 +7,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -24,30 +24,42 @@ export const options = {
 
   plugins: {
     legend: {
-      position: 'top' as const,
+      position: "top" as const,
     },
     title: {
       display: true,
-      text: 'Chart Total Assesses per-Years',
+      text: "Monthly Asset Valuation Totals for 2024",
     },
   },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const labels = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: 'Valuation',
-      data: labels.map(() => Math.floor(Math.random() * 1000)), 
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
-    },
-  ],
+export const BarChart: React.FC<{ data: number[] }> = ({ data }) => {
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Total Valuation",
+        data: data,
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
+      },
+    ],
+  };
+  return <Bar options={options} data={chartData} />;
 };
-
-export function BarChart() {
-  return <Bar options={options} data={data} />;
-}
 
 export default BarChart;

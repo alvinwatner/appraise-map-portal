@@ -148,6 +148,8 @@ export const fetchProperties = async (
 
   let { data, error } = await supabase.rpc("fetch_properties", rpcParams);
 
+  // console.log(`fetched properties data = ${JSON.stringify(data)}`);
+
   if (error) {
     console.error("Error fetching properties:", error);
     return { data: [], total: 0 };
@@ -200,6 +202,141 @@ export const fetchPropertiesByBoundingBox = async (
   }
 
   return { data: data as unknown as Property[], total: data.length };
+};
+
+/**
+ * Fetches the maximum totalValue in the valuations table for the current month.
+ */
+export const fetchMaxTotalValueCurrentMonth = async (): Promise<number> => {
+  const currentDate = new Date();
+  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+  try {
+    // Convert dates to ISO strings for comparison in the database
+    const startDate = firstDayOfMonth.toISOString().split('T')[0];
+    const endDate = lastDayOfMonth.toISOString().split('T')[0];
+
+    // Perform the query to find the maximum totalValue within the current month
+    const { data, error } = await supabase
+      .from('valuations')
+      .select('totalValue')
+      .gte('valuationDate', startDate)
+      .lte('valuationDate', endDate)
+      .order('totalValue', { ascending: false })  // Order by totalValue in descending order
+      .limit(1);  // Only fetch the top record
+
+    if (error) {
+      throw error;
+    }
+
+    // Return the maximum totalValue, or 0 if no data was found
+    return data && data.length > 0 ? data[0].totalValue : 0;
+  } catch (error) {
+    return 0;  // Return 0 in case of error
+  }
+};
+
+export const fetchMonthlyValuations2024 = async () => {
+  // Constructing an array to store the sum of totalValue for each month
+  let monthlyTotals = new Array(12).fill(0);
+
+  try {
+    const { data, error } = await supabase
+      .from("valuations")
+      .select("totalValue, valuationDate")
+      .gte("valuationDate", "2024-01-01") // Greater than or equal to the start of 2024
+      .lte("valuationDate", "2024-12-31") // Less than or equal to the end of 2024
+      .order("valuationDate", { ascending: true }); // Ensure the data is sorted by date
+
+    if (error) {
+      throw error;
+    }
+
+    // Process the fetched data to sum up the total values by month
+    data.forEach((item) => {
+      const date = new Date(item.valuationDate);
+      const month = date.getMonth(); // getMonth() returns month index (0 for January, 11 for December)
+      monthlyTotals[month] += item.totalValue;
+    });
+
+    console.log(`aggregate total data = ${JSON.stringify(monthlyTotals)}`);
+
+    return monthlyTotals; // Returning the array with monthly totals
+  } catch (error) {
+    console.error("Error fetching monthly valuations:", error);
+    return []; // Return an empty array in case of error
+  }
+};
+
+export const fetchYearlyValuations = async () => {
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear, currentYear - 1, currentYear - 2]; // Last 3 years including this year
+  let yearlyTotals = [0, 0, 0]; // Initialize totals for each year
+
+  try {
+    const { data, error } = await supabase
+      .from("valuations")
+      .select("totalValue, valuationDate")
+      .gte("valuationDate", `${years[2]}-01-01`) // Start of 3 years ago
+      .lte("valuationDate", `${years[0]}-12-31`); // End of current year
+
+    if (error) {
+      throw error;
+    }
+
+    // Process the fetched data to sum up the total values by year
+    data.forEach((item) => {
+      const year = new Date(item.valuationDate).getFullYear();
+      const index = years.indexOf(year);
+      if (index !== -1) {
+        yearlyTotals[index] += item.totalValue;
+      }
+    });
+
+    return yearlyTotals; // Returning the array with yearly totals
+  } catch (error) {
+    console.error("Error fetching yearly valuations:", error);
+    return [0, 0, 0]; // Return zeros in case of error
+  }
+};
+
+export const fetchTotalPropertiesCount = async (isCountAset = true): Promise<number> => {
+  try {
+    const propertiesType = isCountAset ? 'aset' : 'data';
+
+    // Perform the query to count rows
+    const { data, error, count } = await supabase
+      .from("properties")
+      .select("*", { count: "exact" })
+      .eq('propertiesType', propertiesType);
+
+    if (error) {
+      throw error;
+    }
+
+    return count ?? 0;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const fetchTotalValuationCount = async (): Promise<number> => {
+  try {
+
+    // Perform the query to count rows
+    const { data, error, count } = await supabase
+      .from("valuations")
+      .select("*", { count: "exact" });
+
+    if (error) {
+      throw error;
+    }
+
+    return count ?? 0;
+  } catch (error) {
+    return 0;
+  }
 };
 
 export const updatePropertiesIsDeleted = async (

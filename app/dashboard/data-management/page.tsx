@@ -612,8 +612,8 @@ const Page = () => {
   };
 
   return (
-    <div className="container mx-auto py-10 px-10 mt-20 border border-inherit">
-      <div className="flex justify-between items-center mb-4">
+    <div className="container mx-auto py-10 px-10 mt-20 border border-inherit ring-1 ring-gray-100 rounded-lg shadow-lg">
+      <div className="flex justify-between items-center mb-4 ">
         <div className="flex space-x-2">
           <input
             type="text"
