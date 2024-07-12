@@ -36,9 +36,12 @@ export async function middleware(req: NextRequest) {
 
   // Check if user is trying to access restricted dashboard routes
   if (
-    ["/dashboard", "/dashboard/data-management", "/dashboard/maps"].includes(
-      pathname
-    )
+    [
+      "/dashboard",
+      "/dashboard/data-management",
+      "/dashboard/maps",
+      "/dashboard/profile",
+    ].includes(pathname)
   ) {
     // If session exists but user tries to access restricted routes
     if (!session.session) {
