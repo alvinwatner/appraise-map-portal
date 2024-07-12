@@ -9,27 +9,6 @@ import NumberCard from "./components/NumberCard";
 import PieChart from "./components/PieChart";
 
 export default function Page() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchSession = async (): Promise<void> => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
-      } catch (error: any) {
-        router.push("/login");
-      } finally {
-        // setLoading(false);
-      }
-    };
-
-    fetchSession();
-  }, [router]);
   return (
     <div className="flex flex-col h-full p-4 bg-gray-100">
       <h1 className="text-3xl font-bold mb-4 pl-28">Dashboard</h1>

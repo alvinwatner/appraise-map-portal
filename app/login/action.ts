@@ -1,19 +1,31 @@
-import { revalidatePath } from "next/cache";
+"use server";
+import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { supabase } from "../lib/supabaseClient";
 
-export async function login(formData: FormData) {
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+export const login = async (formData: FormData) => {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const supabase = createServerActionClient({
+    cookies,
+  });
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
-    redirect("/error");
+    console.error(error);
+    return {
+      error: { message: "Failed to log in. Please check your credentials." },
+    };
   }
 
-  revalidatePath("/dashboard", "layout");
-  redirect("/dashboard");
-}
+  if (data.session) {
+    redirect("/dashboard");
+  }
+
+  return { data };
+};

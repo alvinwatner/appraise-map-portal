@@ -1,95 +1,75 @@
 "use client";
+import { useState, FormEvent } from "react";
+import { login } from "./action";
 
-import React, { useState, useEffect } from "react";
-import { Session } from "@supabase/supabase-js";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "../lib/supabaseClient";
-import { useRouter } from "next/navigation";
+const LoginPage = () => {
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-const useRedirectToDashboard = (session: Session | null) => {
-  const router = useRouter();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
 
-  useEffect(() => {
-    if (session) {
-      router.push("/dashboard");
+    const formData = new FormData(event.currentTarget);
+    const response = await login(formData);
+
+    if (response?.error) {
+      setError(response.error.message);
+    } else {
+      // Handle success here, e.g., redirect to dashboard or show success message
+      // For simplicity, let's assume you handle redirection in the login function
     }
-  }, [session, router]);
-};
 
-const LoginPage: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  useRedirectToDashboard(session);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      setSession(sessionData?.session ?? null);
-    };
-
-    fetchSession();
-
-    const authListener = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-
-        if (session) {
-          const user = session.user;
-          // Check if user exists
-          const { data: existingUser, error } = await supabase
-            .from("users")
-            .select("*")
-            .eq("auth_id", user.id)
-            .single();
-
-          if (error && error.code === "PGRST116") {
-            // If user doesn't exist, create one
-            const { error: insertError } = await supabase.from("users").insert({
-              auth_id: user.id,
-              email: user.email,
-              username: user.user_metadata.username || "",
-              password: "",
-              lastLogin: new Date(),
-              isActive: true,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              name: user.user_metadata.name || "",
-            });
-
-            if (insertError) {
-              console.error("Error creating user:", insertError);
-            }
-          } else if (error) {
-            console.error("Error fetching user:", error);
-          } else {
-            // Update last login and other details
-            const { error: updateError } = await supabase
-              .from("users")
-              .update({
-                lastLogin: new Date(),
-                updatedAt: new Date(),
-              })
-              .eq("auth_id", user.id);
-
-            if (updateError) {
-              console.error("Error updating user:", updateError);
-            }
-          }
-        }
-      }
-    );
-
-    return () => authListener.data.subscription.unsubscribe();
-  }, []);
+    setLoading(false);
+  };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <div className="w-full max-w-md px-4">
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          providers={[]}
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-purple-600">
+          Log In
+        </h2>
+        {error && <div className="mb-4 text-red-600 text-center">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-purple-600 text-white font-semibold rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Submit"}
+          </button>
+        </form>
       </div>
     </div>
   );

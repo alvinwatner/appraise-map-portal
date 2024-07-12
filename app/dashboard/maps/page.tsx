@@ -96,23 +96,6 @@ export default function Page() {
     libraries: libraries as any,
   });
 
-  // Effect Hooks
-  // Authentication and session management
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) throw error;
-      } catch (error) {
-        router.push("/login");
-      }
-    };
-    fetchSession();
-  }, [router]);
-
   // Define the callback to update bounds
   const handleBoundsChange = useCallback(
     (swLat: number, swLng: number, neLat: number, neLng: number) => {
@@ -124,7 +107,6 @@ export default function Page() {
   const fetchData = useCallback(async () => {
     console.log("Refreshing data for new bounds");
     try {
-
       const propertiesData = await fetchPropertiesByBoundingBox(
         bounds.swLat,
         bounds.swLng,

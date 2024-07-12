@@ -89,26 +89,6 @@ const flattenData = (property: Property) => {
 const Page = () => {
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchSession = async (): Promise<void> => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
-      } catch (error: any) {
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSession();
-  }, [router]);
-
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState(new Set<number>());
