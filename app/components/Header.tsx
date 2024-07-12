@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   };
 
   const handleProfileClick = () => {
-    router.push("dashboard/profile");
+    router.push("profile");
   };
 
   return (
