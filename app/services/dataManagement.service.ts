@@ -194,8 +194,6 @@ export const fetchPropertiesByBoundingBox = async (
 
   let { data, error } = await supabase.rpc("properties_in_view", rpcFilters);
 
-  console.log(`result data = ${JSON.stringify(data)}`);
-
   if (error) {
     console.error("Error fetching properties:", error);
     return { data: [], total: 0 };
@@ -209,22 +207,30 @@ export const fetchPropertiesByBoundingBox = async (
  */
 export const fetchMaxTotalValueCurrentMonth = async (): Promise<number> => {
   const currentDate = new Date();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const firstDayOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const lastDayOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
 
   try {
     // Convert dates to ISO strings for comparison in the database
-    const startDate = firstDayOfMonth.toISOString().split('T')[0];
-    const endDate = lastDayOfMonth.toISOString().split('T')[0];
+    const startDate = firstDayOfMonth.toISOString().split("T")[0];
+    const endDate = lastDayOfMonth.toISOString().split("T")[0];
 
     // Perform the query to find the maximum totalValue within the current month
     const { data, error } = await supabase
-      .from('valuations')
-      .select('totalValue')
-      .gte('valuationDate', startDate)
-      .lte('valuationDate', endDate)
-      .order('totalValue', { ascending: false })  // Order by totalValue in descending order
-      .limit(1);  // Only fetch the top record
+      .from("valuations")
+      .select("totalValue")
+      .gte("valuationDate", startDate)
+      .lte("valuationDate", endDate)
+      .order("totalValue", { ascending: false }) // Order by totalValue in descending order
+      .limit(1); // Only fetch the top record
 
     if (error) {
       throw error;
@@ -233,7 +239,7 @@ export const fetchMaxTotalValueCurrentMonth = async (): Promise<number> => {
     // Return the maximum totalValue, or 0 if no data was found
     return data && data.length > 0 ? data[0].totalValue : 0;
   } catch (error) {
-    return 0;  // Return 0 in case of error
+    return 0; // Return 0 in case of error
   }
 };
 
@@ -301,15 +307,17 @@ export const fetchYearlyValuations = async () => {
   }
 };
 
-export const fetchTotalPropertiesCount = async (isCountAset = true): Promise<number> => {
+export const fetchTotalPropertiesCount = async (
+  isCountAset = true
+): Promise<number> => {
   try {
-    const propertiesType = isCountAset ? 'aset' : 'data';
+    const propertiesType = isCountAset ? "aset" : "data";
 
     // Perform the query to count rows
     const { data, error, count } = await supabase
       .from("properties")
       .select("*", { count: "exact" })
-      .eq('propertiesType', propertiesType);
+      .eq("propertiesType", propertiesType);
 
     if (error) {
       throw error;
@@ -321,9 +329,30 @@ export const fetchTotalPropertiesCount = async (isCountAset = true): Promise<num
   }
 };
 
+/**
+ * Fetches property details along with associated user, location, and valuations by property ID.
+ * @param {number} propertyId - The ID of the property to fetch.
+ * @returns {Promise<Object>} - A promise that resolves to the property details.
+ */
+export const fetchPropertyDetailsById = async (
+  propertyId: number
+): Promise<Property | null> => {
+  try {
+    const { data, error } = await supabase.rpc("fetch_property_details_by_id", {
+      property_id: propertyId,
+    });
+
+    if (error) throw error;
+
+    return data[0];
+  } catch (error) {
+    console.error("Error fetching property details:", error);
+    return null;
+  }
+};
+
 export const fetchTotalValuationCount = async (): Promise<number> => {
   try {
-
     // Perform the query to count rows
     const { data, error, count } = await supabase
       .from("valuations")

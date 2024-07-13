@@ -17,8 +17,8 @@ import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 
 // Service and utility imports
 import {
-  fetchProperties,
   fetchPropertiesByBoundingBox,
+  fetchPropertyDetailsById,
 } from "@/app/services/dataManagement.service";
 import { supabase } from "@/app/lib/supabaseClient";
 
@@ -120,6 +120,25 @@ export default function Page() {
       console.error("Failed to fetch properties:", error);
     }
   }, [bounds.neLat, bounds.neLng, bounds.swLat, bounds.swLng, filters]);
+
+  const fetchPropertyDetail = useCallback(async () => {
+    try {
+      const id = Number(searchParams.get("property-id"));
+
+      const property = await fetchPropertyDetailsById(id);
+      if (property != null){
+        mapRef.current.setMapCenter(property.locations.latitude, property.locations.longitude);
+        handleShowMarkerDetail(property);
+      }
+      console.log(`property id ${id} result ${property}  = ${JSON.stringify(property)}`);
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetchPropertyDetail();
+  }, [fetchPropertyDetail]);
 
   // Fetch data based on bounds
   useEffect(() => {

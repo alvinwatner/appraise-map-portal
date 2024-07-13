@@ -589,7 +589,7 @@ const Page = () => {
 
   const handleNavigateToMap = () => {
     if (selectedProperty !== null) {
-      router.push(`/map/${selectedProperty}`);
+      router.push(`/dashboard/maps?property-id=${selectedProperty}`);
     }
   };
 
