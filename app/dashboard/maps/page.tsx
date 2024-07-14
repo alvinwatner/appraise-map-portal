@@ -424,7 +424,7 @@ export default function Page() {
       </div>
 
       <button
-        className="absolute top-[15px] left-[750px] z-50 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400"
+        className="absolute top-[15px] left-[750px] z-50 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400 hover:ring-gray-900 hover:ring-2"
         onClick={() => setShowFilterModal(true)}
       >
         <div className="relative w-full h-full flex items-center justify-center">
