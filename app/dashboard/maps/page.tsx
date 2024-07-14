@@ -126,11 +126,16 @@ export default function Page() {
       const id = Number(searchParams.get("property-id"));
 
       const property = await fetchPropertyDetailsById(id);
-      if (property != null){
-        mapRef.current.setMapCenter(property.locations.latitude, property.locations.longitude);
+      if (property != null) {
+        mapRef.current.setMapCenter(
+          property.locations.latitude,
+          property.locations.longitude
+        );
         handleShowMarkerDetail(property);
       }
-      console.log(`property id ${id} result ${property}  = ${JSON.stringify(property)}`);
+      console.log(
+        `property id ${id} result ${property}  = ${JSON.stringify(property)}`
+      );
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }
@@ -223,18 +228,22 @@ export default function Page() {
   };
 
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
-    setLat(location.lat);
-    setLng(location.lng);
-    setLeftWhiteSheet(true);
-    setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
+    if (isAdding) {
+      setLat(location.lat);
+      setLng(location.lng);
+      setLeftWhiteSheet(true);
+      setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
+    }
   };
 
   const toggleAddingMode = () => {
-    setIsAdding(!isAdding);
     setClickCoordinates(null);
     if (isAdding) {
+      setIsAdding(false);
       setLeftWhiteSheet(false);
       setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+    } else {
+      setIsAdding(true);
     }
   };
 
@@ -417,9 +426,6 @@ export default function Page() {
       <button
         className="absolute top-[15px] left-[750px] z-50 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400"
         onClick={() => setShowFilterModal(true)}
-        // onClick={() => {
-        //   setShowFilterModal(true);
-        // }}
       >
         <div className="relative w-full h-full flex items-center justify-center">
           <>
@@ -436,7 +442,7 @@ export default function Page() {
         key={googleMapKey}
         ref={mapRef}
         properties={properties}
-        isAdding={isAdding}
+        gMapIsAdding={isAdding}
         onMarkerClick={handleMarkerClick}
         onMapClick={handleMapClick}
         onBoundsChange={handleBoundsChange}

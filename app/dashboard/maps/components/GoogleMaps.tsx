@@ -6,7 +6,7 @@ interface GoogleMapProps {
   initLatitude: number;
   initLongitude: number;
   properties: Property[];
-  isAdding: boolean;
+  gMapIsAdding: boolean;
   onMarkerClick: (property: Property) => void;
   onMapClick: (location: google.maps.LatLngLiteral) => void;
   onBoundsChange: (
@@ -22,7 +22,7 @@ function GoogleMaps(
     initLatitude,
     initLongitude,
     properties,
-    isAdding,
+    gMapIsAdding,
     onMarkerClick,
     onMapClick,
     onBoundsChange,
@@ -34,6 +34,23 @@ function GoogleMaps(
   const markersRef = useRef<google.maps.Marker[]>([]);
 
   const [internalProperties, setInternalProperties] = useState<Property[]>([]);
+
+  useEffect(() => {
+    if (!mapInstance.current) return;
+  
+    const clickListener = mapInstance.current.addListener("click", (event: google.maps.MapMouseEvent) => {
+      const lat = event.latLng?.lat();
+      const lng = event.latLng?.lng();
+      if (lat && lng) {
+        onMapClick({
+          lat: lat,
+          lng: lng,
+        });
+      }
+    });
+  
+    return () => google.maps.event.removeListener(clickListener);
+  }, [gMapIsAdding, onMapClick]);  
 
   useEffect(() => {
     setInternalProperties([...properties]);
@@ -92,7 +109,6 @@ function GoogleMaps(
           map: mapInstance.current,
           icon: {
             url: url,
-            // url: `{ ${property.propertiesType == "data" ?  "/marker_data.png" : "/marker_aset.png"}}`,
             scaledSize: new google.maps.Size(52, 52),
           },
         });
@@ -102,30 +118,13 @@ function GoogleMaps(
         });
 
         markersRef.current.push(marker);
-
       });
 
       if (mapInstance.current) {
         mapInstance.current.setOptions({
-          draggableCursor: isAdding ? "pointer" : null,
-          draggable: !isAdding,
+          draggableCursor: gMapIsAdding ? "pointer" : null,
+          draggable: !gMapIsAdding,
         });
-
-        mapInstance.current.addListener(
-          "click",
-          (event: google.maps.MapMouseEvent) => {
-            const lat = event.latLng?.lat();
-            const lng = event.latLng?.lng();
-            if (lat && lng) {
-              if (isAdding) {
-                onMapClick({
-                  lat: lat,
-                  lng: lng,
-                });
-              }
-            }
-          }
-        );
 
         // Listener for updating bounds after map moves
         google.maps.event.addListener(mapInstance.current, "idle", () => {
@@ -142,7 +141,7 @@ function GoogleMaps(
     initializeMap();
   }, [
     onMarkerClick,
-    isAdding,
+    gMapIsAdding,
     properties,
     onMapClick,
     onBoundsChange,
