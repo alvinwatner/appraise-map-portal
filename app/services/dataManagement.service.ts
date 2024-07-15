@@ -1,5 +1,11 @@
 import { supabase } from "./../lib/supabaseClient";
-import { Property, Valuation, Location, User } from "./../types/types";
+import {
+  Property,
+  Valuation,
+  Location,
+  User,
+  Notification,
+} from "./../types/types";
 import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
 
 /**
@@ -302,6 +308,156 @@ export const fetchYearlyValuations = async () => {
   } catch (error) {
     console.error("Error fetching yearly valuations:", error);
     return [0, 0, 0]; // Return zeros in case of error
+  }
+};
+
+export const fetchNotification = async (): Promise<Notification[]> => {
+  try {
+    // Retrieve the current session to get the user ID
+    const { data: session, error: sessionError } =
+      await supabase.auth.getSession();
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    // Check if we have a user id
+    const userData = await users(session.session?.user.id);
+    const userId = userData?.data?.id ?? null;
+    if (!userId) {
+      console.error("No user id found in session");
+      return [];
+    }
+
+    // Fetch notifications for the logged-in user and sort them
+    const { data, error } = await supabase
+      .from("notifications")
+      .select(`id, title, description, isRead, createdAt`)
+      .eq("UserId", userId)
+      .order("createdAt", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data as unknown as Notification[];
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return [];
+  }
+};
+
+export const markAllNotificationsAsRead = async (): Promise<void> => {
+  try {
+    // Retrieve the current session to get the user ID
+    const { data: session, error: sessionError } =
+      await supabase.auth.getSession();
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    // Check if we have a user id
+    const userData = await users(session.session?.user.id);
+    const userId = userData?.data?.id ?? null;
+    if (!userId) {
+      console.error("No user id found in session");
+      return;
+    }
+
+    // Update notifications to mark them as read
+    const { error } = await supabase
+      .from("notifications")
+      .update({ isRead: true })
+      .eq("UserId", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("All notifications marked as read.");
+  } catch (error) {
+    console.error("Error marking notifications as read:", error);
+  }
+};
+
+export const countUnreadNotifications = async (): Promise<number> => {
+  try {
+    // Retrieve the current session to get the user ID
+    const { data: session, error: sessionError } =
+      await supabase.auth.getSession();
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    // Check if we have a user id
+    const userData = await users(session.session?.user.id);
+    const userId = userData?.data?.id ?? null;
+    if (!userId) {
+      console.error("No user id found in session");
+      return 0;
+    }
+
+    // Query to count unread notifications
+    const { data, error, count } = await supabase
+      .from("notifications")
+      .select(`id`, { count: "exact", head: true }) // Count without retrieving full data
+      .eq("UserId", userId)
+      .eq("isRead", false); // Filter for unread notifications
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(`Number of unread notifications: ${count}`);
+    return count || 0; // Ensure a number is always returned
+  } catch (error) {
+    console.error("Error counting unread notifications:", error);
+    return 0;
+  }
+};
+
+// todo : mikirkan gimana notif nya bisa dibaca oleh multiple users.
+// saat ini notif hanya milik satu user id saja.
+export const insertNotification = async (
+  title: string,
+  description: string,
+  
+): Promise<Notification | null> => {
+  try {
+    // Retrieve the current session to get the user ID
+    const { data: session, error: sessionError } =
+      await supabase.auth.getSession();
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    // Check if we have a user id
+    const userData = await users(session.session?.user.id);
+    const userId = userData?.data?.id ?? null;
+    if (!userId) {
+      console.error("No user id found in session");
+    }
+
+    const { data, error } = await supabase
+      .from("notifications")
+      .insert([
+        {
+          title: title,
+          description: description,
+          userId: userId,
+          isRead: false,
+        },
+      ])
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("Notification added:", data);
+    return data as Notification;
+  } catch (error) {
+    console.error("Error inserting notification:", error);
+    return null;
   }
 };
 

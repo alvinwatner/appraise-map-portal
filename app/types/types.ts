@@ -1,3 +1,11 @@
+export interface Notification {
+  id: number;
+  title: number;
+  description: number;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export interface Location {
   id: number | null;
   latitude: number;
