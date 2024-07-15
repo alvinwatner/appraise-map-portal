@@ -303,9 +303,11 @@ const RolesPage: React.FC = () => {
   return (
     <>
       <div className="m-10">
-        <h1 className="text-3xl font-semibold mt-4">Data Management</h1>
+        <h1 className="text-3xl font-semibold mt-4">
+          {activeTab === "users" ? "List Users" : "Billing & Coordinates"}
+        </h1>
         <div className="flex gap-4">
-          <div className="w-1/4 mt-10">
+          <div className="w-1/5 mt-10">
             <nav className="flex flex-col space-y-2">
               <button
                 className={`p-2 text-left ${
@@ -315,7 +317,7 @@ const RolesPage: React.FC = () => {
                 } rounded-md`}
                 onClick={() => setActiveTab("users")}
               >
-                Users
+                List Users
               </button>
               <button
                 className={`p-2 text-left ${
@@ -325,11 +327,11 @@ const RolesPage: React.FC = () => {
                 } rounded-md`}
                 onClick={() => setActiveTab("billingCoordinates")}
               >
-                Billing Coordinates
+                Billing & Coordinates
               </button>
             </nav>
           </div>
-          <div className="w-3/4 border border-inherit mt-10 rounded-lg shadow-lg">
+          <div className="w-4/5 border border-inherit mt-10 rounded-lg shadow-lg">
             {activeTab === "users" && renderUsersTab()}
             {activeTab === "billingCoordinates" &&
               renderBillingCoordinatesTab()}

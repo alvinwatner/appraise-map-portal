@@ -11,9 +11,6 @@ import {
   users,
 } from "@/app/services/dataManagement.service";
 import { Property } from "@/app/types/types";
-import { CgExport } from "react-icons/cg";
-
-import { CgImport } from "react-icons/cg";
 
 import PropertyTable from "./components/PropertyTable";
 import FilterModal from "./components/FilterModal";

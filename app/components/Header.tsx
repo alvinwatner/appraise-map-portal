@@ -3,12 +3,17 @@ import { RxAvatar } from "react-icons/rx";
 import { IoIosNotifications } from "react-icons/io";
 import { TiArrowSortedDown } from "react-icons/ti";
 import { useRouter } from "next/navigation";
-import { countUnreadNotifications } from "../services/dataManagement.service";
+import {
+  countUnreadNotifications,
+  users,
+} from "../services/dataManagement.service";
+import { supabase } from "@/app/lib/supabaseClient";
 
 const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadNotifCount, setUnreadNotifCount] = useState<number>(0);
   const router = useRouter();
+  const [roleId, setRoleId] = useState<number | null>(null);
 
   useEffect(() => {
     const getCountUnreadNotif = async () => {
@@ -17,6 +22,28 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
     };
 
     getCountUnreadNotif();
+  }, []);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const { data: session, error } = await supabase.auth.getSession();
+        if (error) {
+          throw error;
+        }
+
+        // Fetch user data and extract RoleId
+        const dataUser = await users(session.session?.user.id);
+        const userRoleId = dataUser?.data?.RoleId ?? null;
+
+        // Update state with RoleId
+        setRoleId(userRoleId);
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
+    };
+
+    fetchSession();
   }, []);
 
   const handleClick = () => {
@@ -66,12 +93,14 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
             >
               Profile
             </div>
-            <div
-              onClick={handleRolesClick}
-              className="z-10 absolute right-0 top-12 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
-            >
-              Roles
-            </div>
+            {roleId === 1 && (
+              <div
+                onClick={handleRolesClick}
+                className="z-10 absolute right-0 top-12 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
+              >
+                Roles
+              </div>
+            )}
           </>
         )}
       </div>
