@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchAllProperties,
   fetchProperties,
+  insertNotification,
   updatePropertiesIsDeleted,
   updateProperty,
   updateValuation,
   users,
 } from "@/app/services/dataManagement.service";
-import { Property } from "@/app/types/types";
+import { Property, User } from "@/app/types/types";
 
 import PropertyTable from "./components/PropertyTable";
 import FilterModal from "./components/FilterModal";
@@ -116,6 +117,7 @@ const Page = () => {
   const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
   const { replace } = useRouter();
   const [roleId, setRoleId] = useState<number | null>(null);
+  const [user, setUser] = useState<User>();
 
   interface RowData {
     propertiesType?: string | null;
@@ -148,6 +150,7 @@ const Page = () => {
 
         // Update state with RoleId
         setRoleId(userRoleId);
+        setUser(dataUser.data);
       } catch (error) {
         console.error("Error fetching session:", error);
       }
@@ -184,9 +187,14 @@ const Page = () => {
     if (dataType === "asset") {
       await importAssetData(jsonData);
       setImportSuccess(true);
+      insertNotification(
+        "Import Asset",
+        `${user?.name} melakukan import asset`
+      );
     } else if (dataType === "data") {
       await importDataData(jsonData);
       setImportSuccess(true);
+      insertNotification("Import Data", `${user?.name} melakukan import data`);
     }
   };
 
@@ -562,6 +570,8 @@ const Page = () => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(blob, "properties.xlsx");
+
+    insertNotification("Export", `${user?.name} melakukan export`);
   };
 
   const handleCloseExportModal = () => {
