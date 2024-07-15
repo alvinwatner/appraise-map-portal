@@ -28,7 +28,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
   editMode,
   editedData,
   editedValuations,
-  onSelectProperty, // New prop
+  onSelectProperty,
 }) => {
   const [objectTypes, setObjectTypes] = useState<string[]>();
   const [clickedRowId, setClickedRowId] = useState<number | null>(null);

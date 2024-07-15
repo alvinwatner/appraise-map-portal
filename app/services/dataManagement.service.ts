@@ -148,8 +148,6 @@ export const fetchProperties = async (
 
   let { data, error } = await supabase.rpc("fetch_properties", rpcParams);
 
-  // console.log(`fetched properties data = ${JSON.stringify(data)}`);
-
   if (error) {
     console.error("Error fetching properties:", error);
     return { data: [], total: 0 };

@@ -29,11 +29,6 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  // If no session exists, redirect to login page
-  if (!session) {
-    return NextResponse.redirect(`${origin}/login`, { status: 303 });
-  }
-
   // Check if user is trying to access restricted dashboard routes
   if (
     [
@@ -41,6 +36,7 @@ export async function middleware(req: NextRequest) {
       "/dashboard/data-management",
       "/dashboard/maps",
       "/dashboard/profile",
+      "/dashboard/roles",
     ].includes(pathname)
   ) {
     // If session exists but user tries to access restricted routes

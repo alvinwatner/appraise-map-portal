@@ -16,6 +16,10 @@ const Header: React.FC = () => {
     router.push("profile");
   };
 
+  const handleRolesClick = () => {
+    router.push("roles");
+  };
+
   return (
     <header className="bg-c-light-blue p-2 flex justify-between items-center">
       <div className="flex-grow">
@@ -28,12 +32,20 @@ const Header: React.FC = () => {
           <TiArrowSortedDown size={10} className="mr-4" />
         </div>
         {showDropdown && (
-          <div
-            onClick={handleProfileClick}
-            className="absolute right-0 top-0 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
-          >
-            Profile
-          </div>
+          <>
+            <div
+              onClick={handleProfileClick}
+              className="z-10 absolute right-0 top-0 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
+            >
+              Profile
+            </div>
+            <div
+              onClick={handleRolesClick}
+              className="z-10 absolute right-0 top-12 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
+            >
+              Roles
+            </div>
+          </>
         )}
       </div>
     </header>

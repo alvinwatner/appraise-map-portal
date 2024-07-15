@@ -31,15 +31,15 @@ export interface Property {
 }
 
 export interface User {
-  id: number;
-  RoleId: number;
-  email: string;
-  username: string;
-  password: string;
+  id: string;
+  RoleId?: number;
+  email?: string;
+  username?: string;
+  password?: string;
   lastLogin?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  name: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  name?: string;
   auth_id?: string;
 }
