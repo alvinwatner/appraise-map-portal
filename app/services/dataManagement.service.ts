@@ -323,16 +323,32 @@ export const fetchNotification = async (): Promise<Notification[]> => {
     // Check if we have a user id
     const userData = await users(session.session?.user.id);
     const userId = userData?.data?.id ?? null;
-    if (!userId) {
-      console.error("No user id found in session");
+    const roleId = userData?.data?.RoleId ?? null;
+    if (!userId || !roleId) {
+      console.error("No user id or role id found in session");
       return [];
     }
 
-    // Fetch notifications for the logged-in user and sort them
+    let orConditions = `UserId.eq.${userId}`;
+    if (roleId) {
+      orConditions += `,RoleId.eq.${roleId}`;
+    }
+    orConditions += `,and(UserId.is.null,RoleId.is.null)`;
+
     const { data, error } = await supabase
       .from("notifications")
-      .select(`id, title, description, isRead, createdAt`)
-      .eq("UserId", userId)
+      .select(
+        `
+        id,
+        title,
+        description,
+        createdAt,
+        notification_reads!inner(isRead) ( 
+        isRead
+        )
+      `
+      )
+      .or(orConditions)
       .order("createdAt", { ascending: false });
 
     if (error) {
@@ -365,8 +381,8 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
 
     // Update notifications to mark them as read
     const { error } = await supabase
-      .from("notifications")
-      .update({ isRead: true })
+      .from("notification_reads")
+      .update({ isRead: true, readAt: new Date() })
       .eq("UserId", userId);
 
     if (error) {
@@ -396,68 +412,109 @@ export const countUnreadNotifications = async (): Promise<number> => {
       return 0;
     }
 
-    // Query to count unread notifications
+    console.log(`Fetching unread notifications count for user ID: ${userId}`);
+
     const { data, error, count } = await supabase
-      .from("notifications")
-      .select(`id`, { count: "exact", head: true }) // Count without retrieving full data
+      .from("notification_reads")
+      .select("*", { count: "exact", head: true }) // Retrieve only count, not full data
       .eq("UserId", userId)
-      .eq("isRead", false); // Filter for unread notifications
+      .eq("isRead", false);
 
     if (error) {
       throw error;
     }
 
     console.log(`Number of unread notifications: ${count}`);
+    console.log(`Data fetched: ${JSON.stringify(data)}`);
+
     return count || 0; // Ensure a number is always returned
   } catch (error) {
     console.error("Error counting unread notifications:", error);
     return 0;
   }
 };
-
-// todo : mikirkan gimana notif nya bisa dibaca oleh multiple users.
-// saat ini notif hanya milik satu user id saja.
-export const insertNotification = async (
-  title: string,
-  description: string,
-  
-): Promise<Notification | null> => {
+export const insertNotification = async ({
+  title,
+  description,
+  roleId,
+  userId,
+}: {
+  title: string;
+  description: string;
+  roleId?: number;
+  userId?: number;
+}): Promise<void> => {
   try {
-    // Retrieve the current session to get the user ID
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError) {
-      throw sessionError;
-    }
-
-    // Check if we have a user id
-    const userData = await users(session.session?.user.id);
-    const userId = userData?.data?.id ?? null;
-    if (!userId) {
-      console.error("No user id found in session");
-    }
-
-    const { data, error } = await supabase
+    const { data: notifData, error } = await supabase
       .from("notifications")
       .insert([
         {
           title: title,
           description: description,
-          userId: userId,
-          isRead: false,
+          UserId: userId,
+          RoleId: roleId,
         },
       ])
-      .single();
+      .select();
 
     if (error) {
       throw error;
     }
 
-    console.log("Notification added:", data);
-    return data as Notification;
+    if (notifData == null) {
+      throw new Error("Notif data is null");
+    }
+
+    console.log("Notification added:", notifData);
+
+    const notifId = (notifData[0] as Notification).id;
+
+    // Determine target users for the notification based on roleId or userId
+    if (roleId) {
+      // Fetch all users with the specific role
+      const { data: roleUsers, error: roleUsersError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("RoleId", roleId);
+
+      if (roleUsersError) {
+        throw roleUsersError;
+      }
+
+      // Insert notification reads for all users with the role
+      const reads = roleUsers.map((user) => ({
+        UserId: user.id,
+        NotifId: notifId,
+        isRead: false,
+        readAt: null,
+      }));
+
+      const { error: readsError } = await supabase
+        .from("notification_reads")
+        .insert(reads);
+
+      if (readsError) {
+        throw readsError;
+      }
+    } else if (userId) {
+      // Insert a single notification read entry for the specific user
+      const { error: readsError } = await supabase
+        .from("notification_reads")
+        .insert([
+          {
+            UserId: userId,
+            NotifId: notifId,
+            isRead: false,
+            readAt: null,
+          },
+        ]);
+
+      if (readsError) {
+        throw readsError;
+      }
+    }
   } catch (error) {
     console.error("Error inserting notification:", error);
-    return null;
   }
 };
 

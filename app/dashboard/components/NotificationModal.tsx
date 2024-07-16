@@ -31,7 +31,7 @@ export const NotificationModal: React.FC<{ onClose: () => void }> = ({
           <button
             className=""
             onClick={() => {
-              markAllNotificationsAsRead();
+              // markAllNotificationsAsRead();
               onClose();
             }}
           >
