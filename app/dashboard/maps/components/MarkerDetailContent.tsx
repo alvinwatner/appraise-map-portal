@@ -1,4 +1,4 @@
-import { IoCalendarOutline, IoClose } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { PiPencilSimpleLight } from "react-icons/pi";

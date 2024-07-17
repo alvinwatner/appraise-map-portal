@@ -19,6 +19,8 @@ import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 import {
   fetchPropertiesByBoundingBox,
   fetchPropertyDetailsById,
+  fetchUserDataSession,
+  insertNotification,
 } from "@/app/services/dataManagement.service";
 import { supabase } from "@/app/lib/supabaseClient";
 
@@ -205,7 +207,7 @@ export default function Page() {
     setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
     setModalInfo({
       isOpen: true,
-      isSuccess: true,
+      isSuccess: false,
       message: message,
     });
     refreshData();
@@ -273,12 +275,18 @@ export default function Page() {
           <MarkerDetailContent
             property={selectedProperty!}
             onEditClicked={handleOnEditClick}
-            onShowModalSuccess={() => {
-              handleModalSuccess("Property deleted successfully!");
+            onShowModalSuccess={async () => {
+              handleModalSuccess("Property berhasil dihapus!");
+              const userData = await fetchUserDataSession();
+              insertNotification({
+                title: "Penghapusan Data",
+                description: `${userData?.name} menghapus property`,
+                roleId: 1,
+              });
             }}
             onShowModalFail={() => {
               handleModalSuccess(
-                "Failed to delete property. Contact customer support."
+                "Gagal menghapus property. Hubungi Alvin."
               );
             }}
             onClose={() => {
@@ -312,12 +320,18 @@ export default function Page() {
             }}
             lat={lat}
             lng={lng}
-            onShowModalSuccess={() => {
-              handleModalSuccess("Property edited successfully!");
+            onShowModalSuccess={async() => {
+              const userData = await fetchUserDataSession();
+              insertNotification({
+                title: "Penambahan Data",
+                description: `${userData?.name} menambahkan property`,
+                roleId: 1,
+              });              
+              handleModalSuccess("Property berhasil ditambahkan!");
             }}
             onShowModalFail={() => {
               handleModalFailure(
-                "Failed to edit property. Contact customer support."
+                "Gagal menghapus property. Hubungi Alvin."
               );
             }}
           />
@@ -331,12 +345,18 @@ export default function Page() {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
-            onShowModalSuccess={() => {
+            onShowModalSuccess={async () => {
+              const userData = await fetchUserDataSession();
+              insertNotification({
+                title: "Perubahan Data",
+                description: `${userData?.name} merubah property`,
+                roleId: 1,
+              });
               handleModalSuccess("Property added successfully!");
             }}
             onShowModalFail={() => {
               handleModalFailure(
-                "Failed to add property. Contact customer support."
+                "Gagal menghapus property. Hubungi Alvin."
               );
             }}
           />

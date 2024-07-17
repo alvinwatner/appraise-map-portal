@@ -194,7 +194,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       }
 
       onClose(); // Close form on success
-      if (onShowModalSuccess != null) {
+      if (onShowModalSuccess != null) {        
         onShowModalSuccess();
       }
     } catch (error) {

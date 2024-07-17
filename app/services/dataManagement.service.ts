@@ -311,27 +311,33 @@ export const fetchYearlyValuations = async () => {
   }
 };
 
+export const fetchUserDataSession = async (): Promise<User> => {
+  const { data: session, error: sessionError } =
+    await supabase.auth.getSession();
+  if (sessionError) {
+    throw new Error("Failed to retrieve session");
+  }
+
+  if (!session.session?.user.id) {
+    throw new Error("No user id found in session");
+  }
+
+  const userData = await users(session.session.user.id);
+  if (!userData?.data?.id || !userData?.data?.RoleId) {
+    throw new Error("User data incomplete");
+  }
+
+  return userData.data;
+};
+
 export const fetchNotification = async (): Promise<Notification[]> => {
   try {
     // Retrieve the current session to get the user ID
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError) {
-      throw sessionError;
-    }
+    const userData = await fetchUserDataSession();
 
-    // Check if we have a user id
-    const userData = await users(session.session?.user.id);
-    const userId = userData?.data?.id ?? null;
-    const roleId = userData?.data?.RoleId ?? null;
-    if (!userId || !roleId) {
-      console.error("No user id or role id found in session");
-      return [];
-    }
-
-    let orConditions = `UserId.eq.${userId}`;
-    if (roleId) {
-      orConditions += `,RoleId.eq.${roleId}`;
+    let orConditions = `UserId.eq.${userData.id}`;
+    if (userData.RoleId) {
+      orConditions += `,RoleId.eq.${userData.RoleId}`;
     }
     orConditions += `,and(UserId.is.null,RoleId.is.null)`;
 
@@ -343,19 +349,26 @@ export const fetchNotification = async (): Promise<Notification[]> => {
         title,
         description,
         createdAt,
-        notification_reads!inner(isRead) ( 
-        isRead
-        )
-      `
+        isRead:notification_reads (isRead)
+        `
       )
       .or(orConditions)
+      .eq("notification_reads.UserId", userData.id)
       .order("createdAt", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return data as unknown as Notification[];
+    const transformedData = data.map((notification) => ({
+      ...notification,
+      isRead:
+        notification.isRead.length > 0 ? notification.isRead[0].isRead : false,
+    }));
+
+    console.log(`notification response = ${JSON.stringify(transformedData)}`);
+
+    return transformedData as unknown as Notification[];
   } catch (error) {
     console.error("Error fetching notifications:", error);
     return [];
@@ -365,25 +378,13 @@ export const fetchNotification = async (): Promise<Notification[]> => {
 export const markAllNotificationsAsRead = async (): Promise<void> => {
   try {
     // Retrieve the current session to get the user ID
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError) {
-      throw sessionError;
-    }
-
-    // Check if we have a user id
-    const userData = await users(session.session?.user.id);
-    const userId = userData?.data?.id ?? null;
-    if (!userId) {
-      console.error("No user id found in session");
-      return;
-    }
+    const userData = await fetchUserDataSession();
 
     // Update notifications to mark them as read
     const { error } = await supabase
       .from("notification_reads")
       .update({ isRead: true, readAt: new Date() })
-      .eq("UserId", userId);
+      .eq("UserId", userData.id);
 
     if (error) {
       throw error;
@@ -398,26 +399,12 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
 export const countUnreadNotifications = async (): Promise<number> => {
   try {
     // Retrieve the current session to get the user ID
-    const { data: session, error: sessionError } =
-      await supabase.auth.getSession();
-    if (sessionError) {
-      throw sessionError;
-    }
-
-    // Check if we have a user id
-    const userData = await users(session.session?.user.id);
-    const userId = userData?.data?.id ?? null;
-    if (!userId) {
-      console.error("No user id found in session");
-      return 0;
-    }
-
-    console.log(`Fetching unread notifications count for user ID: ${userId}`);
+    const userData = await fetchUserDataSession();
 
     const { data, error, count } = await supabase
       .from("notification_reads")
       .select("*", { count: "exact", head: true }) // Retrieve only count, not full data
-      .eq("UserId", userId)
+      .eq("UserId", userData.id)
       .eq("isRead", false);
 
     if (error) {
@@ -671,6 +658,9 @@ export const addProperty = async ({
   reportNumber,
   valuationDate,
 }: AddPropertyArgs) => {
+  // Retrieve the current session to get the user ID
+  const userData = await fetchUserDataSession();
+
   // Insert new location
   const { data: locationData, error: locationError } = await supabase
     .from("locations")
@@ -697,7 +687,7 @@ export const addProperty = async ({
     .from("properties") // No type argument here
     .insert([
       {
-        UserId: 3,
+        UserId: userData.id,
         LocationId: locationId,
         objectType: objectType,
         landArea: landArea,

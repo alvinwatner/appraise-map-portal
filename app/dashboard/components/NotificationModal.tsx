@@ -31,7 +31,7 @@ export const NotificationModal: React.FC<{ onClose: () => void }> = ({
           <button
             className=""
             onClick={() => {
-              // markAllNotificationsAsRead();
+              markAllNotificationsAsRead();
               onClose();
             }}
           >
@@ -44,7 +44,7 @@ export const NotificationModal: React.FC<{ onClose: () => void }> = ({
           </div>
         )}
         {isLoaded && (
-          <div className="h-full max-h-full overflow-y-scroll">
+          <div className="h-[500px] overflow-y-scroll">
             {notifications?.map((notif, index) => (
               <div
                 className="flex flex-col justify-start mt-2 relative px-6"

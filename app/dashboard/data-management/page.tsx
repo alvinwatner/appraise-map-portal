@@ -187,14 +187,11 @@ const Page = () => {
     if (dataType === "asset") {
       await importAssetData(jsonData);
       setImportSuccess(true);
-      insertNotification(
-        "Import Asset",
-        `${user?.name} melakukan import asset`
-      );
+      insertNotification({title: "Import Data", description: `${user?.name} melakukan import asset` , roleId: 1})
     } else if (dataType === "data") {
       await importDataData(jsonData);
       setImportSuccess(true);
-      insertNotification("Import Data", `${user?.name} melakukan import data`);
+      insertNotification({title: "Import Data", description: `${user?.name} melakukan import data` , roleId: 1})
     }
   };
 
@@ -571,7 +568,8 @@ const Page = () => {
     });
     saveAs(blob, "properties.xlsx");
 
-    insertNotification("Export", `${user?.name} melakukan export`);
+    insertNotification({title: "Export Data", description: `${user?.name} melakukan export`, roleId: 1})
+
   };
 
   const handleCloseExportModal = () => {

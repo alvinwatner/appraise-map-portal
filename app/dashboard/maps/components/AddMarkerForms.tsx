@@ -1,23 +1,12 @@
-import {
-  IoCheckmarkCircleOutline,
-  IoClose,
-  IoCloseCircleOutline,
-} from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import Dropdown from "../../../components/Dropdown";
 import { useState } from "react";
 
 import DropdownInput from "../../../components/DropdownInput";
 import { AreaInput } from "../../../components/AreaInput";
-import { Property, Location, Valuation } from "../../../types/types";
-import { PropertyType } from "../../../components/PropertyChip";
-import { capitalizeFirstLetter } from "@/app/utils/helper";
-import {
-  addProperty,
-  updateProperty,
-} from "../../../services/dataManagement.service";
+import { addProperty } from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
 import { AddAssetValuationForm } from "./AddAssetValuationForm";
-import { EditAssetValuationForms } from "./EditAssetValuationForms";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -88,26 +77,32 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
     // Validate all inputs are not empty
     if (!selectedPropertyType) {
+      console.log(`1`);
       newErrors.debitur = "Property type is required.";
       isValid = false;
     }
     if (!selectedObjectType) {
+      console.log(`2`);
       newErrors.debitur = "Object type is required.";
       isValid = false;
     }
-    if (!debitur) {
+    if (selectedPropertyType == "Aset" && !debitur) {
+      console.log(`3`);
       newErrors.debitur = "Debitur is required.";
       isValid = false;
     }
     if (!address) {
+      console.log(`4`);
       newErrors.address = "Address is required.";
       isValid = false;
     }
     if (!landArea || isNaN(Number(landArea))) {
+      console.log(`5`);
       newErrors.landArea = "Luas Tanah must be a number.";
       isValid = false;
     }
     if (!buildingArea || isNaN(Number(buildingArea))) {
+      console.log(`6`);
       newErrors.buildingArea = "Luas Bangunan must be a number.";
       isValid = false;
     }
@@ -118,6 +113,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         phoneNumber.length < 10 ||
         phoneNumber.length > 15)
     ) {
+      console.log(`7`);
       newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
       isValid = false;
     }
@@ -136,7 +132,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
     // If validation passes
     try {
-      const response = await addProperty({
+      await addProperty({
         latitude: lat!,
         longitude: lng!,
         address: address,
@@ -153,7 +149,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         valuationDate: valuationDate,
       });
 
-      onClose(); // Close form on success
+      onClose();
       if (onShowModalSuccess != null) {
         onShowModalSuccess();
       }
