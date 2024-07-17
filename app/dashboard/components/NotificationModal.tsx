@@ -7,6 +7,7 @@ import { IoMdCloseCircleOutline } from "react-icons/io";
 import { Notification } from "../../types/types";
 import { getTimeAgo } from "../../utils/helper";
 import Loading from "@/app/components/Loading";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 
 export const NotificationModal: React.FC<{ onClose: () => void }> = ({
   onClose,
@@ -45,23 +46,34 @@ export const NotificationModal: React.FC<{ onClose: () => void }> = ({
         )}
         {isLoaded && (
           <div className="h-[500px] overflow-y-scroll">
-            {notifications?.map((notif, index) => (
-              <div
-                className="flex flex-col justify-start mt-2 relative px-6"
-                key={notif.id}
-              >
-                <h3 className="text-base font-semibold mb-1">{notif.title}</h3>
-                <div className="flex justify-between">
-                  <p className="text-sm mb-3">{notif.description}</p>
-                  <p className="text-xs mb-3">{getTimeAgo(notif.createdAt)}</p>
+            {(notifications != undefined ? notifications : [])?.length > 0 ? (
+              notifications?.map((notif, index) => (
+                <div
+                  className="flex flex-col justify-start mt-2 relative px-6"
+                  key={notif.id}
+                >
+                  <h3 className="text-base font-semibold mb-1">
+                    {notif.title}
+                  </h3>
+                  <div className="flex justify-between">
+                    <p className="text-sm mb-3">{notif.description}</p>
+                    <p className="text-xs mb-3">
+                      {getTimeAgo(notif.createdAt)}
+                    </p>
+                  </div>
+                  {!notif.isRead && notif.isRead != null && (
+                    <div className="absolute top-4 left-0 h-2 w-2 bg-red-500 rounded-full"></div>
+                  )}
+                  <div className="h-[1px] w-full bg-black"></div>
                 </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center h-full">
+                <IoMdInformationCircleOutline size={30} className="mr-3 text-gray-500"/>
 
-                {!notif.isRead && notif.isRead != null && (
-                  <div className="absolute top-4 left-0 h-2 w-2 bg-red-500 rounded-full"></div>
-                )}
-                <div className="h-[1px] w-full bg-black"></div>
+                <p className="text-gray-500">No notifications available.</p>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
