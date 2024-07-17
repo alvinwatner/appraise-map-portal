@@ -98,7 +98,7 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
                 onClick={handleRolesClick}
                 className="z-10 absolute right-0 top-12 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
               >
-                Roles
+                Settings
               </div>
             )}
           </>
