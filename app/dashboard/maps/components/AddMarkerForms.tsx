@@ -77,32 +77,26 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
     // Validate all inputs are not empty
     if (!selectedPropertyType) {
-      console.log(`1`);
       newErrors.debitur = "Property type is required.";
       isValid = false;
     }
     if (!selectedObjectType) {
-      console.log(`2`);
       newErrors.debitur = "Object type is required.";
       isValid = false;
     }
     if (selectedPropertyType == "Aset" && !debitur) {
-      console.log(`3`);
       newErrors.debitur = "Debitur is required.";
       isValid = false;
     }
     if (!address) {
-      console.log(`4`);
       newErrors.address = "Address is required.";
       isValid = false;
     }
     if (!landArea || isNaN(Number(landArea))) {
-      console.log(`5`);
       newErrors.landArea = "Luas Tanah must be a number.";
       isValid = false;
     }
     if (!buildingArea || isNaN(Number(buildingArea))) {
-      console.log(`6`);
       newErrors.buildingArea = "Luas Bangunan must be a number.";
       isValid = false;
     }
@@ -113,7 +107,6 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         phoneNumber.length < 10 ||
         phoneNumber.length > 15)
     ) {
-      console.log(`7`);
       newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
       isValid = false;
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchAllProperties,
@@ -432,13 +432,15 @@ const Page = () => {
     getProperties,
   ]);
 
-  const debouncedSearch = useCallback(
-    debounce((value: string) => {
+  const debouncedSearch = useMemo(() => {
+    const handleSearch = (value: string) => {
       setQuery(value);
       replace(`?search=${value}&page=1&perPage=${itemsPerPage}`);
-    }, 500),
-    [router, itemsPerPage]
-  );
+    };
+  
+    return debounce(handleSearch, 500);
+  }, [itemsPerPage, setQuery, replace]);
+  
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
