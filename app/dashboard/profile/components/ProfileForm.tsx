@@ -15,7 +15,7 @@ const ProfileForm: React.FC = () => {
   const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true); // New state for fetching data
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {

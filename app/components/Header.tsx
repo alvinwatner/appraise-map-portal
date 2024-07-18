@@ -51,11 +51,11 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   };
 
   const handleProfileClick = () => {
-    router.push("profile");
+    window.location.href = "/dashboard/profile";
   };
 
   const handleRolesClick = () => {
-    router.push("roles");
+    window.location.href = "/dashboard/roles";
   };
 
   return (

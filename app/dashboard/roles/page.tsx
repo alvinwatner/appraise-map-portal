@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/components/Loading";
 import { supabase } from "@/app/lib/supabaseClient";
 import { User } from "@/app/types/types";
 import { useEffect, useState } from "react";
@@ -332,9 +333,15 @@ const RolesPage: React.FC = () => {
             </nav>
           </div>
           <div className="w-4/5 border border-inherit mt-10 rounded-lg shadow-lg">
-            {activeTab === "users" && renderUsersTab()}
-            {activeTab === "billingCoordinates" &&
-              renderBillingCoordinatesTab()}
+            {loading ? (
+              <Loading />
+            ) : (
+              <div>
+                {activeTab === "users" && renderUsersTab()}
+                {activeTab === "billingCoordinates" &&
+                  renderBillingCoordinatesTab()}
+              </div>
+            )}
           </div>
         </div>
       </div>

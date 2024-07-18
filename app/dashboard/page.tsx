@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
 import BarChart from "./components/BarChart";
 import NumberCard from "./components/NumberCard";
 import PieChart from "./components/PieChart";
@@ -24,23 +23,6 @@ export default function Page() {
   const [totalAssesedData, setTotalAssesedData] = useState<number>(0);
   const [totalAnnualValuation, setTotalAnnualValuation] = useState<number>(0);
   const [maxMonthlyValuation, setMaxMonthlyValuation] = useState<number>(0);
-
-  const fetchSession = useCallback(async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        throw error;
-      }
-      if (!session) {
-        router.push('/login');
-      } else {
-        fetchData();
-      }
-    } catch (error) {
-      console.error('Authentication error:', error);
-      router.push('/login');
-    }
-  }, [router]);
 
   const fetchData = async () => {
     try {
@@ -66,8 +48,8 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchSession().then(fetchData);
-  }, [fetchSession, router]);
+    fetchData();
+  }, [router]);
 
   return (
     <div className="w-full h-full bg-gray-100 flex justify-center items-center px-4">
