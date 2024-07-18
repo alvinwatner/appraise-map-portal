@@ -187,11 +187,19 @@ const Page = () => {
     if (dataType === "asset") {
       await importAssetData(jsonData);
       setImportSuccess(true);
-      insertNotification({title: "Import Data", description: `${user?.name} melakukan import asset` , roleId: 1})
+      insertNotification({
+        title: "Import Data",
+        description: `${user?.name} melakukan import asset`,
+        roleId: 1,
+      });
     } else if (dataType === "data") {
       await importDataData(jsonData);
       setImportSuccess(true);
-      insertNotification({title: "Import Data", description: `${user?.name} melakukan import data` , roleId: 1})
+      insertNotification({
+        title: "Import Data",
+        description: `${user?.name} melakukan import data`,
+        roleId: 1,
+      });
     }
   };
 
@@ -437,10 +445,9 @@ const Page = () => {
       setQuery(value);
       replace(`?search=${value}&page=1&perPage=${itemsPerPage}`);
     };
-  
+
     return debounce(handleSearch, 500);
   }, [itemsPerPage, setQuery, replace]);
-  
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -570,8 +577,11 @@ const Page = () => {
     });
     saveAs(blob, "properties.xlsx");
 
-    insertNotification({title: "Export Data", description: `${user?.name} melakukan export`, roleId: 1})
-
+    insertNotification({
+      title: "Export Data",
+      description: `${user?.name} melakukan export`,
+      roleId: 1,
+    });
   };
 
   const handleCloseExportModal = () => {
@@ -783,7 +793,7 @@ const Page = () => {
             </div>
             <div
               className="table-container"
-              style={{ maxHeight: "60vh", maxWidth: "162vh" }}
+              style={{ maxHeight: "50vh", maxWidth: "140vh" }}
             >
               <PropertyTable
                 currentData={properties}
