@@ -24,6 +24,14 @@ export interface Valuation {
   appraiser: string;
 }
 
+export interface Settings {  
+  id: number;
+  title: number;
+  latitude: number;
+  longitude: number;
+  maxBilling: string;
+}
+
 export interface Property {
   id: number;
   debitur: string;

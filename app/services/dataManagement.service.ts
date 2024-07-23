@@ -5,6 +5,7 @@ import {
   Location,
   User,
   Notification,
+  Settings,
 } from "./../types/types";
 import { PostgrestError, PostgrestResponse } from "@supabase/supabase-js";
 
@@ -308,6 +309,43 @@ export const fetchYearlyValuations = async () => {
   } catch (error) {
     console.error("Error fetching yearly valuations:", error);
     return [0, 0, 0]; // Return zeros in case of error
+  }
+};
+
+
+export const updateSettingsData = async (
+  id: number,
+  changes: Partial<Settings>
+) => {
+
+  const { data, error } = await supabase
+    .from("settings")
+    .update(changes)
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+export const fetchSettingsData = async (): Promise<Settings> => {
+  try {
+    const { data, error } = await supabase.from("settings").select(`
+        id,
+        maxBilling,
+        latitude,
+        longitude
+        `);
+
+    if (error) {
+      throw error;
+    }
+
+    return data[0] as unknown as Settings;
+  } catch (error) {
+    console.error("Error fetching settings data:", error);
+    throw error;
   }
 };
 

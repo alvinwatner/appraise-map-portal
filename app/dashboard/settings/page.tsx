@@ -4,14 +4,16 @@ import Loading from "@/app/components/Loading";
 import { supabase } from "@/app/lib/supabaseClient";
 import { User } from "@/app/types/types";
 import { useEffect, useState } from "react";
+import { BillingCoordinatesTab } from "./components/BillingCoordinatesTab";
 
-const RolesPage: React.FC = () => {
+const SettingsPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("users");
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -265,42 +267,6 @@ const RolesPage: React.FC = () => {
     </div>
   );
 
-  const renderBillingCoordinatesTab = () => (
-    <div className="p-8">
-      <h2 className="text-xl font-bold mb-4">Billing Coordinates</h2>
-      <div className="mb-4">
-        <label className="block text-gray-700">Maximum Billing</label>
-        <input
-          type="number"
-          className="p-2 border border-gray-300 rounded-md w-full"
-          placeholder="Enter maximum billing"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Default Longitude</label>
-        <input
-          type="text"
-          className="p-2 border border-gray-300 rounded-md w-full"
-          placeholder="Enter default longitude"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Default Latitude</label>
-        <input
-          type="text"
-          className="p-2 border border-gray-300 rounded-md w-full"
-          placeholder="Enter default latitude"
-        />
-      </div>
-      <button
-        className="p-2 bg-blue-500 text-white rounded-md"
-        disabled={loading}
-      >
-        {loading ? "Saving..." : "Save"}
-      </button>
-    </div>
-  );
-
   return (
     <>
       <div className="m-10">
@@ -339,7 +305,7 @@ const RolesPage: React.FC = () => {
               <div>
                 {activeTab === "users" && renderUsersTab()}
                 {activeTab === "billingCoordinates" &&
-                  renderBillingCoordinatesTab()}
+                  <BillingCoordinatesTab/>}
               </div>
             )}
           </div>
@@ -349,4 +315,4 @@ const RolesPage: React.FC = () => {
   );
 };
 
-export default RolesPage;
+export default SettingsPage;

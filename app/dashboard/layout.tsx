@@ -1,12 +1,9 @@
 "use client";
-// directory: /app/dashboard/layout.tsx
 import React, { useState } from "react";
 
 import Header from "../components/Header";
 import SideNav from "../components/SideNav";
-import { IoMdCloseCircleOutline } from "react-icons/io";
 
-import FilterModal from "./data-management/components/FilterModal";
 import { NotificationModal } from "./components/NotificationModal";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

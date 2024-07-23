@@ -19,6 +19,7 @@ import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 import {
   fetchPropertiesByBoundingBox,
   fetchPropertyDetailsById,
+  fetchSettingsData,
   fetchUserDataSession,
   insertNotification,
 } from "@/app/services/dataManagement.service";
@@ -78,6 +79,8 @@ export default function Page() {
   const [isAdding, setIsAdding] = useState(false);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
+  const [initLat, setInitLat] = useState<number | null>(null);
+  const [initLng, setInitLng] = useState<number | null>(null);  
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
   const [googleMapKey, setgoogleMapKey] = useState(Date.now());
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
@@ -105,6 +108,17 @@ export default function Page() {
     },
     []
   );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await fetchSettingsData();
+      console.log(`settingsData result = ${JSON.stringify(result)}`);
+      setInitLat(result.latitude);
+      setInitLng(result.longitude);
+    };
+
+    fetchData();
+  }, []);
 
   const fetchData = useCallback(async () => {
     console.log("Refreshing data for new bounds");
@@ -285,9 +299,7 @@ export default function Page() {
               });
             }}
             onShowModalFail={() => {
-              handleModalSuccess(
-                "Gagal menghapus property. Hubungi Alvin."
-              );
+              handleModalSuccess("Gagal menghapus property. Hubungi Alvin.");
             }}
             onClose={() => {
               setLeftWhiteSheet(false);
@@ -320,19 +332,17 @@ export default function Page() {
             }}
             lat={lat}
             lng={lng}
-            onShowModalSuccess={async() => {
+            onShowModalSuccess={async () => {
               const userData = await fetchUserDataSession();
               insertNotification({
                 title: "Penambahan Data",
                 description: `${userData?.name} menambahkan property`,
                 roleId: 1,
-              });              
+              });
               handleModalSuccess("Property berhasil ditambahkan!");
             }}
             onShowModalFail={() => {
-              handleModalFailure(
-                "Gagal menghapus property. Hubungi Alvin."
-              );
+              handleModalFailure("Gagal menghapus property. Hubungi Alvin.");
             }}
           />
         );
@@ -355,9 +365,7 @@ export default function Page() {
               handleModalSuccess("Property added successfully!");
             }}
             onShowModalFail={() => {
-              handleModalFailure(
-                "Gagal menghapus property. Hubungi Alvin."
-              );
+              handleModalFailure("Gagal menghapus property. Hubungi Alvin.");
             }}
           />
         );
@@ -457,8 +465,8 @@ export default function Page() {
       </button>
 
       <GoogleMaps
-        initLatitude={3.560506}
-        initLongitude={98.636445}
+        initLatitude={initLat ?? 3.560506}
+        initLongitude={initLng ?? 98.636445}
         key={googleMapKey}
         ref={mapRef}
         properties={properties}

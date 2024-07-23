@@ -55,7 +55,7 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   };
 
   const handleRolesClick = () => {
-    window.location.href = "/dashboard/roles";
+    window.location.href = "/dashboard/settings";
   };
 
   return (
