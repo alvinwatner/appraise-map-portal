@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchAllProperties,
   fetchProperties,
+  getPropertiesCount,
   insertNotification,
   updatePropertiesIsDeleted,
   updateProperty,
@@ -21,6 +22,7 @@ import { supabase } from "@/app/lib/supabaseClient";
 import ExportPopup from "./components/ExportPopup";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import wkx from "wkx";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -49,16 +51,28 @@ const escapeCSVField = (field: any): string => {
 };
 
 const flattenAsset = (property: Property) => {
+  let longitude = property.locations.longitude;
+  let latitude = property.locations.latitude;
+  if (property.locations.coordinate) {
+    const wkbBuffer: Buffer = Buffer.from(property.locations.coordinate, "hex");
+
+    // Parse WKB to GeoJSON
+    const geoJson = wkx.Geometry.parse(wkbBuffer).toGeoJSON() as {
+      coordinates: [number, number];
+    };
+
+    // Extract latitude and longitude
+    const [long, lat]: [number, number] = geoJson.coordinates;
+    longitude = long;
+    latitude = lat;
+  }
+
   return property.valuations.map((valuation) => ({
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
-    KOORDINAT: escapeCSVField(
-      property.locations.longitude ||
-        null + "," + property.locations.latitude ||
-        null
-    ),
+    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     PENILAI: escapeCSVField(valuation.appraiser || null),
@@ -69,16 +83,28 @@ const flattenAsset = (property: Property) => {
 };
 
 const flattenData = (property: Property) => {
+  let longitude = property.locations.longitude;
+  let latitude = property.locations.latitude;
+  if (property.locations.coordinate) {
+    const wkbBuffer: Buffer = Buffer.from(property.locations.coordinate, "hex");
+
+    // Parse WKB to GeoJSON
+    const geoJson = wkx.Geometry.parse(wkbBuffer).toGeoJSON() as {
+      coordinates: [number, number];
+    };
+
+    // Extract latitude and longitude
+    const [long, lat]: [number, number] = geoJson.coordinates;
+    longitude = long;
+    latitude = lat;
+  }
+
   return property.valuations.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     "NO. HP": escapeCSVField(property.phoneNumber || null),
-    KOORDINAT: escapeCSVField(
-      property.locations.longitude ||
-        null + "," + property.locations.latitude ||
-        null
-    ),
+    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     "NILAI TANAH /m²": escapeCSVField(valuation.landValue || null),
@@ -205,32 +231,43 @@ const Page = () => {
 
   const importAssetData = async (jsonData: RowData[]) => {
     try {
-      const { count: totalCountProperties, error: countErrorProperties } =
-        await (await supabase)
-          .from("properties")
-          .select("id", { count: "exact" });
+      const { data: dataProperties, error: errorProperties } = await supabase
+        .from("properties")
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorProperties) {
-        throw countErrorProperties;
+      const totalCountProperties =
+        dataProperties !== null ? dataProperties[0].id : null;
+
+      if (errorProperties) {
+        throw errorProperties;
       }
 
-      const { count: totalCountValuations, error: countErrorValuations } =
-        await (await supabase)
-          .from("valuations")
-          .select("id", { count: "exact" });
+      const { data: dataValuations, error: errorValuations } = await supabase
+        .from("valuations")
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorValuations) {
-        throw countErrorValuations;
+      const totalCountValuations =
+        dataValuations !== null ? dataValuations[0].id : null;
+
+      if (errorValuations) {
+        throw errorValuations;
       }
 
-      const { count: totalCountLocations, error: countErrorLocations } = await (
-        await supabase
-      )
+      const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
-        .select("id", { count: "exact" });
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorLocations) {
-        throw countErrorLocations;
+      const totalCountLocations =
+        dataLocations !== null ? dataLocations[0].id : null;
+
+      if (errorLocations) {
+        throw errorLocations;
       }
 
       for (let i = 0; i < jsonData.length; i++) {
@@ -240,8 +277,9 @@ const Page = () => {
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
-          latitude: coordinatesArray?.[0],
-          longitude: coordinatesArray?.[1],
+          // latitude: coordinatesArray?.[0],
+          // longitude: coordinatesArray?.[1],
+          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
 
         const formattedDataProperties = {
@@ -297,32 +335,43 @@ const Page = () => {
 
   const importDataData = async (jsonData: RowData[]) => {
     try {
-      const { count: totalCountProperties, error: countErrorProperties } =
-        await (await supabase)
-          .from("properties")
-          .select("id", { count: "exact" });
+      const { data: dataProperties, error: errorProperties } = await supabase
+        .from("properties")
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorProperties) {
-        throw countErrorProperties;
+      const totalCountProperties =
+        dataProperties !== null ? dataProperties[0].id : null;
+
+      if (errorProperties) {
+        throw errorProperties;
       }
 
-      const { count: totalCountValuations, error: countErrorValuations } =
-        await (await supabase)
-          .from("valuations")
-          .select("id", { count: "exact" });
+      const { data: dataValuations, error: errorValuations } = await supabase
+        .from("valuations")
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorValuations) {
-        throw countErrorValuations;
+      const totalCountValuations =
+        dataValuations !== null ? dataValuations[0].id : null;
+
+      if (errorValuations) {
+        throw errorValuations;
       }
 
-      const { count: totalCountLocations, error: countErrorLocations } = await (
-        await supabase
-      )
+      const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
-        .select("id", { count: "exact" });
+        .select("id")
+        .order("id", { ascending: false })
+        .limit(1);
 
-      if (countErrorLocations) {
-        throw countErrorLocations;
+      const totalCountLocations =
+        dataLocations !== null ? dataLocations[0].id : null;
+
+      if (errorLocations) {
+        throw errorLocations;
       }
 
       for (let i = 0; i < jsonData.length; i++) {
@@ -332,8 +381,9 @@ const Page = () => {
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
-          latitude: coordinatesArray?.[0],
-          longitude: coordinatesArray?.[1],
+          // latitude: coordinatesArray?.[0],
+          // longitude: coordinatesArray?.[1],
+          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
 
         const formattedDataProperties = {
@@ -410,8 +460,10 @@ const Page = () => {
           sortField,
           sort
         );
+
+        const countProperties = await getPropertiesCount();
         setProperties(propertiesData.data);
-        setTotalItems(propertiesData.total);
+        setTotalItems(countProperties.count);
       } catch (error) {
         console.error("Error fetching properties:", error);
       } finally {
@@ -639,7 +691,7 @@ const Page = () => {
     <>
       <div className="m-10">
         <h1 className="text-3xl font-semibold mt-4">Data Management</h1>
-        <div className="border border-inherit min-h-96 w-full mt-10 rounded-lg shadow-lg">
+        <div className="border border-inherit min-h-96 mt-10 rounded-lg shadow-lg">
           <div className="p-8">
             <div className="flex justify-between items-center mb-4 ">
               <div className="flex space-x-2">
@@ -791,24 +843,19 @@ const Page = () => {
                 </button>
               </div>
             </div>
-            <div
-              className="table-container"
-              style={{ maxHeight: "50vh", maxWidth: "140vh" }}
-            >
-              <PropertyTable
-                currentData={properties}
-                selectedRows={selectedRows}
-                handleSelectRow={handleSelectRow}
-                handleSelectAll={handleSelectAll}
-                handleChange={handleChange}
-                editMode={editMode}
-                editedData={editedData}
-                editedValuations={editedValuations}
-                handleHeaderClick={handleHeaderClick}
-                sortConfig={sortConfig}
-                onSelectProperty={handleSelectProperty}
-              />
-            </div>
+            <PropertyTable
+              currentData={properties}
+              selectedRows={selectedRows}
+              handleSelectRow={handleSelectRow}
+              handleSelectAll={handleSelectAll}
+              handleChange={handleChange}
+              editMode={editMode}
+              editedData={editedData}
+              editedValuations={editedValuations}
+              handleHeaderClick={handleHeaderClick}
+              sortConfig={sortConfig}
+              onSelectProperty={handleSelectProperty}
+            />
             <div className="mt-4 flex justify-between">
               <div>
                 <span className="text-sm text-gray-700">

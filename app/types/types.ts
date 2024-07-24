@@ -11,6 +11,7 @@ export interface Location {
   latitude: number;
   longitude: number;
   address: string;
+  coordinate: string;
 }
 
 export interface Valuation {
@@ -24,7 +25,7 @@ export interface Valuation {
   appraiser: string;
 }
 
-export interface Settings {  
+export interface Settings {
   id: number;
   title: number;
   latitude: number;
@@ -58,4 +59,21 @@ export interface User {
   updatedAt?: string;
   name?: string;
   auth_id?: string;
+}
+
+export interface RowData {
+  propertiesType?: string | null;
+  reportNumber?: string | null;
+  valuationDate?: string | null;
+  objectType?: string | null;
+  debitur?: string | null;
+  phoneNumber?: string | null;
+  address?: string | null;
+  landArea?: string | null;
+  buildingArea?: string | null;
+  landValue?: string | null;
+  buildingValue?: string | null;
+  totalValue?: string | null;
+  coordinates?: string | null;
+  appraiser?: string | null;
 }

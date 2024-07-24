@@ -312,12 +312,10 @@ export const fetchYearlyValuations = async () => {
   }
 };
 
-
 export const updateSettingsData = async (
   id: number,
   changes: Partial<Settings>
 ) => {
-
   const { data, error } = await supabase
     .from("settings")
     .update(changes)
@@ -809,35 +807,24 @@ export const fetchAllProperties = async (
     .from("properties")
     .select(
       `
-      id,
+      propertiesType,
       debitur,
+      phoneNumber,
       landArea,
       buildingArea,
-      phoneNumber,
-      propertiesType,
       isDeleted,
-      users (
-        id,
-        email,
-        username,
-        lastLogin,
-        isActive
-      ),
-      locations (
-        id,
-        latitude,
-        longitude,
-        address
-      ),
       objectType,
+      locations (
+        address,
+        coordinate
+      ),
       valuations!inner(
-        id,
+        reportNumber,
         valuationDate,
+        appraiser,
         landValue,
         buildingValue,
-        totalValue,
-        reportNumber,
-        appraiser
+        totalValue
       )
     `,
       { count: "exact" }
@@ -904,4 +891,15 @@ export const users = async (userId?: string): Promise<{ data: User }> => {
     return { data: null as any };
   }
   return { data: data as unknown as User };
+};
+
+export const getPropertiesCount = async () => {
+  let { data, error } = await supabase.rpc("count_properties");
+
+  if (error) {
+    console.error("Error fetching properties:", error);
+    return { count: 0 };
+  }
+
+  return { count: data };
 };

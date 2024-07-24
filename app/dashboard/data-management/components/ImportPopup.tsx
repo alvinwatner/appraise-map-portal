@@ -1,7 +1,7 @@
-import React, { useState, ChangeEvent } from 'react';
-import Modal from 'react-modal';
-import * as XLSX from 'xlsx';
-import Papa from 'papaparse';
+import React, { useState, ChangeEvent } from "react";
+import Modal from "react-modal";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
 
 interface ImportPopupProps {
   isOpen: boolean;
@@ -26,9 +26,13 @@ interface RowData {
   appraiser?: string | null;
 }
 
-const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) => {
+const ImportPopup: React.FC<ImportPopupProps> = ({
+  isOpen,
+  onClose,
+  onImport,
+}) => {
   const [file, setFile] = useState<File | null>(null);
-  const [dataType, setDataType] = useState<'asset' | 'data'>('asset');
+  const [dataType, setDataType] = useState<"asset" | "data">("asset");
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -37,7 +41,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
   };
 
   const handleDataTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setDataType(event.target.value as 'asset' | 'data');
+    setDataType(event.target.value as "asset" | "data");
   };
 
   const handleImport = () => {
@@ -47,7 +51,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
         if (e.target && e.target.result) {
           const content = e.target.result as string;
           const mapData = (row: any): RowData => {
-            if (dataType === 'asset') {
+            if (dataType === "asset") {
               return {
                 valuationDate: row["TANGGAL PENILAIAN"] || null,
                 objectType: row["JENIS OBJEK"] || null,
@@ -77,18 +81,25 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
             }
           };
 
-          if (file.name.endsWith('.csv')) {
+          if (file.name.endsWith(".csv")) {
             const result = Papa.parse(content, { header: true });
             const jsonData: RowData[] = (result.data as any[])
               .map(mapData)
-              .filter(row => Object.values(row).some(value => value !== null && value !== ''));
+              .filter((row) =>
+                Object.values(row).some(
+                  (value) => value !== null && value !== ""
+                )
+              );
 
             onImport(jsonData, dataType);
           } else {
-            const workbook = XLSX.read(content, { type: 'binary' });
-            const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+            const workbook = XLSX.read(content, { type: "binary" });
+            const sheetData = XLSX.utils.sheet_to_json(
+              workbook.Sheets[workbook.SheetNames[0]],
+              { header: 1 }
+            );
             const headers: string[] = sheetData[0] as string[];
-            const data = sheetData.slice(1).map(row => {
+            const data = sheetData.slice(1).map((row) => {
               const rowData: { [key: string]: any } = {};
               (row as any[]).forEach((cell, index) => {
                 rowData[headers[index]] = cell;
@@ -98,7 +109,11 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
 
             const jsonData: RowData[] = data
               .map(mapData)
-              .filter(row => Object.values(row).some(value => value !== null && value !== ''));
+              .filter((row) =>
+                Object.values(row).some(
+                  (value) => value !== null && value !== ""
+                )
+              );
 
             onImport(jsonData, dataType);
           }
@@ -106,7 +121,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
       };
       reader.readAsBinaryString(file);
     } else {
-      console.error('Unsupported file format');
+      console.error("Unsupported file format");
     }
     onClose();
   };
@@ -128,7 +143,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
               <input
                 type="radio"
                 value="asset"
-                checked={dataType === 'asset'}
+                checked={dataType === "asset"}
                 onChange={handleDataTypeChange}
               />
               Asset
@@ -137,7 +152,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({ isOpen, onClose, onImport }) 
               <input
                 type="radio"
                 value="data"
-                checked={dataType === 'data'}
+                checked={dataType === "data"}
                 onChange={handleDataTypeChange}
               />
               Data

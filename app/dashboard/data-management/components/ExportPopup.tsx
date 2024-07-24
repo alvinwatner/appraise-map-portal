@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import Modal from 'react-modal';
+import React, { useState } from "react";
+import Modal from "react-modal";
 
 interface ExportPopupProps {
   isOpen: boolean;
@@ -7,7 +7,11 @@ interface ExportPopupProps {
   onExport: (exportAll: boolean) => void;
 }
 
-const ExportPopup: React.FC<ExportPopupProps> = ({ isOpen, onClose, onExport }) => {
+const ExportPopup: React.FC<ExportPopupProps> = ({
+  isOpen,
+  onClose,
+  onExport,
+}) => {
   const [exportAll, setExportAll] = useState(false);
 
   const handleExport = () => {
@@ -26,7 +30,7 @@ const ExportPopup: React.FC<ExportPopupProps> = ({ isOpen, onClose, onExport }) 
     >
       <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md">
         <div className="px-6 py-4">
-          <div className="text-center font-bold text-xl mb-4">Import Data</div>
+          <div className="text-center font-bold text-xl mb-4">Export Data</div>
           <div className="mb-4">
             <label className="block mb-2">
               <input
