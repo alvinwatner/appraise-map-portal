@@ -118,7 +118,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
       </div>
 
       {property.valuations.length != 0 &&
-        property.valuations.map((valuation) => (
+        property?.valuations?.map((valuation) => (
           <>
             {property.propertiesType == "aset" && (
               <ValuationCardAsset valuation={valuation} />

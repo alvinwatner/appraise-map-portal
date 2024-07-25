@@ -1,3 +1,4 @@
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { supabase } from "./../lib/supabaseClient";
 import {
   Property,
@@ -348,8 +349,9 @@ export const fetchSettingsData = async (): Promise<Settings> => {
 };
 
 export const fetchUserDataSession = async (): Promise<User> => {
+  const supabases = createClientComponentClient();
   const { data: session, error: sessionError } =
-    await supabase.auth.getSession();
+    await supabases.auth.getSession();
   if (sessionError) {
     throw new Error("Failed to retrieve session");
   }
@@ -893,8 +895,35 @@ export const users = async (userId?: string): Promise<{ data: User }> => {
   return { data: data as unknown as User };
 };
 
-export const getPropertiesCount = async () => {
-  let { data, error } = await supabase.rpc("count_properties");
+export const getPropertiesCount = async (
+  search?: string,
+  page?: number,
+  perPage?: number,
+  filters: any = {},
+  sortField?: string,
+  sort?: string
+) => {
+  const {
+    propertyType,
+    objectType,
+    valuationDate,
+    minTotalValue,
+    maxTotalValue,
+  } = filters;
+
+  const rpcParams = {
+    search_query: search && search !== "" ? search : null,
+    property_type: propertyType && propertyType !== "" ? propertyType : null,
+    object_type: objectType && objectType !== "" ? objectType : null,
+    valuation_date:
+      valuationDate && valuationDate !== "" ? valuationDate : null,
+    min_total_value: minTotalValue || null,
+    max_total_value: maxTotalValue || null,
+    sort_field: sortField,
+    sort_order: sort,
+  };
+
+  let { data, error } = await supabase.rpc("count_properties", rpcParams);
 
   if (error) {
     console.error("Error fetching properties:", error);

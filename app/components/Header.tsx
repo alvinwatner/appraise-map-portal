@@ -7,7 +7,7 @@ import {
   countUnreadNotifications,
   users,
 } from "../services/dataManagement.service";
-import { supabase } from "@/app/lib/supabaseClient";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -27,7 +27,9 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
+        const supabase = createClientComponentClient();
         const { data: session, error } = await supabase.auth.getSession();
+
         if (error) {
           throw error;
         }

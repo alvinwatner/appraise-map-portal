@@ -86,10 +86,10 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     setClickedRowId(id);
   };
 
-  const tableWidthPercentage = 100 - 26;
+  const tableWidthPercentage = 100 - 25;
 
   return (
-    <div className="mt-10 px-4" style={{ width: `${tableWidthPercentage}vw` }}>
+    <div className="mt-10" style={{ width: `${tableWidthPercentage}vw` }}>
       <div className="overflow-x-auto">
         <table className="w-full bg-white border border-gray-200">
           <thead>

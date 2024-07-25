@@ -23,6 +23,7 @@ import ExportPopup from "./components/ExportPopup";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import wkx from "wkx";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -67,7 +68,7 @@ const flattenAsset = (property: Property) => {
     latitude = lat;
   }
 
-  return property.valuations.map((valuation) => ({
+  return property?.valuations?.map((valuation) => ({
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
@@ -99,7 +100,7 @@ const flattenData = (property: Property) => {
     latitude = lat;
   }
 
-  return property.valuations.map((valuation) => ({
+  return property?.valuations?.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
@@ -165,7 +166,8 @@ const Page = () => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const { data: session, error } = await supabase.auth.getSession();
+        const supabases = createClientComponentClient();
+        const { data: session, error } = await supabases.auth.getSession();
         if (error) {
           throw error;
         }
@@ -461,7 +463,15 @@ const Page = () => {
           sort
         );
 
-        const countProperties = await getPropertiesCount();
+        const countProperties = await getPropertiesCount(
+          query,
+          page,
+          perPage,
+          filters,
+          sortField,
+          sort
+        );
+
         setProperties(propertiesData.data);
         setTotalItems(countProperties.count);
       } catch (error) {
@@ -615,12 +625,12 @@ const Page = () => {
 
     const workbook = XLSX.utils.book_new();
 
-    const assetData = asset.data.flatMap((property) => flattenAsset(property));
-    const assetSheet = XLSX.utils.json_to_sheet(assetData);
+    const assetData = asset.data?.flatMap((property) => flattenAsset(property));
+    const assetSheet = XLSX.utils?.json_to_sheet(assetData);
     XLSX.utils.book_append_sheet(workbook, assetSheet, "Asset Sheet");
 
-    const dataData = data.data.flatMap((property) => flattenData(property));
-    const dataSheet = XLSX.utils.json_to_sheet(dataData);
+    const dataData = data.data?.flatMap((property) => flattenData(property));
+    const dataSheet = XLSX.utils?.json_to_sheet(dataData);
     XLSX.utils.book_append_sheet(workbook, dataSheet, "Data Sheet");
 
     const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });

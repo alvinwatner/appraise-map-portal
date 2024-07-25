@@ -2,6 +2,7 @@
 
 import Loading from "@/app/components/Loading";
 import { supabase } from "@/app/lib/supabaseClient";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 
 const ProfileForm: React.FC = () => {
@@ -19,13 +20,14 @@ const ProfileForm: React.FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      const supabases = createClientComponentClient();
       const {
         data: { user },
         error,
-      } = await supabase.auth.getUser();
+      } = await supabases.auth.getUser();
       if (error) {
         console.error("Error fetching user:", error);
-        setFetching(false); // Set fetching to false in case of error
+        setFetching(false);
         return;
       }
       if (user) {
