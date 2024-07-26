@@ -14,6 +14,8 @@ const LoginPage = () => {
     const formData = new FormData(event.currentTarget);
     const response = await login(formData);
 
+    
+
     if (response?.error) {
       setError(response.error.message);
     } else {

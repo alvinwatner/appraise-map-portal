@@ -172,7 +172,8 @@ export const fetchPropertiesByBoundingBox = async (
   filters: {
     propertyType?: string;
     objectType?: string;
-    valuationDate?: string;
+    startValuationDate?: string;
+    endValuationDate?: string;
     minTotalValue?: number;
     maxTotalValue?: number;
   } = {}
@@ -190,9 +191,13 @@ export const fetchPropertiesByBoundingBox = async (
       filters.objectType && filters.objectType !== ""
         ? filters.objectType
         : null,
-    valuation_date:
-      filters.valuationDate && filters.valuationDate !== ""
-        ? filters.valuationDate
+    start_valuation_date:
+      filters.startValuationDate && filters.startValuationDate !== ""
+        ? filters.startValuationDate
+        : null,
+    end_valuation_date:
+      filters.endValuationDate && filters.endValuationDate !== ""
+        ? filters.endValuationDate
         : null,
     min_total_value: filters.minTotalValue || null,
     max_total_value: filters.maxTotalValue || null,
@@ -659,6 +664,7 @@ interface AddPropertyArgs {
   landValue: number;
   buildingValue: number;
   totalValue: number;
+  appraiser: string;
   reportNumber?: string | null;
   valuationDate?: string | null;
 }
@@ -693,9 +699,11 @@ export const addProperty = async ({
   landValue,
   buildingValue,
   totalValue,
+  appraiser,
   reportNumber,
   valuationDate,
 }: AddPropertyArgs) => {
+  console.log(`add properties appraiser = ${appraiser}`);
   // Retrieve the current session to get the user ID
   const userData = await fetchUserDataSession();
 
@@ -754,6 +762,7 @@ export const addProperty = async ({
       landValue: landValue,
       buildingValue: buildingValue,
       totalValue: totalValue,
+      appraiser: appraiser,
       reportNumber: reportNumber,
       valuationDate: valuationDate,
       PropertyId: propertyId,

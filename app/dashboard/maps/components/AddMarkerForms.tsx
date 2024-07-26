@@ -44,6 +44,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
   const [totalValue, setTotalValue] = useState<number>(0);
   const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
+  const [appraiser, setAppraiser] = useState<string>("");
 
   const onChangePropertyType = (propertyType: string) => {
     selectPropertyType(propertyType);
@@ -138,6 +139,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         landValue: landValue,
         buildingValue: buildingValue,
         totalValue: totalValue,
+        appraiser: appraiser,
         reportNumber: reportNumber,
         valuationDate: valuationDate,
       });
@@ -271,6 +273,10 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
             onChangeReportNumber={(value) => {
               setReportNumber(value);
             }}
+            onChangeAppraiser={(value) => {
+              setAppraiser(value);
+              console.log(`appraiser value = ${value}`);
+            }}
           />
         ) : (
           <AddAssetValuationForm
@@ -289,6 +295,9 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
             onChangeReportNumber={(value) => {
               setReportNumber(value);
             }}
+            onChangeAppraiser={(value) => {
+              setAppraiser(value);
+            }}            
           />
           // <DataValuationForms
           //   valuations={property?.valuations ?? []}

@@ -1,5 +1,5 @@
-import Dropdown from "@/app/components/Dropdown";
 import { fetchObjectTypes } from "@/app/services/dataManagement.service";
+import { filterNumeric, formatRupiah } from "@/app/utils/helper";
 import React, { useEffect, useState } from "react";
 
 type FilterModalProps = {
@@ -22,8 +22,11 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const [propertyType, setPropertyType] = useState(
     defaultFilters?.propertyType || ""
   );
-  const [valuationDate, setValuationDate] = useState(
-    defaultFilters?.valuationDate || ""
+  const [startValuationDate, setStartValuationDate] = useState(
+    defaultFilters?.startValuationDate || ""
+  );
+  const [endValuationDate, setEndValuationDate] = useState(
+    defaultFilters?.endValuationDate || ""
   );
   const [objectType, setObjectType] = useState(
     defaultFilters?.objectType || ""
@@ -37,6 +40,15 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   const [objectTypes, setObjectTypes] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const handleClear = () => {
+    setPropertyType("");
+    setStartValuationDate("");
+    setEndValuationDate("");
+    setObjectType("");
+    setMinTotalValue("");
+    setMaxTotalValue("");
+  };
 
   useEffect(() => {
     const getObjectTypes = async () => {
@@ -56,7 +68,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   useEffect(() => {
     if (defaultFilters) {
       setPropertyType(defaultFilters.propertyType || "");
-      setValuationDate(defaultFilters.valuationDate || "");
+      setStartValuationDate(defaultFilters.startValuationDate || "");
+      setEndValuationDate(defaultFilters.endValuationDate || "");
       setObjectType(defaultFilters.objectType || "");
       setMinTotalValue(defaultFilters.minTotalValue || "");
       setMaxTotalValue(defaultFilters.maxTotalValue || "");
@@ -66,7 +79,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const handleApply = () => {
     const filters = {
       propertyType,
-      valuationDate,
+      startValuationDate,
+      endValuationDate,
       objectType,
       minTotalValue: minTotalValue ? Number(minTotalValue) : undefined,
       maxTotalValue: maxTotalValue ? Number(maxTotalValue) : undefined,
@@ -77,11 +91,17 @@ const FilterModal: React.FC<FilterModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
       <div className="bg-white p-6 rounded shadow-md w-full max-w-lg">
-        <h2 className="text-xl mb-4">Filter Properties</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl mb-4">Filter Properties</h2>
+          <button className="text-sm text-blue-500" onClick={handleClear}>
+            Clear
+          </button>
+        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Jenis Data</label>
           <select
-            className="block w-full rounded-md"
+            className="block w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
             value={propertyType || ""}
             onChange={(e) => setPropertyType(e.target.value)}
           >
@@ -94,18 +114,27 @@ const FilterModal: React.FC<FilterModalProps> = ({
           </select>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Tanggal Penilaian</label>
+          <label className="block mb-2">Dari (Tanggal Penilaian) :</label>
           <input
             type="date"
-            className="w-full px-4 py-2 border rounded"
-            value={valuationDate}
-            onChange={(e) => setValuationDate(e.target.value)}
+            className=" w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+            value={startValuationDate}
+            onChange={(e) => setStartValuationDate(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2">Sampai (Tanggal Penilaian) :</label>
+          <input
+            type="date"
+            className=" w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+            value={endValuationDate}
+            onChange={(e) => setEndValuationDate(e.target.value)}
           />
         </div>
         <div className="mb-4">
           <label className="block mb-2">Jenis Objek</label>
           <select
-            className="block w-full rounded-md"
+            className="block w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
             value={objectType || ""}
             onChange={(e) => {
               const selectedId = e.target.value;
@@ -127,18 +156,20 @@ const FilterModal: React.FC<FilterModalProps> = ({
           <label className="block mb-2">Rentang Total Nilai</label>
           <div className="flex space-x-2">
             <input
-              type="number"
-              className="w-full px-4 py-2 border rounded"
+              className="w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               placeholder="Min"
-              value={minTotalValue}
-              onChange={(e) => setMinTotalValue(e.target.value)}
+              value={formatRupiah(minTotalValue)}
+              onChange={(e) =>
+                setMinTotalValue(Number(filterNumeric(e.target.value)))
+              }
             />
             <input
-              type="number"
-              className="w-full px-4 py-2 border rounded"
+              className="w-full pl-2 py-2 rounded-lg  placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               placeholder="Max"
-              value={maxTotalValue}
-              onChange={(e) => setMaxTotalValue(e.target.value)}
+              value={formatRupiah(maxTotalValue)}
+              onChange={(e) =>
+                setMaxTotalValue(Number(filterNumeric(e.target.value)))
+              }
             />
           </div>
         </div>

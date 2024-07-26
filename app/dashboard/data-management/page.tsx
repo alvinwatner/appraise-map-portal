@@ -176,6 +176,10 @@ const Page = () => {
         const dataUser = await users(session.session?.user.id);
         const userRoleId = dataUser?.data?.RoleId ?? null;
 
+        console.log(
+          `dataUser = ${JSON.stringify(dataUser)} roleId = ${userRoleId}`
+        );
+
         // Update state with RoleId
         setRoleId(userRoleId);
         setUser(dataUser.data);

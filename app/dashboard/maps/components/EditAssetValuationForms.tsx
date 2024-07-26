@@ -34,9 +34,11 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
   const handleInputChange =
     (field: keyof Valuation) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value =
-        field === "valuationDate"
-          ? e.target.value
-          : Number(filterNumeric(e.target.value));
+        field === "landValue" ||
+        field === "buildingValue" ||
+        field === "totalValue"
+          ? Number(filterNumeric(e.target.value))
+          : e.target.value;
       setValuation((prev) => ({ ...prev, [field]: value }));
       onChangeValuations(initialValuation.id ?? 0, field, value);
     };
@@ -72,12 +74,14 @@ const EditAssetValuationForm: React.FC<EditAssetValuationFormProps> = ({
         label="Penilai"
         value={valuation.appraiser}
         onChange={handleInputChange("appraiser")}
+        type="string"
         placeholder="Penilai"
       />
       <ValuationInput
         label="No Laporan"
         value={valuation.reportNumber}
         onChange={handleInputChange("reportNumber")}
+        type="string"
         placeholder="No Laporan"
       />
     </div>
@@ -200,6 +204,7 @@ const AddAssetValuationFormOnEdit: React.FC<
         label="Penilai"
         value={valuation.appraiser}
         onChange={handleInputChange("appraiser")}
+        type="string"
         placeholder="Penilai"
       />
       <ValuationInput
