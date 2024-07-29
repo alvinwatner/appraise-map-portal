@@ -135,7 +135,8 @@ export const fetchProperties = async (
   const {
     propertyType,
     objectType,
-    valuationDate,
+    startValuationDate,
+    endValuationDate,
     minTotalValue,
     maxTotalValue,
   } = filters;
@@ -146,8 +147,8 @@ export const fetchProperties = async (
     search_query: search && search !== "" ? search : null,
     property_type: propertyType && propertyType !== "" ? propertyType : null,
     object_type: objectType && objectType !== "" ? objectType : null,
-    valuation_date:
-      valuationDate && valuationDate !== "" ? valuationDate : null,
+    start_valuation_date: startValuationDate && startValuationDate !== "" ? startValuationDate : null,
+    end_valuation_date: endValuationDate && endValuationDate !== "" ? endValuationDate : null,
     min_total_value: minTotalValue || null,
     max_total_value: maxTotalValue || null,
     sort_field: sortField,
