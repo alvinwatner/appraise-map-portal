@@ -7,6 +7,7 @@ import { AreaInput } from "../../../components/AreaInput";
 import { addProperty } from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
 import { AddAssetValuationForm } from "./AddAssetValuationForm";
+import { AddDataValuationForm } from "./AddDataValuationForm";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -256,7 +257,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
           <p className="text-red-500 text-xs">{errors.buildingArea}</p>
         )}
 
-        {selectedPropertyType == "Aset" ? (
+        {selectedPropertyType == "Aset" && (
           <AddAssetValuationForm
             onChangeLandValue={(value) => {
               setLandValue(value);
@@ -278,8 +279,10 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
               console.log(`appraiser value = ${value}`);
             }}
           />
-        ) : (
-          <AddAssetValuationForm
+        )}
+
+        {selectedPropertyType == "Data" && (
+          <AddDataValuationForm
             onChangeLandValue={(value) => {
               setLandValue(value);
             }}
@@ -292,17 +295,7 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
             onChangeValuationDate={(value) => {
               setValuationDate(value);
             }}
-            onChangeReportNumber={(value) => {
-              setReportNumber(value);
-            }}
-            onChangeAppraiser={(value) => {
-              setAppraiser(value);
-            }}            
           />
-          // <DataValuationForms
-          //   valuations={property?.valuations ?? []}
-          //   isEdit={property != null}
-          // />
         )}
 
         <div className="grid grid-cols-2 gap-2 mb-10 mt-8">

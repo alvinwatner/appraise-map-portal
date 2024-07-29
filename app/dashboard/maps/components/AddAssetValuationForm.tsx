@@ -1,12 +1,11 @@
-import React, {useEffect, useState } from "react";
-import { filterNumeric, formatRupiah } from "../../../utils/helper";
+import React, { useEffect, useState } from "react";
 import { fetchUserDataSession } from "@/app/services/dataManagement.service";
+import {
+  BaseAddValuationForm,
+  BaseAddValuationFormProps,
+} from "./BaseValuationForm";
 
-interface AddAssetValuationFormProps {
-  onChangeLandValue: (value: number) => void;
-  onChangeBuildingValue: (value: number) => void;
-  onChangeTotalValue: (value: number) => void;
-  onChangeValuationDate: (value: string) => void;
+interface AddAssetValuationFormProps extends BaseAddValuationFormProps {
   onChangeReportNumber: (value: string) => void;
   onChangeAppraiser: (value: string) => void;
 }
@@ -15,82 +14,36 @@ export const AddAssetValuationForm: React.FC<AddAssetValuationFormProps> = ({
   onChangeLandValue,
   onChangeBuildingValue,
   onChangeTotalValue,
-  onChangeReportNumber,
   onChangeValuationDate,
+  onChangeReportNumber,
   onChangeAppraiser,
 }: AddAssetValuationFormProps) => {
-  const [landValue, setLandValue] = useState<number>(0);
-  const [buildingValue, setBuildingValue] = useState<number>(0);
-  const [totalValue, setTotalValue] = useState<number>(0);
-  const [valuationDate, setValuationDate] = useState<string>("");
   const [reportNumber, setReportNumber] = useState<string>("");
   const [appraiser, setAppraiser] = useState<string>("");
+
+  useEffect(() => {
+    onChangeAppraiser(appraiser);
+  }, [appraiser, onChangeAppraiser]);
 
   useEffect(() => {
     const fetchSession = async () => {
       const result = await fetchUserDataSession();
       console.log(`add data session result = ${JSON.stringify(result)}`);
       setAppraiser(result.name ?? "");
-      onChangeAppraiser(result.name ?? "");
     };
 
     fetchSession();
-  }, [onChangeAppraiser]);
+  }, []);
 
   return (
     <div>
-      <p className="text-2sm font-thin mb-2 mt-5">Nilai:</p>
+      <BaseAddValuationForm
+        onChangeLandValue={onChangeLandValue}
+        onChangeBuildingValue={onChangeBuildingValue}
+        onChangeTotalValue={onChangeTotalValue}
+        onChangeValuationDate={onChangeValuationDate}
+      />
       <div className="ml-4">
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Tanah/meter :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(landValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setLandValue(value);
-            onChangeLandValue(value);
-          }}
-          type="text"
-          placeholder="Nilai Tanah"
-        />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Nilai Bangunan/meter :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(buildingValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setBuildingValue(value);
-            onChangeBuildingValue(value);
-          }}
-          type="text"
-          placeholder="Nilai Bangunan"
-        />
-
-        <p className="text-2sm font-thin mb-2 mt-5">Total Nilai :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={formatRupiah(totalValue)}
-          onChange={(e) => {
-            var value = Number(filterNumeric(e.target.value));
-            setTotalValue(value);
-            onChangeTotalValue(value);
-          }}
-          type="text"
-          placeholder="Total Nilai"
-        />
-        <p className="text-2sm font-thin mb-2 mt-5">Tanggal Penilaian :</p>
-        <input
-          className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-          value={valuationDate}
-          onChange={(e) => {
-            var value = e.target.value;
-            setValuationDate(value);
-            onChangeValuationDate(value);
-          }}
-          type="date"
-          placeholder="Tanggal Penilaian"
-        />
         <p className="text-2sm font-thin mb-2 mt-5">Dinilai Oleh :</p>
         <input
           className="w-full pl-2 py-2 rounded-lg placeholder:placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"

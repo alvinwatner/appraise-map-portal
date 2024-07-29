@@ -81,7 +81,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         icon={HiOutlineLocationMarker}
         title="Lokasi :"
         body={property.locations.address}
-        className="mb-6"
+        className="mb-1"
       />
       {property.propertiesType == "data" && (
         <PropertyRowItemWithIcon
