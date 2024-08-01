@@ -35,7 +35,7 @@ import Loading from "@/app/components/Loading";
 import { Search } from "./components/Search";
 
 // Type imports
-import { Property } from "@/app/types/types";
+import { Property, User } from "@/app/types/types";
 
 // Icon imports
 import {
@@ -75,12 +75,14 @@ export default function Page() {
     neLng: 0,
   });
 
+  const [userData, setUserData] = useState<User | null>(null);
+
   const [filters, setFilters] = useState({});
   const [isAdding, setIsAdding] = useState(false);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const [initLat, setInitLat] = useState<number | null>(null);
-  const [initLng, setInitLng] = useState<number | null>(null);  
+  const [initLng, setInitLng] = useState<number | null>(null);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
   const [googleMapKey, setgoogleMapKey] = useState(Date.now());
   const [leftWhiteSheetComponent, setLeftWhiteSheetComponent] = useState(
@@ -109,15 +111,23 @@ export default function Page() {
     []
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetchSettingsData();
-      console.log(`settingsData result = ${JSON.stringify(result)}`);
-      setInitLat(result.latitude);
-      setInitLng(result.longitude);
-    };
+  const fetchSessionData = async () => {
+    try {
+      const results = await Promise.all([
+        fetchSettingsData(),
+        fetchUserDataSession(),
+      ]);
 
-    fetchData();
+      setInitLat(results[0].latitude);
+      setInitLng(results[0].longitude);
+      setUserData(results[1]);
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSessionData();
   }, []);
 
   const fetchData = useCallback(async () => {
@@ -477,21 +487,24 @@ export default function Page() {
       />
 
       {/* Floating action button */}
-      <button
-        className={`fixed bottom-10 right-10 z-50 p-4 rounded-full ${
-          isAdding
-            ? "bg-white cursor-pointer ring-2 ring-black"
-            : "bg-yellow-400"
-        } hover:ring-2 hover:ring-white transition duration-700`}
-        onClick={toggleAddingMode}
-        style={{ cursor: "pointer", outline: "none" }}
-      >
-        {isAdding ? (
-          <FiX className="text-3xl text-gray-800" />
-        ) : (
-          <FiPlus className="text-3xl text-black" />
-        )}
-      </button>
+      {
+        (userData?.RoleId == 1 || userData?.RoleId == 2) &&
+        <button
+          className={`fixed bottom-10 right-10 z-50 p-4 rounded-full ${
+            isAdding
+              ? "bg-white cursor-pointer ring-2 ring-black"
+              : "bg-yellow-400"
+          } hover:ring-2 hover:ring-white transition duration-700`}
+          onClick={toggleAddingMode}
+          style={{ cursor: "pointer", outline: "none" }}
+        >
+          {isAdding ? (
+            <FiX className="text-3xl text-gray-800" />
+          ) : (
+            <FiPlus className="text-3xl text-black" />
+          )}
+        </button>
+      }
 
       {showFilterModal && (
         <FilterModal

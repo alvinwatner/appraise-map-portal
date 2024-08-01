@@ -15,9 +15,12 @@ import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 
 import { ValuationCardAsset } from "./ValuationCardAsset";
 import { ValuationCardData } from "./ValuationCardData";
-import { updatePropertiesIsDeleted } from "../../../services/dataManagement.service";
+import {
+  fetchUserDataSession,
+  updatePropertiesIsDeleted,
+} from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface MarkerDetailContentProps {
   onClose: () => void;
@@ -37,6 +40,16 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
 }: MarkerDetailContentProps) => {
   // New state for loading and modal
   const [isLoading, setIsLoading] = useState(false);
+  const [roleId, setRoleId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchRoleId = async () => {
+      const userData = await fetchUserDataSession();
+      setRoleId(userData.RoleId ?? 3);
+    };
+
+    fetchRoleId();
+  }, []);
 
   const handleDeleteSelected = async () => {
     setIsLoading(true);
@@ -117,7 +130,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         </div>
       </div>
 
-      {property.valuations.length != 0 &&
+      {property.valuations?.length != 0 &&
         property?.valuations?.map((valuation) => (
           <>
             {property.propertiesType == "aset" && (
@@ -130,28 +143,31 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
           </>
         ))}
 
-      <div className="grid grid-cols-2 gap-2 mb-10 mt-8 ">
-        <button
-          className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded"
-          onClick={() => {
-            onEditClicked(property);
-          }}
-        >
-          Edit <PiPencilSimpleLight className="ml-2" />
-        </button>
-        <button
-          className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleDeleteSelected}
-        >
-          {isLoading ? (
-            <Loading size="w-4 h-4" strokeWidth="border-2 border-t-2" />
-          ) : (
-            <>
-              Delete <RiDeleteBin5Line className="ml-2" />
-            </>
-          )}
-        </button>
-      </div>
+      {
+        (roleId == 1 || roleId == 2) && 
+        <div className="grid grid-cols-2 gap-2 mb-10 mt-8 ">
+          <button
+            className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded"
+            onClick={() => {
+              onEditClicked(property);
+            }}
+          >
+            Edit <PiPencilSimpleLight className="ml-2" />
+          </button>
+          <button
+            className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleDeleteSelected}
+          >
+            {isLoading ? (
+              <Loading size="w-4 h-4" strokeWidth="border-2 border-t-2" />
+            ) : (
+              <>
+                Delete <RiDeleteBin5Line className="ml-2" />
+              </>
+            )}
+          </button>
+        </div>
+      }
     </div>
   );
 };
