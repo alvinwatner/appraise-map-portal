@@ -24,6 +24,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import wkx from "wkx";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { PiExportBold } from "react-icons/pi";
+import { BiImport } from "react-icons/bi";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -717,42 +719,26 @@ const Page = () => {
                   onChange={handleSearchChange}
                   onKeyPress={handleSearchKeyPress}
                 />
-                {(roleId == 1 || roleId == 2)  && <button
-                  className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                  style={{ backgroundColor: "#20744A" }}
-                  onClick={handleImportClick}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
+                {(roleId == 1 || roleId == 2) && (
+                  <button
+                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
+                    style={{ backgroundColor: "#20744A" }}
+                    onClick={handleImportClick}
                   >
-                    <path
-                      fill="currentColor"
-                      d="M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1m-9.71 1.71a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42L13 12.59V3a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42Z"
-                    ></path>
-                  </svg>
-                  &nbsp;Import
-                </button>}
-                {(roleId == 1 ) && <button
-                  className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                  style={{ backgroundColor: "#20744A" }}
-                  onClick={handleExportClick}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
+                    <BiImport className= "mr-2" />
+                    Import
+                  </button>
+                )}
+                {roleId == 1 && (
+                  <button
+                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
+                    style={{ backgroundColor: "#20744A" }}
+                    onClick={handleExportClick}
                   >
-                    <path
-                      fill="currentColor"
-                      d="M8.71 7.71L11 5.41V15a1 1 0 0 0 2 0V5.41l2.29 2.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-.33-.21a1 1 0 0 0-.76 0a1 1 0 0 0-.33.21l-4 4a1 1 0 0 0 1.42 1.42m6.58 8.58L13 18.59V9a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42l4 4a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42Z"
-                    ></path>
-                  </svg>
-                  &nbsp;Export
-                </button>}
+                    <PiExportBold className="mr-2" />
+                    Export
+                  </button>
+                )}
               </div>
               <div className="flex space-x-2">
                 <div className="flex space-x-2">

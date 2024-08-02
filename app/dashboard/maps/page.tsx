@@ -298,6 +298,7 @@ export default function Page() {
         return (
           <MarkerDetailContent
             property={selectedProperty!}
+            roleId={userData?.RoleId ?? 3}
             onEditClicked={handleOnEditClick}
             onShowModalSuccess={async () => {
               handleModalSuccess("Property berhasil dihapus!");

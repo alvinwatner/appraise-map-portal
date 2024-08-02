@@ -300,7 +300,7 @@ const SettingsPage: React.FC = () => {
           </div>
           <div className="w-4/5 border border-inherit mt-10 rounded-lg shadow-lg">
             {loading ? (
-              <Loading />
+              <Loading size="w-16 h-16" strokeWidth="border-4 border-t-4"/>
             ) : (
               <div>
                 {activeTab === "users" && renderUsersTab()}

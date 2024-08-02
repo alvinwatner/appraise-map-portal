@@ -32,6 +32,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   onShowModalSuccess,
   onShowModalFail,
 }: EditMarkerFormProps) => {
+  const [phoneNumber, setPhoneNumber] = useState<string>(property.phoneNumber);
+  const [debitur, setDebitur] = useState<string>(property.debitur);
+  const [address, setAddress] = useState<string>(property.locations.address);
   const [newValuations, setNewValuations] = useState<Valuation[]>([]);
 
   const [editedProperty, setEditedProperty] = useState<Partial<Property>>({
@@ -78,7 +81,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
     value: any
   ) => {
     setEditedValuations((prevMap) => {
-      const updatedMap = new Map(prevMap); 
+      const updatedMap = new Map(prevMap);
       const existingValuation = updatedMap.get(id) || {};
 
       updatedMap.set(id, { ...existingValuation, [field]: value });
@@ -194,7 +197,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       }
 
       onClose(); // Close form on success
-      if (onShowModalSuccess != null) {        
+      if (onShowModalSuccess != null) {
         onShowModalSuccess();
       }
     } catch (error) {
@@ -221,6 +224,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       <div className="px-12">
         <p className="text-2sm font-thin mb-2">Jenis Data :</p>
         <Dropdown
+          readonly={true}
           placeholder="Jenis Data"
           options={propertyTypes}
           onChange={onChangePropertyType}
@@ -241,11 +245,13 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nomor HP :</p>
             <input
-              value={property.phoneNumber}
+              value={phoneNumber}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
-                handleOnChangeProperty("phoneNumber", event.target.value);
+                const value = event.target.value;
+                handleOnChangeProperty("phoneNumber", value);
+                setPhoneNumber(value);
               }}
               placeholder="Nomor HP"
             />
@@ -259,11 +265,13 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <>
             <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
             <input
-              value={property.debitur}
+              value={debitur}
               className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
-                handleOnChangeProperty("debitur", event.target.value);
+                const value = event.target.value;
+                handleOnChangeProperty("debitur", value);
+                setDebitur(value);
               }}
               placeholder="Nama Debitur"
             />
@@ -274,15 +282,16 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
         )}
         <p className="text-2sm font-thin mb-2 mt-5">Alamat:</p>
         <textarea
-          value={property.locations.address}
+          value={address}
           className="w-full pl-2 py-2 h-20 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm resize-none"
           rows={4}
           onChange={(event) => {
+            const value = event.target.value;
             handleOnChangeProperty("locations", {
               ...editedProperty.locations,
-              address: event.target.value,
+              address: value,
             });
-            handleOnChangeProperty("landArea", event.target.value);
+            setAddress(value);
           }}
           placeholder="Alamat"
         ></textarea>

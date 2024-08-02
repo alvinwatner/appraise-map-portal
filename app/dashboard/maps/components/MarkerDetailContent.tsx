@@ -27,7 +27,7 @@ interface MarkerDetailContentProps {
   onEditClicked: (property: Property) => void;
   onShowModalSuccess?: () => void;
   onShowModalFail?: () => void;
-
+  roleId: number;
   property: Property;
 }
 
@@ -36,20 +36,11 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
   onClose,
   onEditClicked,
   onShowModalSuccess,
+  roleId,
   onShowModalFail,
 }: MarkerDetailContentProps) => {
   // New state for loading and modal
   const [isLoading, setIsLoading] = useState(false);
-  const [roleId, setRoleId] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchRoleId = async () => {
-      const userData = await fetchUserDataSession();
-      setRoleId(userData.RoleId ?? 3);
-    };
-
-    fetchRoleId();
-  }, []);
 
   const handleDeleteSelected = async () => {
     setIsLoading(true);
@@ -143,8 +134,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
           </>
         ))}
 
-      {
-        (roleId == 1 || roleId == 2) && 
+      {(roleId == 1 || roleId == 2) && (
         <div className="grid grid-cols-2 gap-2 mb-10 mt-8 ">
           <button
             className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2  rounded"
@@ -167,7 +157,7 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
             )}
           </button>
         </div>
-      }
+      )}
     </div>
   );
 };
