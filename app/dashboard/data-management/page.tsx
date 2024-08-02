@@ -178,10 +178,6 @@ const Page = () => {
         const dataUser = await users(session.session?.user.id);
         const userRoleId = dataUser?.data?.RoleId ?? null;
 
-        console.log(
-          `dataUser = ${JSON.stringify(dataUser)} roleId = ${userRoleId}`
-        );
-
         // Update state with RoleId
         setRoleId(userRoleId);
         setUser(dataUser.data);
@@ -217,24 +213,26 @@ const Page = () => {
   };
 
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
+    setLoading(true);
     setImportSuccess(false);
     if (dataType === "asset") {
       await importAssetData(jsonData);
-      setImportSuccess(true);
       insertNotification({
         title: "Import Data",
         description: `${user?.name} melakukan import asset`,
         roleId: 1,
       });
+      setImportSuccess(true);
     } else if (dataType === "data") {
       await importDataData(jsonData);
-      setImportSuccess(true);
       insertNotification({
         title: "Import Data",
         description: `${user?.name} melakukan import data`,
         roleId: 1,
       });
+      setImportSuccess(true);
     }
+    setLoading(false);
   };
 
   const importAssetData = async (jsonData: RowData[]) => {
@@ -281,7 +279,7 @@ const Page = () => {
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
 
-        const coordinatesArray = item.coordinates?.split(", ").map(Number);
+        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
@@ -299,6 +297,7 @@ const Page = () => {
           LocationId: formattedDataLocations.id,
           objectType: item.objectType,
           propertiesType: "asset",
+          UserId: user?.id,
         };
 
         const formattedDataValuations = {
@@ -385,7 +384,7 @@ const Page = () => {
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
 
-        const coordinatesArray = item.coordinates?.split(", ").map(Number);
+        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
@@ -403,6 +402,7 @@ const Page = () => {
           buildingArea: parseAndFormatFloat(item.buildingArea),
           LocationId: formattedDataLocations.id,
           objectType: item.objectType,
+          UserId: user?.id,
         };
 
         const formattedDataValuations = {
@@ -448,6 +448,8 @@ const Page = () => {
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams?.get("page") as string) || 1;
   const itemsPerPage = parseInt(searchParams?.get("perPage") as string) || 10;
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getProperties = useCallback(
     async (
@@ -591,6 +593,7 @@ const Page = () => {
   };
 
   const handleSave = async () => {
+    setIsSubmitting(true);
     for (const [id, changes] of Array.from(editedData.entries())) {
       await updateProperty(id, changes);
     }
@@ -607,6 +610,7 @@ const Page = () => {
       itemsPerPage
     );
     setProperties(propertiesData.data);
+    setIsSubmitting(false);
   };
 
   const handleFilterApply = (filters: any) => {
@@ -725,7 +729,7 @@ const Page = () => {
                     style={{ backgroundColor: "#20744A" }}
                     onClick={handleImportClick}
                   >
-                    <BiImport className= "mr-2" />
+                    <BiImport className="mr-2" />
                     Import
                   </button>
                 )}
@@ -777,19 +781,28 @@ const Page = () => {
                         <button
                           className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
                           onClick={handleSave}
+                          disabled={isSubmitting}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="1em"
-                            height="1em"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M12 0C5.4 0 0 5.4 0 12c0 6.6 5.4 12 12 12s12-5.4 12-12C24 5.4 18.6 0 12 0zm6.3 8.7l-7.5 7.5c-.3.3-.6.4-1 .4s-.7-.1-1-.4l-3.3-3.3c-.5-.5-.5-1.3 0-1.8c.5-.5 1.3-.5 1.8 0L10 13l6.8-6.8c.5-.5 1.3-.5 1.8 0c.4.5.4 1.3-.3 1.8z"
-                            ></path>
-                          </svg>
-                          &nbsp; Simpan
+                          {isSubmitting ? (
+                            <>
+                              <Loading size="w-5 h-5" />
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="1em"
+                                height="1em"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fill="currentColor"
+                                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"
+                                ></path>
+                              </svg>
+                              Simpan
+                            </>
+                          )}
                         </button>
                       )}
                       <button

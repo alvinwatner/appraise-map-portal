@@ -35,7 +35,7 @@ export async function middleware(req: NextRequest) {
       "/dashboard",
       "/dashboard/data-management",
       "/dashboard/maps",
-      "/dashboard/profile",
+      "/profile",
       "/dashboard/settings",
     ].includes(pathname)
   ) {

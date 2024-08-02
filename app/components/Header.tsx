@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { IoIosNotifications } from "react-icons/io";
 import { TiArrowSortedDown } from "react-icons/ti";
@@ -14,6 +14,7 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
   const [unreadNotifCount, setUnreadNotifCount] = useState<number>(0);
   const router = useRouter();
   const [roleId, setRoleId] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const getCountUnreadNotif = async () => {
@@ -48,16 +49,43 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
     fetchSession();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleClick = () => {
     setShowDropdown(!showDropdown);
   };
 
   const handleProfileClick = () => {
-    window.location.href = "/dashboard/profile";
+    router.push("/profile");
+    setShowDropdown(false);
   };
 
   const handleRolesClick = () => {
-    window.location.href = "/dashboard/settings";
+    router.push("/dashboard/settings");
+    setShowDropdown(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const supabase = createClientComponentClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+    setShowDropdown(false);
   };
 
   return (
@@ -83,22 +111,28 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
         <TiArrowSortedDown size={10} className="mr-4" />
       </div>
       {showDropdown && (
-        <>
+        <div ref={dropdownRef}>
           <div
             onClick={handleProfileClick}
-            className="z-10 absolute right-0 top-0 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
+            className="z-[60] absolute right-0 top-0 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
           >
             Profile
           </div>
           {roleId === 1 && (
             <div
               onClick={handleRolesClick}
-              className="z-10 absolute right-0 top-12 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
+              className="z-[60] absolute right-0 top-14 mt-9 w-48 bg-white border border-gray-300 rounded-b-md  p-4 cursor-pointer"
             >
               Settings
             </div>
           )}
-        </>
+          <div
+            onClick={handleLogout}
+            className="z-[60] absolute right-0 top-28 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
+          >
+            Logout
+          </div>
+        </div>
       )}
     </header>
   );

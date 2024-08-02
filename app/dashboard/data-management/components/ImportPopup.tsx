@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import Modal from "react-modal";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
+import Loading from "@/app/components/Loading";
 
 interface ImportPopupProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [dataType, setDataType] = useState<"asset" | "data">("asset");
+  const [loading, setLoading] = useState<boolean>(false); // Add loading state
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -46,6 +48,8 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
 
   const handleImport = () => {
     if (file) {
+      setLoading(true); // Set loading to true
+
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target && e.target.result) {
@@ -117,13 +121,15 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
 
             onImport(jsonData, dataType);
           }
+
+          setLoading(false);
+          onClose();
         }
       };
       reader.readAsBinaryString(file);
     } else {
       console.error("Unsupported file format");
     }
-    onClose();
   };
 
   return (
@@ -164,9 +170,11 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
             accept=".csv, .xls, .xlsx"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4"
           />
+          {loading && <Loading size="w-5 h-5" />}
           <div className="flex justify-end">
             <button
               onClick={handleImport}
+              disabled={loading}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"
             >
               Import

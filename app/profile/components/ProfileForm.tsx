@@ -138,6 +138,7 @@ const ProfileForm: React.FC = () => {
                 Username
               </label>
               <input
+                disabled
                 type="text"
                 name="username"
                 value={profile.username}
@@ -150,30 +151,13 @@ const ProfileForm: React.FC = () => {
                 Email
               </label>
               <input
+                disabled
                 type="email"
                 name="email"
                 value={profile.email}
                 onChange={handleChange}
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <select
-                name="RoleId"
-                value={profile.RoleId}
-                onChange={handleChange}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-              >
-                <option value="">Select a role</option>
-                {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
             </div>
             <button
               type="submit"
@@ -182,7 +166,7 @@ const ProfileForm: React.FC = () => {
               }`}
               disabled={loading}
             >
-              {loading ? "Updating..." : "Update Profile"}
+              {loading ? <Loading size="w-5 h-5" /> : "Update Profile"}
             </button>
           </form>
         </>

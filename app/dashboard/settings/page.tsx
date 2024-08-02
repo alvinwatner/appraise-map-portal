@@ -14,7 +14,6 @@ const SettingsPage: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("users");
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -90,12 +89,24 @@ const SettingsPage: React.FC = () => {
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border border-gray-300 p-2">Fullname</th>
-              <th className="border border-gray-300 p-2">Username</th>
-              <th className="border border-gray-300 p-2">Email</th>
-              <th className="border border-gray-300 p-2">Status</th>
-              <th className="border border-gray-300 p-2">Role</th>
-              <th className="border border-gray-300 p-2">Actions</th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Fullname
+              </th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Username
+              </th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Email
+              </th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Status
+              </th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Role
+              </th>
+              <th className="w-10 break-words border border-gray-300 p-2">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +123,7 @@ const SettingsPage: React.FC = () => {
                           name: e.target.value,
                         }))
                       }
-                      className="p-1 border border-gray-300 rounded-md"
+                      className="w-full p-1 border border-gray-300 rounded-md"
                     />
                   ) : (
                     user.name
@@ -129,7 +140,7 @@ const SettingsPage: React.FC = () => {
                           username: e.target.value,
                         }))
                       }
-                      className="p-1 border border-gray-300 rounded-md"
+                      className="w-full p-1 border border-gray-300 rounded-md"
                     />
                   ) : (
                     user.username
@@ -146,7 +157,7 @@ const SettingsPage: React.FC = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="p-1 border border-gray-300 rounded-md"
+                      className="w-full p-1 border border-gray-300 rounded-md"
                     />
                   ) : (
                     user.email
@@ -162,7 +173,7 @@ const SettingsPage: React.FC = () => {
                           isActive: e.target.value === "active",
                         }))
                       }
-                      className="p-1 border border-gray-300 rounded-md"
+                      className="w-full p-1 border border-gray-300 rounded-md"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -191,16 +202,16 @@ const SettingsPage: React.FC = () => {
                       }
                       className="p-1 border border-gray-300 rounded-md"
                     >
-                      <option value={1}>Super Admin</option>
-                      <option value={2}>Admin</option>
-                      <option value={3}>User</option>
+                      <option value={1}>Admin</option>
+                      <option value={2}>Editor</option>
+                      <option value={3}>Viewer</option>
                     </select>
                   ) : user.RoleId === 1 ? (
-                    "Super Admin"
-                  ) : user.RoleId === 2 ? (
                     "Admin"
+                  ) : user.RoleId === 2 ? (
+                    "Editor"
                   ) : user.RoleId === 3 ? (
-                    "User"
+                    "Viewer"
                   ) : (
                     "Unknown"
                   )}
@@ -300,12 +311,13 @@ const SettingsPage: React.FC = () => {
           </div>
           <div className="w-4/5 border border-inherit mt-10 rounded-lg shadow-lg">
             {loading ? (
-              <Loading size="w-16 h-16" strokeWidth="border-4 border-t-4"/>
+              <Loading size="w-16 h-16" strokeWidth="border-4 border-t-4" />
             ) : (
               <div>
                 {activeTab === "users" && renderUsersTab()}
-                {activeTab === "billingCoordinates" &&
-                  <BillingCoordinatesTab/>}
+                {activeTab === "billingCoordinates" && (
+                  <BillingCoordinatesTab />
+                )}
               </div>
             )}
           </div>

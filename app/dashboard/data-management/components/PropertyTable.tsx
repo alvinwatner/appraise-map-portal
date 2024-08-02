@@ -444,9 +444,11 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       {item.valuations?.[0]?.reportNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {new Date(
-                        item.valuations?.[0]?.valuationDate
-                      ).toLocaleDateString()}
+                      {item.valuations?.[0]?.valuationDate
+                        ? new Date(
+                            item.valuations?.[0]?.valuationDate
+                          ).toLocaleDateString("id-ID")
+                        : "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.valuations?.[0]?.appraiser}

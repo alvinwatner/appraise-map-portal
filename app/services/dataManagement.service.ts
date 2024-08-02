@@ -130,7 +130,7 @@ export const fetchProperties = async (
   perPage: number = 10,
   filters: any = {},
   sortField: string = "id",
-  sort: string = "asc"
+  sort: string = "desc"
 ): Promise<{ data: Property[]; total: number }> => {
   const {
     propertyType,
@@ -147,8 +147,12 @@ export const fetchProperties = async (
     search_query: search && search !== "" ? search : null,
     property_type: propertyType && propertyType !== "" ? propertyType : null,
     object_type: objectType && objectType !== "" ? objectType : null,
-    start_valuation_date: startValuationDate && startValuationDate !== "" ? startValuationDate : null,
-    end_valuation_date: endValuationDate && endValuationDate !== "" ? endValuationDate : null,
+    start_valuation_date:
+      startValuationDate && startValuationDate !== ""
+        ? startValuationDate
+        : null,
+    end_valuation_date:
+      endValuationDate && endValuationDate !== "" ? endValuationDate : null,
     min_total_value: minTotalValue || null,
     max_total_value: maxTotalValue || null,
     sort_field: sortField,
