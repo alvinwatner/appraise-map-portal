@@ -79,8 +79,8 @@ export default function Page() {
 
   const [filters, setFilters] = useState({});
   const [isAdding, setIsAdding] = useState(false);
-  const [lat, setLat] = useState<number>(0);
-  const [lng, setLng] = useState<number>(0);
+  const [clickedLat, setClickedLat] = useState<number>(0);
+  const [clickedLng, setClickedLng] = useState<number>(0);
   const [initLat, setInitLat] = useState<number | null>(null);
   const [initLng, setInitLng] = useState<number | null>(null);
   const [isShowLeftWhiteSheet, setLeftWhiteSheet] = useState(false);
@@ -99,7 +99,7 @@ export default function Page() {
   // Utility Hooks
   const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "",
+    googleMapsApiKey: "AIzaSyDAV8Ih-E6v-_g9qPNcoKcd1hRkk0Vn7N0",
     libraries: libraries as any,
   });
 
@@ -255,8 +255,8 @@ export default function Page() {
 
   const handleMapClick = (location: google.maps.LatLngLiteral) => {
     if (isAdding) {
-      setLat(location.lat);
-      setLng(location.lng);
+      setClickedLat(location.lat);
+      setClickedLng(location.lng);
       setLeftWhiteSheet(true);
       setLeftWhiteSheetComponent(LeftWhiteSheetComponent.add);
     }
@@ -340,9 +340,11 @@ export default function Page() {
               setLeftWhiteSheet(false);
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
-            lat={lat}
-            lng={lng}
+            lat={clickedLat}
+            lng={clickedLng}
             onShowModalSuccess={async () => {
+              setInitLat(clickedLat ?? initLat);
+              setInitLng(clickedLng ?? initLng);              
               const userData = await fetchUserDataSession();
               insertNotification({
                 title: "Penambahan Data",
@@ -366,6 +368,8 @@ export default function Page() {
               setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
             }}
             onShowModalSuccess={async () => {
+              setInitLat(onEditProperty?.locations.latitude ?? initLat);
+              setInitLng(onEditProperty?.locations.longitude ?? initLng);
               const userData = await fetchUserDataSession();
               insertNotification({
                 title: "Perubahan Data",
