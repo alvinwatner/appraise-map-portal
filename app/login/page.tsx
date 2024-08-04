@@ -68,7 +68,7 @@ const LoginPage = () => {
             className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={loading}
           >
-            {loading ? <Loading size="w-5 h-5" /> : "Submit"}
+            {loading ? <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2"  /> : "Submit"}
           </button>
         </form>
       </div>

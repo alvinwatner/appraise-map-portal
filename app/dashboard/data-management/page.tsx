@@ -799,7 +799,7 @@ const Page = () => {
                         >
                           {isSubmitting ? (
                             <>
-                              <Loading size="w-5 h-5" />
+                               <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2"  />
                             </>
                           ) : (
                             <>

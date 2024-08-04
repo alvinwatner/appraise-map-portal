@@ -141,9 +141,11 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
       className="flex items-center justify-center mt-52"
       overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75"
     >
-      <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md">
+      <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md ">
         <div className="px-6 py-4">
-          <div className="text-center font-bold text-xl mb-4">Import Data</div>
+          <div className="text-center font-bold text-xl mb-4">
+            Import Property
+          </div>
           <div className="mb-4">
             <label className="mr-4">
               <input
@@ -152,7 +154,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
                 checked={dataType === "asset"}
                 onChange={handleDataTypeChange}
               />
-              Asset
+              Aset
             </label>
             <label>
               <input
@@ -170,8 +172,26 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
             accept=".csv, .xls, .xlsx"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4"
           />
+          <div className="flex flex-col justify-end items-start">
+            <button
+              className="text-center text-sm mb-2 underline text-blue-500"
+              onClick={() => {
+                //TODO: handle download template aset
+              }}
+            >
+              Download template aset
+            </button>
+            <button
+              className="text-center text-sm mb-2 underline text-blue-500"
+              onClick={() => {
+                //TODO: handle download template data
+              }}
+            >
+              Download template data
+            </button>
+          </div>
           {loading && <Loading size="w-5 h-5" />}
-          <div className="flex justify-end">
+          <div className="flex justify-end mb-4">
             <button
               onClick={handleImport}
               disabled={loading}
