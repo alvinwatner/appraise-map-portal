@@ -300,11 +300,18 @@ const Page = () => {
           UserId: user?.id,
         };
 
+        const formattedValuationDate =
+          typeof item.valuationDate === "string"
+            ? item.valuationDate.includes("/")
+              ? item.valuationDate.split("/").reverse().join("-")
+              : item.valuationDate
+            : null;
+
         const formattedDataValuations = {
           id: (totalCountValuations || 0) + i + 1,
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
-          valuationDate: item.valuationDate?.split("/").reverse().join("-"),
+          valuationDate: formattedValuationDate,
           buildingValue: parseAndFormatFloat(item.buildingValue),
           landValue: parseAndFormatFloat(item.landValue),
           totalValue: parseAndFormatFloat(item.totalValue),
@@ -405,11 +412,18 @@ const Page = () => {
           UserId: user?.id,
         };
 
+        const formattedValuationDate =
+          typeof item.valuationDate === "string"
+            ? item.valuationDate.includes("/")
+              ? item.valuationDate.split("/").reverse().join("-")
+              : item.valuationDate
+            : null;
+
         const formattedDataValuations = {
           id: (totalCountValuations || 0) + i + 1,
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
-          valuationDate: item.valuationDate?.split("/").reverse().join("-"),
+          valuationDate: formattedValuationDate,
           buildingValue: parseAndFormatFloat(item.buildingValue),
           landValue: parseAndFormatFloat(item.landValue),
           totalValue: parseAndFormatFloat(item.totalValue),
