@@ -136,7 +136,7 @@ export default function Home() {
 
       <footer className="w-full h-12 flex justify-center items-center border-t py-14">
         <div className="flex flex-col items-center">
-          <p>© 2024 Graha Paramita Konsultan. All rights reserved.</p>
+          <p>© 2024 PT. Graha Paramita Konsultan. All rights reserved.</p>
           <Link href="https://www.consultnta.com/">
             <div className="flex flex-row">
               <p>Powered by </p>
