@@ -59,7 +59,7 @@ export default function Home() {
               <h2 className="text-[38px] font-semibold mb-7">
                 Perjalanan Perusahaan
               </h2>
-              <p className="text-xl  mt-2">
+              <p className="text-lg  mt-2">
                 Graha Paramita Konsultan berawal dari bentuk usaha perseorangan
                 yang dikenal sebagai Kantor Jasa Penilai Publik (KJPP) Muhammad
                 Syarif. Seiring dengan perubahan regulasi dan perkembangan
@@ -93,7 +93,7 @@ export default function Home() {
                   <h3 className="text-2xl font-semibold mb-2 text-center">
                     Penilaian Properti
                   </h3>
-                  <p className="text-xl text-gray-600 ">
+                  <p className="text-base text-gray-600 ">
                     Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Properti dapat memberikan jasa lainnya yang berkaitan dengan
                     kegiatan penilaian, meliputi konsultasi pengembangan
@@ -105,9 +105,9 @@ export default function Home() {
               <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-4 ">
                 <div className="bg-white rounded-lg  shadow-lg p-5  h-[300px] flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
                   <h3 className="text-2xl font-semibold mb-2 text-center">
-                    Penilaian Bisnis - Jasa Lainnya
+                    Penilaian Bisnis
                   </h3>
-                  <p className="text-xl text-gray-600 ">
+                  <p className="text-base text-gray-600 ">
                     Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Bisnis dapat memberikan jasa lainnya yang berkaitan dengan
                     kegiatan penilaian, meliputi studi kelayakan usaha,
@@ -119,9 +119,9 @@ export default function Home() {
               <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-4 ">
                 <div className="bg-white rounded-lg  shadow-lg p-5  h-[300px] flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
                   <h3 className="text-2xl font-semibold mb-2 text-center">
-                    Penilaian Properti Sederhana
+                    Penilaian Sederhana
                   </h3>
-                  <p className="text-xl text-gray-600 ">
+                  <p className="text-base text-gray-600 ">
                     Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Properti Sederhana dapat memberikan jasa lainnya yang
                     berkaitan dengan kegiatan penilaian, yaitu jasa agen
@@ -138,7 +138,10 @@ export default function Home() {
         <div className="flex flex-col items-center">
           <p>© 2024 Graha Paramita Consultan. All rights reserved.</p>
           <Link href="https://www.consultnta.com/">
-            <p>Powered by consultnta</p>
+            <div className="flex flex-row">
+              <p>Powered by </p>
+              <p className="underline text-blue-500 ml-1">consultnta.</p>
+            </div>
           </Link>
         </div>
       </footer>
