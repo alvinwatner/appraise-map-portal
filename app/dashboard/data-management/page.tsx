@@ -26,6 +26,7 @@ import wkx from "wkx";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { PiExportBold } from "react-icons/pi";
 import { BiImport } from "react-icons/bi";
+import FeedbackModal from "./components/FeedbackModal";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -79,6 +80,7 @@ const flattenAsset = (property: Property) => {
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     PENILAI: escapeCSVField(valuation.appraiser || null),
+    "HARGA BANGUNAN /m²": escapeCSVField(valuation.buildingValue || null),
     "HARGA TANAH /m²": escapeCSVField(valuation.landValue || null),
     NILAI: escapeCSVField(valuation.totalValue || null),
     "NOMOR LAPORAN": escapeCSVField(valuation.reportNumber || null),
@@ -148,6 +150,13 @@ const Page = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [user, setUser] = useState<User>();
 
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] =
+    useState<boolean>(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string>("");
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">(
+    "success"
+  );
+
   interface RowData {
     propertiesType?: string | null;
     reportNumber?: string | null;
@@ -201,7 +210,7 @@ const Page = () => {
     value: string | null | undefined
   ): number | null => {
     if (value == null) return null;
-    const cleanedValue = value.replace(/,/g, "");
+    const cleanedValue = value.replace(/[.,]/g, "");
 
     const floatValue = parseFloat(cleanedValue);
 
@@ -212,27 +221,84 @@ const Page = () => {
     return floatValue;
   };
 
+  const validateRow = (row: RowData, dataType: string): boolean => {
+    const requiredFields: { [key: string]: (keyof RowData)[] } = {
+      asset: [
+        "valuationDate",
+        "objectType",
+        "debitur",
+        "address",
+        "coordinates",
+        "landArea",
+        "buildingArea",
+        "appraiser",
+        "buildingValue",
+        "landValue",
+        "totalValue",
+        "reportNumber",
+      ],
+      data: [
+        "valuationDate",
+        "objectType",
+        "address",
+        "phoneNumber",
+        "coordinates",
+        "landArea",
+        "buildingArea",
+        "landValue",
+        "buildingValue",
+        "totalValue",
+      ],
+    };
+
+    const missingFields: string[] = [];
+
+    requiredFields[dataType].forEach((field) => {
+      const value = row[field];
+      if (value === undefined || value === null || value === "") {
+        missingFields.push(field);
+      }
+    });
+
+    if (missingFields.length > 0) {
+      const errorMessage = `Validation failed. Missing or empty fields: ${missingFields.join(
+        ", "
+      )}.`;
+      throw new Error(errorMessage);
+    }
+
+    return missingFields.length === 0;
+  };
+
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
     setLoading(true);
-    setImportSuccess(false);
-    if (dataType === "asset") {
-      await importAssetData(jsonData);
-      insertNotification({
-        title: "Import Data",
-        description: `${user?.name} melakukan import asset`,
-        roleId: 1,
-      });
-      setImportSuccess(true);
-    } else if (dataType === "data") {
-      await importDataData(jsonData);
-      insertNotification({
-        title: "Import Data",
-        description: `${user?.name} melakukan import data`,
-        roleId: 1,
-      });
-      setImportSuccess(true);
+    try {
+      if (dataType === "asset") {
+        await importAssetData(jsonData);
+        insertNotification({
+          title: "Import Data",
+          description: `${user?.name} melakukan import asset`,
+          roleId: 1,
+        });
+      } else if (dataType === "data") {
+        await importDataData(jsonData);
+        insertNotification({
+          title: "Import Data",
+          description: `${user?.name} melakukan import data`,
+          roleId: 1,
+        });
+      }
+      setFeedbackMessage("Import successful!");
+      setFeedbackType("success");
+      setIsFeedbackModalOpen(true);
+    } catch (error: any) {
+      console.error("Error handling import data:", error);
+      setFeedbackMessage("Import failed! " + error.message);
+      setFeedbackType("error");
+      setIsFeedbackModalOpen(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const importAssetData = async (jsonData: RowData[]) => {
@@ -278,6 +344,7 @@ const Page = () => {
 
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
+        validateRow(item, "asset");
 
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
@@ -292,8 +359,8 @@ const Page = () => {
           id: (totalCountProperties || 0) + i + 1,
           debitur: item.debitur,
           phoneNumber: item.phoneNumber,
-          landArea: parseAndFormatFloat(item.landArea),
-          buildingArea: parseAndFormatFloat(item.buildingArea),
+          landArea: item.landArea,
+          buildingArea: item.buildingArea,
           LocationId: formattedDataLocations.id,
           objectType: item.objectType,
           propertiesType: "asset",
@@ -312,9 +379,9 @@ const Page = () => {
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
           valuationDate: formattedValuationDate,
-          buildingValue: parseAndFormatFloat(item.buildingValue),
-          landValue: parseAndFormatFloat(item.landValue),
-          totalValue: parseAndFormatFloat(item.totalValue),
+          buildingValue: item.buildingValue,
+          landValue: item.landValue,
+          totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
 
@@ -342,8 +409,8 @@ const Page = () => {
           throw error;
         }
       }
-    } catch (error) {
-      console.error("Error handling import asset data:", error);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to import data data");
     }
   };
 
@@ -390,6 +457,7 @@ const Page = () => {
 
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
+        validateRow(item, "data");
 
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
@@ -405,8 +473,8 @@ const Page = () => {
           propertiesType: "data",
           debitur: item.debitur,
           phoneNumber: item.phoneNumber,
-          landArea: parseAndFormatFloat(item.landArea),
-          buildingArea: parseAndFormatFloat(item.buildingArea),
+          landArea: item.landArea,
+          buildingArea: item.buildingArea,
           LocationId: formattedDataLocations.id,
           objectType: item.objectType,
           UserId: user?.id,
@@ -424,9 +492,9 @@ const Page = () => {
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
           valuationDate: formattedValuationDate,
-          buildingValue: parseAndFormatFloat(item.buildingValue),
-          landValue: parseAndFormatFloat(item.landValue),
-          totalValue: parseAndFormatFloat(item.totalValue),
+          buildingValue: item.buildingValue,
+          landValue: item.landValue,
+          totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
 
@@ -454,8 +522,8 @@ const Page = () => {
           throw error;
         }
       }
-    } catch (error) {
-      console.error("Error handling import data data:", error);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to import data data");
     }
   };
 
@@ -514,14 +582,15 @@ const Page = () => {
       sortConfig?.key,
       sortConfig?.direction
     );
+    setImportSuccess(false);
   }, [
     currentPage,
     itemsPerPage,
     query,
     filters,
-    importSuccess,
     sortConfig,
     getProperties,
+    importSuccess,
   ]);
 
   const debouncedSearch = useMemo(() => {
@@ -703,6 +772,11 @@ const Page = () => {
     }
   };
 
+  const handleOk = () => {
+    setIsFeedbackModalOpen(false);
+    setImportSuccess(true);
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -799,7 +873,10 @@ const Page = () => {
                         >
                           {isSubmitting ? (
                             <>
-                               <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2"  />
+                              <Loading
+                                size="w-5 h-5"
+                                strokeWidth="border-2 border-t-2"
+                              />
                             </>
                           ) : (
                             <>
@@ -949,6 +1026,13 @@ const Page = () => {
             onExport={handleExport}
           />
         )}
+        <FeedbackModal
+          isOpen={isFeedbackModalOpen}
+          onClose={() => setIsFeedbackModalOpen(false)}
+          message={feedbackMessage}
+          type={feedbackType}
+          onOk={handleOk}
+        />
       </div>
     </>
   );
