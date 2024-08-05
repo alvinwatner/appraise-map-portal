@@ -8,6 +8,7 @@ import { addProperty } from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
 import { AddAssetValuationForm } from "./AddAssetValuationForm";
 import { AddDataValuationForm } from "./AddDataValuationForm";
+import { error } from "console";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -58,11 +59,19 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
   };
 
   const [errors, setErrors] = useState({
+    propertyType: "",
+    objectType: "",
     debitur: "",
     address: "",
     landArea: "",
     buildingArea: "",
     phoneNumber: "",
+    landValue: "",
+    buildingValue: "",
+    totalValue: "",
+    valuationDate: "",
+    reportNumber: "",
+    appraiser: "",
   });
 
   const validateInputs = () => {
@@ -75,15 +84,21 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       landArea: "",
       buildingArea: "",
       phoneNumber: "",
+      landValue: "",
+      buildingValue: "",
+      totalValue: "",
+      valuationDate: "",
+      reportNumber: "",
+      appraiser: "",
     };
 
     // Validate all inputs are not empty
     if (!selectedPropertyType) {
-      newErrors.debitur = "Property type is required.";
+      newErrors.propertyType = "Property type is required.";
       isValid = false;
     }
     if (!selectedObjectType) {
-      newErrors.debitur = "Object type is required.";
+      newErrors.objectType = "Object type is required.";
       isValid = false;
     }
     if (selectedPropertyType == "Aset" && !debitur) {
@@ -95,21 +110,60 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       isValid = false;
     }
     if (!landArea || isNaN(Number(landArea))) {
+      newErrors.landArea = "Luas Tanah is required.";
+      isValid = false;
+    }
+
+    if (isNaN(Number(landArea))) {
       newErrors.landArea = "Luas Tanah must be a number.";
       isValid = false;
     }
+
     if (!buildingArea || isNaN(Number(buildingArea))) {
-      newErrors.buildingArea = "Luas Bangunan must be a number.";
+      newErrors.buildingArea = "Luas Bangunan is required.";
       isValid = false;
     }
-    if (
-      selectedPropertyType == "Data" &&
-      (!phoneNumber ||
-        isNaN(Number(phoneNumber)) ||
-        phoneNumber.length < 10 ||
-        phoneNumber.length > 15)
-    ) {
+
+    if (isNaN(Number(buildingArea))) {
+      newErrors.landArea = "Building area must be a number.";
+      isValid = false;
+    }
+    if (selectedPropertyType == "Data" && !phoneNumber) {
+      newErrors.phoneNumber = "Phone number is required.";
+      isValid = false;
+    }
+    if (isNaN(Number(phoneNumber))) {
       newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
+      isValid = false;
+    }
+
+    if (!landValue) {
+      newErrors.landValue = "Nilai tanah is required.";
+      isValid = false;
+    }
+
+    if (!buildingValue) {
+      newErrors.buildingValue = "Nilai bangunan is required.";
+      isValid = false;
+    }
+
+    if (!totalValue) {
+      newErrors.totalValue = "Total nilai is required.";
+      isValid = false;
+    }
+
+    if (!valuationDate) {
+      newErrors.valuationDate = "Tanggal penilaian is required.";
+      isValid = false;
+    }
+
+    if (!reportNumber) {
+      newErrors.reportNumber = "Nomor Laporan is required.";
+      isValid = false;
+    }
+
+    if (!appraiser) {
+      newErrors.appraiser = "Penilai is required.";
       isValid = false;
     }
 
@@ -176,6 +230,9 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
           onChange={onChangePropertyType}
           initialValue={selectedPropertyType}
         />
+        {errors.objectType && (
+          <p className="text-red-500 text-xs">{errors.propertyType}</p>
+        )}
 
         <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek :</p>
         <DropdownInput
@@ -184,6 +241,9 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
           onChange={onChangeObjectType}
           initialValue={selectedObjectType}
         />
+        {errors.objectType && (
+          <p className="text-red-500 text-xs">{errors.objectType}</p>
+        )}
 
         {selectedPropertyType == "Data" && (
           <>
@@ -259,6 +319,16 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
         {selectedPropertyType == "Aset" && (
           <AddAssetValuationForm
+            assetValuationErrors={{
+              appraiser: errors.appraiser,
+              reportNumber: errors.reportNumber,
+            }}
+            errors={{
+              landValue: errors.landValue,
+              buildingValue: errors.buildingValue,
+              totalValue: errors.totalValue,
+              valuationDate: errors.valuationDate,
+            }}
             onChangeLandValue={(value) => {
               setLandValue(value);
             }}
@@ -283,6 +353,12 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
 
         {selectedPropertyType == "Data" && (
           <AddDataValuationForm
+            errors={{
+              landValue: errors.landValue,
+              buildingValue: errors.buildingValue,
+              totalValue: errors.totalValue,
+              valuationDate: errors.valuationDate,
+            }}
             onChangeLandValue={(value) => {
               setLandValue(value);
             }}

@@ -12,10 +12,12 @@ export const AddDataValuationForm: React.FC<AddDataValuationFormProps> = ({
   onChangeBuildingValue,
   onChangeTotalValue,
   onChangeValuationDate,
+  errors,
 }: AddDataValuationFormProps) => {
   return (
     <div>
       <BaseAddValuationForm
+        errors={errors}
         onChangeLandValue={onChangeLandValue}
         onChangeBuildingValue={onChangeBuildingValue}
         onChangeTotalValue={onChangeTotalValue}
