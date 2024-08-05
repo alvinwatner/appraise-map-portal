@@ -9,7 +9,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Graha Pramita Konsultan",
+  title: "Graha Paramita Konsultan",
   description: "Appraise Map Portal",
 };
 
