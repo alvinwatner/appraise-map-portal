@@ -27,6 +27,8 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { PiExportBold } from "react-icons/pi";
 import { BiImport } from "react-icons/bi";
 import FeedbackModal from "./components/FeedbackModal";
+import { PropertyTableSkeleton } from "./components/PropertyTableSkeleton";
+import { Pagination } from "./components/Pagination";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -777,10 +779,6 @@ const Page = () => {
     setImportSuccess(true);
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleHeaderClick = (field: string) => {
@@ -943,19 +941,24 @@ const Page = () => {
                 </button>
               </div>
             </div>
-            <PropertyTable
-              currentData={properties}
-              selectedRows={selectedRows}
-              handleSelectRow={handleSelectRow}
-              handleSelectAll={handleSelectAll}
-              handleChange={handleChange}
-              editMode={editMode}
-              editedData={editedData}
-              editedValuations={editedValuations}
-              handleHeaderClick={handleHeaderClick}
-              sortConfig={sortConfig}
-              onSelectProperty={handleSelectProperty}
-            />
+
+            {loading ? (
+              <PropertyTableSkeleton />
+            ) : (
+              <PropertyTable
+                currentData={properties}
+                selectedRows={selectedRows}
+                handleSelectRow={handleSelectRow}
+                handleSelectAll={handleSelectAll}
+                handleChange={handleChange}
+                editMode={editMode}
+                editedData={editedData}
+                editedValuations={editedValuations}
+                handleHeaderClick={handleHeaderClick}
+                sortConfig={sortConfig}
+                onSelectProperty={handleSelectProperty}
+              />
+            )}
             <div className="mt-4 flex justify-between">
               <div>
                 <span className="text-sm text-gray-700">
@@ -964,33 +967,13 @@ const Page = () => {
                   {totalItems} results
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  className="px-4 py-2 text-sm border rounded-md"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </button>
-                {[...Array(totalPages)].map((_, index) => (
-                  <button
-                    key={index}
-                    className={`px-4 py-2 text-sm border rounded-md ${
-                      currentPage === index + 1 ? "bg-gray-300" : ""
-                    }`}
-                    onClick={() => handlePageChange(index + 1)}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-                <button
-                  className="px-4 py-2 text-sm border rounded-md"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </button>
-              </div>
+              <Pagination
+                totalPages={totalPages}
+                onPageChanged={(page) => {
+                  handlePageChange(page);
+                }}
+              />
+
               <div>
                 <label className="mr-2 text-sm">Items per page:</label>
                 <select
@@ -1039,3 +1022,4 @@ const Page = () => {
 };
 
 export default Page;
+
