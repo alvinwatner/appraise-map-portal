@@ -109,18 +109,9 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       newErrors.address = "Address is required.";
       isValid = false;
     }
-    if (!landArea || isNaN(Number(landArea))) {
-      newErrors.landArea = "Luas Tanah is required.";
-      isValid = false;
-    }
 
     if (isNaN(Number(landArea))) {
       newErrors.landArea = "Luas Tanah must be a number.";
-      isValid = false;
-    }
-
-    if (!buildingArea || isNaN(Number(buildingArea))) {
-      newErrors.buildingArea = "Luas Bangunan is required.";
       isValid = false;
     }
 
@@ -132,23 +123,8 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       newErrors.phoneNumber = "Phone number is required.";
       isValid = false;
     }
-    if (isNaN(Number(phoneNumber))) {
+    if (selectedPropertyType == "Data" && isNaN(Number(phoneNumber))) {
       newErrors.phoneNumber = "Phone number must be between 10 and 15 digits.";
-      isValid = false;
-    }
-
-    if (!landValue) {
-      newErrors.landValue = "Nilai tanah is required.";
-      isValid = false;
-    }
-
-    if (!buildingValue) {
-      newErrors.buildingValue = "Nilai bangunan is required.";
-      isValid = false;
-    }
-
-    if (!totalValue) {
-      newErrors.totalValue = "Total nilai is required.";
       isValid = false;
     }
 
@@ -157,12 +133,12 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
       isValid = false;
     }
 
-    if (!reportNumber) {
+    if (!reportNumber && selectedPropertyType == "Aset") {
       newErrors.reportNumber = "Nomor Laporan is required.";
       isValid = false;
     }
 
-    if (!appraiser) {
+    if (!appraiser && selectedPropertyType == "Aset") {
       newErrors.appraiser = "Penilai is required.";
       isValid = false;
     }
@@ -186,14 +162,14 @@ export const AddMarkerForm: React.FC<AddMarkerFormProps> = ({
         longitude: lng!,
         address: address,
         objectType: selectedObjectType,
-        landArea: Number(landArea),
-        buildingArea: Number(buildingArea),
+        landArea: landArea != null ? Number(landArea) : 0,
+        buildingArea: buildingArea != null ? Number(buildingArea) : 0,
         phoneNumber: phoneNumber,
         propertiesType: selectedPropertyType.toLowerCase(),
         debitur: debitur,
-        landValue: landValue,
-        buildingValue: buildingValue,
-        totalValue: totalValue,
+        landValue: landValue ?? 0,
+        buildingValue: buildingValue ?? 0,
+        totalValue: totalValue ?? 0,
         appraiser: appraiser,
         reportNumber: reportNumber,
         valuationDate: valuationDate,
