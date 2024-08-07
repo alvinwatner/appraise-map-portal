@@ -128,7 +128,9 @@ const Header: React.FC<{ onNotifClick: () => void }> = ({ onNotifClick }) => {
           )}
           <div
             onClick={handleLogout}
-            className="z-[60] absolute right-0 top-28 mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer"
+            className={`z-[60] absolute right-0 ${
+              roleId === 1 ? "top-28" : "top-14 "
+            }  mt-9 w-48 bg-white border border-gray-300 rounded-md shadow-lg p-4 cursor-pointer`}
           >
             Logout
           </div>
