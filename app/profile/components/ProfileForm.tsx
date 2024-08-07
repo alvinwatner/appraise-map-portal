@@ -12,6 +12,7 @@ const ProfileForm: React.FC = () => {
     password: "",
     email: "",
     RoleId: "",
+    auth_id: "",
   });
   const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -44,6 +45,7 @@ const ProfileForm: React.FC = () => {
             password: "",
             email: data.email,
             RoleId: data.RoleId,
+            auth_id: data.auth_id,
           });
         }
 
@@ -51,7 +53,7 @@ const ProfileForm: React.FC = () => {
           console.error("Error fetching profile:", error);
         }
       }
-      setFetching(false); // Set fetching to false after data is fetched
+      setFetching(false);
     };
 
     const fetchRoles = async () => {
@@ -76,35 +78,24 @@ const ProfileForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError) {
-      console.error("Error fetching user:", userError);
-      setLoading(false);
-      return;
-    }
-    if (user) {
-      const { data, error } = await supabase
-        .from("users")
-        .update({
-          name: profile.name,
-          username: profile.username,
-          email: profile.email,
-          RoleId: profile.RoleId,
-          updatedAt: new Date(),
-        })
-        .eq("auth_id", user.id);
+    const { data, error } = await supabase
+      .from("users")
+      .update({
+        name: profile.name,
+        username: profile.username,
+        email: profile.email,
+        RoleId: profile.RoleId,
+        updatedAt: new Date(),
+      })
+      .eq("auth_id", profile.auth_id);
 
-      if (error) {
-        console.error("Error updating profile:", error);
-      } else {
-        setSuccessMessage("Profile updated successfully");
-        setTimeout(() => setSuccessMessage(null), 3000);
-      }
-      setLoading(false);
+    if (error) {
+      console.error("Error updating profile:", error);
+    } else {
+      setSuccessMessage("Profile updated successfully");
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
+    setLoading(false);
   };
 
   return (
