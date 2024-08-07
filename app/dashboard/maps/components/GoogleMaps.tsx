@@ -256,9 +256,8 @@ function GoogleMaps(
   }));
 
   useEffect(() => {
-    const loader = new Loader({
-      apiKey: "",
-      // apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
+    const loader = new Loader({      
+      apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
       version: "quarterly",
     });
 

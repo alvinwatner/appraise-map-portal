@@ -99,8 +99,7 @@ export default function Page() {
   // Utility Hooks
   const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "",
-    // googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
     libraries: libraries as any,
   });
 
@@ -346,7 +345,7 @@ export default function Page() {
             lng={clickedLng}
             onShowModalSuccess={async () => {
               setInitLat(clickedLat ?? initLat);
-              setInitLng(clickedLng ?? initLng);              
+              setInitLng(clickedLng ?? initLng);
               const userData = await fetchUserDataSession();
               insertNotification({
                 title: "Penambahan Data",
@@ -493,8 +492,7 @@ export default function Page() {
       />
 
       {/* Floating action button */}
-      {
-        (userData?.RoleId == 1 || userData?.RoleId == 2) &&
+      {(userData?.RoleId == 1 || userData?.RoleId == 2) && (
         <button
           className={`fixed bottom-10 right-10 z-50 p-4 rounded-full ${
             isAdding
@@ -510,7 +508,7 @@ export default function Page() {
             <FiPlus className="text-3xl text-black" />
           )}
         </button>
-      }
+      )}
 
       {showFilterModal && (
         <FilterModal
