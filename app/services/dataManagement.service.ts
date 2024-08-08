@@ -633,7 +633,6 @@ export const updateLocation = async (
   id: number,
   changes: Partial<Location>
 ) => {
-
   const { data, error } = await supabase
     .from("locations")
     .update(changes)
@@ -650,6 +649,21 @@ export const updateProperty = async (
   id: number,
   changes: Partial<Property>
 ) => {
+  if (changes.locations) {
+    const { latitude, longitude, ...restLocations } = changes.locations;
+    let coordinates = `POINT(${longitude} ${latitude})`;
+    const { error } = await supabase
+      .from("locations")
+      .update({
+        ...restLocations,
+        coordinate: coordinates,
+      })
+      .eq("id", changes.locations.id)
+      .select();
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
   delete changes.locations;
   delete changes.valuations;
   const { data, error } = await supabase

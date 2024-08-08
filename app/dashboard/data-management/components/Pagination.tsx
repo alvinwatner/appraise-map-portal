@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { MdKeyboardArrowRight, MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import {
+  MdKeyboardArrowRight,
+  MdOutlineKeyboardArrowLeft,
+} from "react-icons/md";
 
 interface PaginationProps {
   totalPages: number;
@@ -60,12 +63,8 @@ export const Pagination: React.FC<PaginationProps> = ({
    */
   const renderButtons = useCallback(() => {
     const newButtons = [];
-
-    console.log(`currentPage = ${currentPage}`);
-
     // Always show the first page button unless it's the current page
     if (currentPage !== 1) {
-      console.log(`currentPage !== 1`);
       newButtons.push(
         <button
           key="first"
@@ -81,13 +80,11 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     // Show ellipsis if there are pages between the first page and the current range
     if (prevPage > 2) {
-      console.log(`prevPage > 2`);
       newButtons.push(<span key={prevPage}>...</span>);
     }
 
     // Show the previous page button if applicable
     if (currentPage > 2) {
-      console.log(`currentPage > 2`);
       newButtons.push(
         <button
           key="prev"
@@ -111,7 +108,6 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     // Show the next page button if applicable
     if (currentPage < totalPages - 1) {
-      console.log(`currentPage < totalPages - 1`);
       newButtons.push(
         <button
           key="next"
@@ -125,13 +121,11 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     // Show ellipsis if there are pages between the current range and the last page
     if (currentPage < totalPages - 2) {
-      console.log(`currentPage < totalPages - 2`);
       newButtons.push(<span key={currentPage + 1}>...</span>);
     }
 
     // Always show the last page button unless it's the current page
     if (currentPage !== totalPages) {
-      console.log(`currentPage !== totalPages`);
       newButtons.push(
         <button
           key="last"

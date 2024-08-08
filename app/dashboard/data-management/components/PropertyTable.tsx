@@ -58,6 +58,8 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     { label: "Tanggal Penilaian", field: "valuationDate", sortable: false },
     { label: "Penilai", field: "appraiser", sortable: false },
     { label: "Jenis Objek", field: "objectType", sortable: false },
+    { label: "Latitude", field: "locations(latitude)", sortable: false },
+    { label: "Longitude", field: "locations(longitude)", sortable: false },
     { label: "Nama Debitor", field: "debitur", sortable: false },
     { label: "Nomor Tlp", field: "phoneNumber", sortable: false },
     { label: "Alamat", field: "locations(address)", sortable: false },
@@ -270,6 +272,52 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                         className="block w-full rounded-md"
                         type="text"
                         value={
+                          editedData.get(item.id)?.locations?.latitude === null
+                            ? ""
+                            : editedData.get(item.id)?.locations?.latitude ??
+                              item.locations?.latitude ??
+                              ""
+                        }
+                        onChange={(e) => {
+                          const latitude = e.target.value || null;
+                          const currentLocations =
+                            editedData.get(item.id)?.locations ||
+                            item.locations;
+                          handleChange(item.id, "locations", {
+                            ...currentLocations,
+                            latitude: latitude,
+                          });
+                        }}
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        className="block w-full rounded-md"
+                        type="text"
+                        value={
+                          editedData.get(item.id)?.locations?.longitude === null
+                            ? ""
+                            : editedData.get(item.id)?.locations?.longitude ??
+                              item.locations?.longitude ??
+                              ""
+                        }
+                        onChange={(e) => {
+                          const longitude = e.target.value || null;
+                          const currentLocations =
+                            editedData.get(item.id)?.locations ||
+                            item.locations;
+                          handleChange(item.id, "locations", {
+                            ...currentLocations,
+                            longitude: longitude,
+                          });
+                        }}
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        className="block w-full rounded-md"
+                        type="text"
+                        value={
                           editedData.get(item.id)?.debitur === null
                             ? ""
                             : editedData.get(item.id)?.debitur ??
@@ -315,10 +363,13 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                               ""
                         }
                         onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
+                          const address = e.target.value || null;
+                          const currentLocations =
+                            editedData.get(item.id)?.locations ||
+                            item.locations;
                           handleChange(item.id, "locations", {
-                            ...item.locations,
-                            address: newBuildingValue,
+                            ...currentLocations,
+                            address: address,
                           });
                         }}
                       />
@@ -455,6 +506,12 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.objectType}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.locations?.latitude}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.locations?.longitude}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.debitur}

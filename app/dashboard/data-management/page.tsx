@@ -77,8 +77,9 @@ const flattenAsset = (property: Property) => {
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
+    LATITUDE: escapeCSVField(property.locations.latitude || null),
+    LONGITUDE: escapeCSVField(property.locations.longitude || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
-    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     PENILAI: escapeCSVField(valuation.appraiser || null),
@@ -109,9 +110,10 @@ const flattenData = (property: Property) => {
   return property?.valuations?.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
+    LATITUDE: escapeCSVField(property.locations.latitude || null),
+    LONGITUDE: escapeCSVField(property.locations.longitude || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     "NO. HP": escapeCSVField(property.phoneNumber || null),
-    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     "NILAI TANAH /m²": escapeCSVField(valuation.landValue || null),
@@ -167,12 +169,13 @@ const Page = () => {
     debitur?: string | null;
     phoneNumber?: string | null;
     address?: string | null;
+    longitude?: string | null;
+    latitude?: string | null;
     landArea?: string | null;
     buildingArea?: string | null;
     landValue?: string | null;
     buildingValue?: string | null;
     totalValue?: string | null;
-    coordinates?: string | null;
     appraiser?: string | null;
   }
 
@@ -229,8 +232,9 @@ const Page = () => {
         "valuationDate",
         "objectType",
         "debitur",
+        "latitude",
+        "longitude",
         "address",
-        "coordinates",
         "landArea",
         "buildingArea",
         "appraiser",
@@ -242,9 +246,10 @@ const Page = () => {
       data: [
         "valuationDate",
         "objectType",
+        "latitude",
+        "longitude",
         "address",
         "phoneNumber",
-        "coordinates",
         "landArea",
         "buildingArea",
         "landValue",
@@ -348,13 +353,12 @@ const Page = () => {
         const item = jsonData[i];
         validateRow(item, "asset");
 
-        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
           // latitude: coordinatesArray?.[0],
           // longitude: coordinatesArray?.[1],
-          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
+          coordinate: `POINT(${item.longitude} ${item.latitude})`,
         };
 
         const formattedDataProperties = {
@@ -461,13 +465,12 @@ const Page = () => {
         const item = jsonData[i];
         validateRow(item, "data");
 
-        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
           // latitude: coordinatesArray?.[0],
           // longitude: coordinatesArray?.[1],
-          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
+          coordinate: `POINT(${item?.longitude} ${item.latitude})`,
         };
 
         const formattedDataProperties = {
@@ -534,6 +537,7 @@ const Page = () => {
   const itemsPerPage = parseInt(searchParams?.get("perPage") as string) || 10;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getProperties = useCallback(
     async (
@@ -679,23 +683,35 @@ const Page = () => {
 
   const handleSave = async () => {
     setIsSubmitting(true);
-    for (const [id, changes] of Array.from(editedData.entries())) {
-      await updateProperty(id, changes);
-    }
+    setError(null);
 
-    for (const [id, changes] of Array.from(editedValuations.entries())) {
-      await updateValuation(id, changes);
-    }
+    try {
+      for (const [id, changes] of Array.from(editedData.entries())) {
+        await updateProperty(id, changes);
+      }
 
-    setEditMode(false);
-    setSelectedRows(new Set());
-    const propertiesData = await fetchProperties(
-      query,
-      currentPage,
-      itemsPerPage
-    );
-    setProperties(propertiesData.data);
-    setIsSubmitting(false);
+      for (const [id, changes] of Array.from(editedValuations.entries())) {
+        await updateValuation(id, changes);
+      }
+
+      setEditMode(false);
+      setSelectedRows(new Set());
+      const propertiesData = await fetchProperties(
+        query,
+        currentPage,
+        itemsPerPage
+      );
+      setProperties(propertiesData.data);
+    } catch (err: any) {
+      // Handle and set error state
+      setError(
+        `An error occurred while saving. Please try again. ${
+          err?.message || err
+        }`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFilterApply = (filters: any) => {
@@ -705,14 +721,20 @@ const Page = () => {
 
   const handleExport = async (exportAll: boolean) => {
     const asset = exportAll
-      ? await fetchAllProperties(query, { ...filters, propertiesType: "asset" })
+      ? await fetchProperties(query, currentPage, 9999999, {
+          ...filters,
+          propertiesType: "asset",
+        })
       : await fetchProperties(query, currentPage, itemsPerPage, {
           ...filters,
           propertiesType: "asset",
         });
 
     const data = exportAll
-      ? await fetchAllProperties(query, { ...filters, propertyType: "data" })
+      ? await fetchProperties(query, currentPage, 9999999, {
+          ...filters,
+          propertyType: "data",
+        })
       : await fetchProperties(query, currentPage, itemsPerPage, {
           ...filters,
           propertyType: "data",
@@ -720,11 +742,15 @@ const Page = () => {
 
     const workbook = XLSX.utils.book_new();
 
-    const assetData = asset.data?.flatMap((property) => flattenAsset(property));
+    const assetData = asset.data
+      ?.flatMap((property) => flattenAsset(property))
+      .filter(Boolean);
     const assetSheet = XLSX.utils?.json_to_sheet(assetData);
     XLSX.utils.book_append_sheet(workbook, assetSheet, "Asset Sheet");
 
-    const dataData = data.data?.flatMap((property) => flattenData(property));
+    const dataData = data.data
+      ?.flatMap((property) => flattenData(property))
+      .filter(Boolean);
     const dataSheet = XLSX.utils?.json_to_sheet(dataData);
     XLSX.utils.book_append_sheet(workbook, dataSheet, "Data Sheet");
 
@@ -797,6 +823,9 @@ const Page = () => {
     <>
       <div className="m-10">
         <h1 className="text-3xl font-semibold mt-4">Data Management</h1>
+        {error && (
+          <div className="bg-red-500 text-white p-4 rounded mt-4">{error}</div>
+        )}
         <div className="border border-inherit min-h-96 mt-10 rounded-lg shadow-lg">
           <div className="p-8">
             <div className="flex justify-between items-center mb-4 ">
@@ -1022,4 +1051,3 @@ const Page = () => {
 };
 
 export default Page;
-
