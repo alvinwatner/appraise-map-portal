@@ -8,6 +8,7 @@ import { Property, Valuation } from "../../../types/types";
 import { capitalizeFirstLetter } from "@/app/utils/helper";
 import {
   addValuations,
+  updateLocation,
   updateProperty,
   updateValuation,
 } from "../../../services/dataManagement.service";
@@ -186,6 +187,11 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
     // If validation passes
     try {
+      if (editedProperty.locations) {
+        // set location id
+        updateLocation(property.locations.id ?? 0, editedProperty.locations);
+      }
+
       updateProperty(property.id, editedProperty);
 
       for (const [id, changes] of Array.from(editedValuations.entries())) {
@@ -291,6 +297,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
               ...editedProperty.locations,
               address: value,
             });
+
             setAddress(value);
           }}
           placeholder="Alamat"

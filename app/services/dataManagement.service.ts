@@ -629,20 +629,27 @@ export const updatePropertiesIsDeleted = async (
   return data;
 };
 
+export const updateLocation = async (
+  id: number,
+  changes: Partial<Location>
+) => {
+
+  const { data, error } = await supabase
+    .from("locations")
+    .update(changes)
+    .eq("id", id)
+    .select();
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 export const updateProperty = async (
   id: number,
   changes: Partial<Property>
 ) => {
-  if (changes.locations) {
-    const { error } = await supabase
-      .from("locations")
-      .update(changes.locations)
-      .eq("id", changes.locations.id)
-      .select();
-    if (error) {
-      throw new Error(error.message);
-    }
-  }
   delete changes.locations;
   delete changes.valuations;
   const { data, error } = await supabase

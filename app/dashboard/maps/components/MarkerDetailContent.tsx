@@ -85,8 +85,9 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         icon={HiOutlineLocationMarker}
         title="Lokasi :"
         body={property.locations.address}
-        className="mb-1"
+        className="mb-2"
       />
+
       {property.propertiesType == "data" && (
         <PropertyRowItemWithIcon
           icon={MdPhone}
@@ -121,14 +122,13 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         </div>
       </div>
 
-      {property.valuations?.length != 0 &&
-        property?.valuations?.map((valuation) => (
+      {property.valuations?.length !== 0 &&
+        [...property.valuations].reverse().map((valuation) => (
           <>
-            {property.propertiesType == "aset" && (
+            {property.propertiesType === "aset" && (
               <ValuationCardAsset valuation={valuation} />
             )}
-
-            {property.propertiesType == "data" && (
+            {property.propertiesType === "data" && (
               <ValuationCardData valuation={valuation} />
             )}
           </>
