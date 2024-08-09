@@ -29,6 +29,7 @@ import { BiImport } from "react-icons/bi";
 import FeedbackModal from "./components/FeedbackModal";
 import { PropertyTableSkeleton } from "./components/PropertyTableSkeleton";
 import { Pagination } from "./components/Pagination";
+import { ConfirmationModal } from "./components/ConfirmationModal";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -160,6 +161,10 @@ const Page = () => {
   const [feedbackType, setFeedbackType] = useState<"success" | "error">(
     "success"
   );
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
+  const [actionToConfirm, setActionToConfirm] = useState<() => void>(() => {});
 
   interface RowData {
     propertiesType?: string | null;
@@ -654,12 +659,24 @@ const Page = () => {
   };
 
   const handleDeleteSelected = async () => {
-    const idsToDelete = Array.from(selectedRows);
-    await updatePropertiesIsDeleted(idsToDelete, true);
-    setProperties(
-      properties.filter((property) => !idsToDelete.includes(property.id))
-    );
-    setSelectedRows(new Set());
+    setLoading(true);
+    try {
+      const idsToDelete = Array.from(selectedRows);
+      await updatePropertiesIsDeleted(idsToDelete, true);
+      setProperties(
+        properties.filter((property) => !idsToDelete.includes(property.id))
+      );
+      setSelectedRows(new Set());
+    } catch (err: any) {
+      setError(
+        `An error occurred while saving. Please try again. ${
+          err?.message || err
+        }`
+      );
+    } finally {
+      setLoading(false);
+      setIsConfirmationModalOpen(false);
+    }
   };
 
   const handleEditSelected = (isEditMode: boolean) => {
@@ -807,6 +824,11 @@ const Page = () => {
     setImportSuccess(true);
   };
 
+  const handleDeleteConfirmation = () => {
+    setActionToConfirm(() => handleDeleteSelected);
+    setIsConfirmationModalOpen(true);
+  };
+
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleHeaderClick = (field: string) => {
@@ -927,7 +949,7 @@ const Page = () => {
                       )}
                       <button
                         className="bg-red-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                        onClick={handleDeleteSelected}
+                        onClick={handleDeleteConfirmation}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1046,6 +1068,12 @@ const Page = () => {
           message={feedbackMessage}
           type={feedbackType}
           onOk={handleOk}
+        />
+        <ConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setIsConfirmationModalOpen(false)}
+          onConfirm={actionToConfirm}
+          message="Yakin hapus data?"
         />
       </div>
     </>
