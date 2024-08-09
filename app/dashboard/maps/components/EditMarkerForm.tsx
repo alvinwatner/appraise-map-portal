@@ -187,19 +187,14 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
     // If validation passes
     try {
-      if (editedProperty.locations) {
-        // set location id
-        updateLocation(property.locations.id ?? 0, editedProperty.locations);
-      }
-
-      updateProperty(property.id, editedProperty);
+      await updateProperty(property.id, editedProperty);
 
       for (const [id, changes] of Array.from(editedValuations.entries())) {
         await updateValuation(id, changes);
       }
 
       if (newValuations.length > 0) {
-        addValuations(newValuations);
+        await addValuations(newValuations);
       }
 
       onClose(); // Close form on success
@@ -296,6 +291,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
             handleOnChangeProperty("locations", {
               ...editedProperty.locations,
               address: value,
+              id: property.locations.id ?? 0,
             });
 
             setAddress(value);

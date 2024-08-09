@@ -629,20 +629,24 @@ export const updatePropertiesIsDeleted = async (
   return data;
 };
 
-export const updateLocation = async (
-  id: number,
-  changes: Partial<Location>
-) => {
-  const { data, error } = await supabase
+export const updateLocation = async (location: Partial<Location>) => {
+  // extract latitude and longitude
+  const { latitude, longitude, ...restLocations } = location;
+
+  const changes = { ...restLocations };
+  if (latitude !== undefined && longitude !== undefined) {
+    changes.coordinate = `POINT(${longitude} ${latitude})`;
+  }
+
+  const { error } = await supabase
     .from("locations")
     .update(changes)
-    .eq("id", id)
+    .eq("id", location.id)
     .select();
+
   if (error) {
     throw new Error(error.message);
   }
-
-  return data;
 };
 
 export const updateProperty = async (
@@ -650,19 +654,7 @@ export const updateProperty = async (
   changes: Partial<Property>
 ) => {
   if (changes.locations) {
-    const { latitude, longitude, ...restLocations } = changes.locations;
-    let coordinates = `POINT(${longitude} ${latitude})`;
-    const { error } = await supabase
-      .from("locations")
-      .update({
-        ...restLocations,
-        coordinate: coordinates,
-      })
-      .eq("id", changes.locations.id)
-      .select();
-    if (error) {
-      throw new Error(error.message);
-    }
+    await updateLocation(changes.locations);
   }
   delete changes.locations;
   delete changes.valuations;
