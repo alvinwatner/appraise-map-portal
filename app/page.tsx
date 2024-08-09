@@ -15,7 +15,7 @@ export default function Home() {
 
       <nav className="bg-slate-400 py-4 shadow-md">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold ">Graha Paramita Konsultan</h1>
+          <h1 className="text-xl font-bold ">PT. Graha Paramita Konsultan</h1>
           <div className="flex items-center">
             <a href="#home" className="mx-2  hover:text-blue-300 font-medium">
               Home
@@ -45,10 +45,10 @@ export default function Home() {
           style={{ backgroundImage: "url(/background.jpg)" }}
         >
           <h2 className="text-4xl font-bold text-white shadow-lg">
-            Graha Paramita Konsultan
+            PT. Graha Paramita Konsultan
           </h2>
           <p className="mt-3 text-xl text-white shadow-lg">
-            Konsultan Terpercaya untuk Penilaian dan Konsultasi Bisnis Anda.
+            {/* Konsultan Terpercaya untuk Penilaian dan Konsultasi Bisnis Anda. */}
           </p>
           <p className="text-white mt-2"></p>
         </section>
@@ -57,17 +57,17 @@ export default function Home() {
           <div className="flex flex-row justify-between gap-10">
             <div className="flex-1">
               <h2 className="text-[38px] font-semibold mb-7">
-                Perjalanan Perusahaan
+                Tentang Kami
               </h2>
               <p className="text-lg  mt-2">
-                Graha Paramita Konsultan berawal dari bentuk usaha perseorangan
+                {/* Graha Paramita Konsultan berawal dari bentuk usaha perseorangan
                 yang dikenal sebagai Kantor Jasa Penilai Publik (KJPP) Muhammad
                 Syarif. Seiring dengan perubahan regulasi dan perkembangan
                 perusahaan, kami menjadi bagian dari Kantor Jasa Penilai Publik
                 Syarif, Endang & Rekan pada tahun 2012. Dengan pengalaman
                 bertahun-tahun di bidang penilaian properti dan bisnis, kami
                 berkomitmen untuk memberikan layanan profesional yang dapat
-                diandalkan dan memenuhi kebutuhan para pengguna jasa.
+                diandalkan dan memenuhi kebutuhan para pengguna jasa. */}
               </p>
             </div>
             <div
@@ -91,41 +91,41 @@ export default function Home() {
               <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-4 ">
                 <div className="bg-white rounded-lg  shadow-lg p-5  h-[300px] flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
                   <h3 className="text-2xl font-semibold mb-2 text-center">
-                    Penilaian Properti
+                    {/* Penilaian Properti */}
                   </h3>
                   <p className="text-base text-gray-600 ">
-                    Penilai Publik dengan klasifikasi bidang jasa Penilaian
+                    {/* Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Properti dapat memberikan jasa lainnya yang berkaitan dengan
                     kegiatan penilaian, meliputi konsultasi pengembangan
                     properti, desain sistem informasi aset, manajemen properti,
-                    studi kelayakan usaha, dsb.
+                    studi kelayakan usaha, dsb. */}
                   </p>
                 </div>
               </div>
               <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-4 ">
                 <div className="bg-white rounded-lg  shadow-lg p-5  h-[300px] flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
                   <h3 className="text-2xl font-semibold mb-2 text-center">
-                    Penilaian Bisnis
+                    {/* Penilaian Bisnis */}
                   </h3>
                   <p className="text-base text-gray-600 ">
-                    Penilai Publik dengan klasifikasi bidang jasa Penilaian
+                    {/* Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Bisnis dapat memberikan jasa lainnya yang berkaitan dengan
                     kegiatan penilaian, meliputi studi kelayakan usaha,
                     penasihat keuangan korporasi, dan pengawasan pembiayaan
-                    proyek.
+                    proyek. */}
                   </p>
                 </div>
               </div>
               <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 p-4 ">
                 <div className="bg-white rounded-lg  shadow-lg p-5  h-[300px] flex flex-col items-center hover:shadow-xl transition-shadow duration-300 ease-in-out">
                   <h3 className="text-2xl font-semibold mb-2 text-center">
-                    Penilaian Sederhana
+                    {/* Penilaian Sederhana */}
                   </h3>
                   <p className="text-base text-gray-600 ">
-                    Penilai Publik dengan klasifikasi bidang jasa Penilaian
+                    {/* Penilai Publik dengan klasifikasi bidang jasa Penilaian
                     Properti Sederhana dapat memberikan jasa lainnya yang
                     berkaitan dengan kegiatan penilaian, yaitu jasa agen
-                    properti.
+                    properti. */}
                   </p>
                 </div>
               </div>
