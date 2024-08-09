@@ -58,8 +58,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     { label: "Tanggal Penilaian", field: "valuationDate", sortable: false },
     { label: "Penilai", field: "appraiser", sortable: false },
     { label: "Jenis Objek", field: "objectType", sortable: false },
-    { label: "Latitude", field: "locations(latitude)", sortable: false },
-    { label: "Longitude", field: "locations(longitude)", sortable: false },
+    { label: "Koordinat", field: "locations(latitude)", sortable: false },
     { label: "Nama Debitor", field: "debitur", sortable: false },
     { label: "Nomor Tlp", field: "phoneNumber", sortable: false },
     { label: "Alamat", field: "locations(address)", sortable: false },
@@ -272,42 +271,34 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                         className="block w-full rounded-md"
                         type="text"
                         value={
-                          editedData.get(item.id)?.locations?.latitude === null
-                            ? ""
-                            : editedData.get(item.id)?.locations?.latitude ??
-                              item.locations?.latitude ??
-                              ""
+                          editedData.get(item.id)?.locations?.coordinate ??
+                          `${
+                            editedData.get(item.id)?.locations?.latitude ??
+                            item.locations?.latitude ??
+                            ""
+                          }, ${
+                            editedData.get(item.id)?.locations?.longitude ??
+                            item.locations?.longitude ??
+                            ""
+                          }`
                         }
                         onChange={(e) => {
-                          const latitude = e.target.value || null;
+                          const value = e.target.value;
+                          const [latitude, longitude] = value
+                            .split(",")
+                            .map((coord) => coord.trim());
+
+                          console.log("Latitude:", latitude);
+                          console.log("Longitude:", longitude);
+
                           const currentLocations =
                             editedData.get(item.id)?.locations ||
                             item.locations;
                           handleChange(item.id, "locations", {
                             ...currentLocations,
+                            coordinate: `${latitude}, ${longitude}`,
+
                             latitude: latitude,
-                          });
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.locations?.longitude === null
-                            ? ""
-                            : editedData.get(item.id)?.locations?.longitude ??
-                              item.locations?.longitude ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const longitude = e.target.value || null;
-                          const currentLocations =
-                            editedData.get(item.id)?.locations ||
-                            item.locations;
-                          handleChange(item.id, "locations", {
-                            ...currentLocations,
                             longitude: longitude,
                           });
                         }}
@@ -508,10 +499,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       {item.objectType}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {item.locations?.latitude}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.locations?.longitude}
+                      {`${item.locations?.latitude}, ${item.locations?.longitude}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.debitur}

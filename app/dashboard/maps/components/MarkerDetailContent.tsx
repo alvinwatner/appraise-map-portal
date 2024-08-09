@@ -21,6 +21,7 @@ import {
 } from "../../../services/dataManagement.service";
 import Loading from "../../../components/Loading";
 import { useEffect, useState } from "react";
+import { TbCurrentLocation } from "react-icons/tb";
 
 interface MarkerDetailContentProps {
   onClose: () => void;
@@ -110,6 +111,12 @@ export const MarkerDetailContent: React.FC<MarkerDetailContentProps> = ({
         }
         className="mb-1"
       />
+      <PropertyRowItem
+        icon={TbCurrentLocation}
+        title="Koordinat :"
+        body={property.locations ? `${property.locations.latitude},  ${property.locations.longitude}` : "-"}
+        className="mb-1"
+      />      
 
       <div className="grid grid-cols-12 grid-rows-1 mb-5 ">
         <div className=" col-span-2 row-span-1 items-center  flex justify-start">

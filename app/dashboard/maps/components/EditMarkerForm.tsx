@@ -33,6 +33,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
   onShowModalSuccess,
   onShowModalFail,
 }: EditMarkerFormProps) => {
+  const [coordinate, setCoordinate] = useState<string>(
+    `${property.locations.latitude}, ${property.locations.longitude}`
+  );
   const [phoneNumber, setPhoneNumber] = useState<string>(property.phoneNumber);
   const [debitur, setDebitur] = useState<string>(property.debitur);
   const [address, setAddress] = useState<string>(property.locations.address);
@@ -323,6 +326,31 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
         {errors.buildingArea && (
           <p className="text-red-500 text-xs">{errors.buildingArea}</p>
         )}
+
+        <p className="text-2sm font-thin mb-2 mt-5">Koordinat :</p>
+        <input
+          value={coordinate}
+          className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+          type="text"
+          onChange={(event) => {
+            const value = event.target.value;
+            setCoordinate(value);
+            const [latitude, longitude] = value
+              .split(",")
+              .map((coord) => coord.trim());
+
+            console.log("Latitude:", latitude);
+            console.log("Longitude:", longitude);
+            handleOnChangeProperty("locations", {
+              ...editedProperty.locations,
+              latitude: latitude,
+              longitude: longitude,
+              id: property.locations.id ?? 0,
+            });
+
+          }}
+          placeholder="Koordinat"
+        ></input>
 
         {selectedPropertyType == "Aset" ? (
           <EditAssetValuationForms

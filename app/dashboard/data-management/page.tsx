@@ -683,6 +683,7 @@ const Page = () => {
 
   const handleSave = async () => {
     setIsSubmitting(true);
+    setLoading(true);
     setError(null);
 
     try {
@@ -710,6 +711,7 @@ const Page = () => {
         }`
       );
     } finally {
+      setLoading(false);
       setIsSubmitting(false);
     }
   };
