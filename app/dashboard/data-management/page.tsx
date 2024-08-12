@@ -78,9 +78,8 @@ const flattenAsset = (property: Property) => {
     "TANGGAL PENILAIAN": escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
     "NAMA DEBITUR": escapeCSVField(property.debitur || null),
-    LATITUDE: escapeCSVField(property.locations.latitude || null),
-    LONGITUDE: escapeCSVField(property.locations.longitude || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
+    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     PENILAI: escapeCSVField(valuation.appraiser || null),
@@ -111,10 +110,9 @@ const flattenData = (property: Property) => {
   return property?.valuations?.map((valuation) => ({
     TANGGAL: escapeCSVField(valuation.valuationDate || null),
     "JENIS OBJEK": escapeCSVField(property.objectType || null),
-    LATITUDE: escapeCSVField(property.locations.latitude || null),
-    LONGITUDE: escapeCSVField(property.locations.longitude || null),
     ALAMAT: escapeCSVField(property.locations.address || null),
     "NO. HP": escapeCSVField(property.phoneNumber || null),
+    KOORDINAT: escapeCSVField(`${longitude ?? ""},${latitude ?? ""}`),
     "LUAS TANAH": escapeCSVField(property.landArea || null),
     "LUAS BANGUNAN": escapeCSVField(property.buildingArea || null),
     "NILAI TANAH /m²": escapeCSVField(valuation.landValue || null),
@@ -174,13 +172,12 @@ const Page = () => {
     debitur?: string | null;
     phoneNumber?: string | null;
     address?: string | null;
-    longitude?: string | null;
-    latitude?: string | null;
     landArea?: string | null;
     buildingArea?: string | null;
     landValue?: string | null;
     buildingValue?: string | null;
     totalValue?: string | null;
+    coordinates?: string | null;
     appraiser?: string | null;
   }
 
@@ -237,9 +234,8 @@ const Page = () => {
         "valuationDate",
         "objectType",
         "debitur",
-        "latitude",
-        "longitude",
         "address",
+        "coordinates",
         "landArea",
         "buildingArea",
         "appraiser",
@@ -251,10 +247,9 @@ const Page = () => {
       data: [
         "valuationDate",
         "objectType",
-        "latitude",
-        "longitude",
         "address",
         "phoneNumber",
+        "coordinates",
         "landArea",
         "buildingArea",
         "landValue",
@@ -363,12 +358,13 @@ const Page = () => {
         const item = jsonData[i];
         validateRow(item, "asset");
 
+        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
           // latitude: coordinatesArray?.[0],
           // longitude: coordinatesArray?.[1],
-          coordinate: `POINT(${item.longitude} ${item.latitude})`,
+          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
 
         const formattedDataProperties = {
@@ -475,12 +471,13 @@ const Page = () => {
         const item = jsonData[i];
         validateRow(item, "data");
 
+        const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: (totalCountLocations || 0) + i + 1,
           address: item.address,
           // latitude: coordinatesArray?.[0],
           // longitude: coordinatesArray?.[1],
-          coordinate: `POINT(${item?.longitude} ${item.latitude})`,
+          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
 
         const formattedDataProperties = {

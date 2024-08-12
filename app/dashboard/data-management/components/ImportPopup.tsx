@@ -15,9 +15,8 @@ interface RowData {
   valuationDate?: string | null;
   objectType?: string | null;
   debitur?: string | null;
-  latitude?: string | null;
-  longitude?: string | null;
   address?: string | null;
+  coordinates?: string | null;
   landArea?: string | null;
   buildingArea?: string | null;
   appraiser?: string | null;
@@ -33,9 +32,8 @@ const requiredFields = {
     "TANGGAL PENILAIAN",
     "JENIS OBJEK",
     "NAMA DEBITUR",
-    "LATITUDE",
-    "LONGITUDE",
     "ALAMAT",
+    "KOORDINAT",
     "LUAS TANAH",
     "LUAS BANGUNAN",
     "PENILAI",
@@ -47,10 +45,9 @@ const requiredFields = {
   data: [
     "TANGGAL",
     "JENIS OBJEK",
-    "LATITUDE",
-    "LONGITUDE",
     "ALAMAT",
     "NO. HP",
+    "KOORDINAT",
     "LUAS TANAH",
     "LUAS BANGUNAN",
     "NILAI TANAH /m²",
@@ -63,11 +60,10 @@ const exampleRows = {
   asset: [
     [
       "2023-01-01",
-      "Tanah",
+      "asset",
       "John Doe",
-      "123.456",
-      "789.012",
       "Jalan Raya No. 1",
+      "123.456,789.012",
       "1000",
       "200",
       "Jane Smith",
@@ -80,11 +76,10 @@ const exampleRows = {
   data: [
     [
       "2023-01-01",
-      "Tanah",
-      "123.456",
-      "789.012",
+      "data",
       "Jalan Raya No. 1",
       "08123456789",
+      "123.456,789.012",
       "1000",
       "200",
       "150000",
@@ -146,9 +141,8 @@ const mapData = (row: any, dataType: "asset" | "data"): RowData => {
       valuationDate: parseDate(row["TANGGAL PENILAIAN"]) || null,
       objectType: row["JENIS OBJEK"] || null,
       debitur: row["NAMA DEBITUR"] || null,
-      latitude: row["LATITUDE"] || null,
-      longitude: row["LONGITUDE"] || null,
       address: row["ALAMAT"] || null,
+      coordinates: row["KOORDINAT"] || null,
       landArea: row["LUAS TANAH"] || null,
       buildingArea: row["LUAS BANGUNAN"] || null,
       appraiser: row["PENILAI"] || null,
@@ -161,10 +155,9 @@ const mapData = (row: any, dataType: "asset" | "data"): RowData => {
     return {
       valuationDate: parseDate(row["TANGGAL"]) || null,
       objectType: row["JENIS OBJEK"] || null,
-      latitude: row["LATITUDE"] || null,
-      longitude: row["LONGITUDE"] || null,
       address: row["ALAMAT"] || null,
       phoneNumber: row["NO. HP"] || null,
+      coordinates: row["KOORDINAT"] || null,
       landArea: row["LUAS TANAH"] || null,
       buildingArea: row["LUAS BANGUNAN"] || null,
       landValue: row["NILAI TANAH /m²"] || null,
