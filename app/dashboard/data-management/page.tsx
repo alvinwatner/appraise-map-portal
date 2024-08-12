@@ -265,6 +265,11 @@ const Page = () => {
 
     const missingFields: string[] = [];
 
+    // Check if objectType is valid
+    if (!["asset", "data"].includes(row.objectType ?? "")) {
+      throw new Error("Invalid objectType. Must be 'asset' or 'data'.");
+    }
+
     requiredFields[dataType].forEach((field) => {
       const value = row[field];
       if (value === undefined || value === null || value === "") {

@@ -189,6 +189,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                             },
                           ]);
                         }}
+                        disabled={item.propertiesType === "data"}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -241,6 +242,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                             },
                           ]);
                         }}
+                        disabled={item.propertiesType === "data"}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -319,6 +321,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                           const newBuildingValue = e.target.value || null;
                           handleChange(item.id, "debitur", newBuildingValue);
                         }}
+                        disabled={item.propertiesType === "data"}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -340,6 +343,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                             newBuildingValue
                           );
                         }}
+                        disabled={item.propertiesType === "aset"}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
