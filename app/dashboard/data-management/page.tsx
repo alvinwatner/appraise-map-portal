@@ -57,7 +57,7 @@ const escapeCSVField = (field: any): string => {
   return fieldString;
 };
 
-const flattenAsset = (property: Property) => {
+const flattenAset = (property: Property) => {
   let longitude = property.locations.longitude;
   let latitude = property.locations.latitude;
   if (property.locations.coordinate) {
@@ -230,7 +230,7 @@ const Page = () => {
 
   const validateRow = (row: RowData, dataType: string): boolean => {
     const requiredFields: { [key: string]: (keyof RowData)[] } = {
-      asset: [
+      aset: [
         "valuationDate",
         "objectType",
         "debitur",
@@ -261,8 +261,8 @@ const Page = () => {
     const missingFields: string[] = [];
 
     // Check if objectType is valid
-    if (!["asset", "data"].includes(row.objectType ?? "")) {
-      throw new Error("Invalid objectType. Must be 'asset' or 'data'.");
+    if (!["aset", "data"].includes(row.objectType ?? "")) {
+      throw new Error("Invalid objectType. Must be 'aset' or 'data'.");
     }
 
     requiredFields[dataType].forEach((field) => {
@@ -285,11 +285,11 @@ const Page = () => {
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
     setLoading(true);
     try {
-      if (dataType === "asset") {
-        await importAssetData(jsonData);
+      if (dataType === "aset") {
+        await importAsetData(jsonData);
         insertNotification({
           title: "Import Data",
-          description: `${user?.name} melakukan import asset`,
+          description: `${user?.name} melakukan import aset`,
           roleId: 1,
         });
       } else if (dataType === "data") {
@@ -313,7 +313,7 @@ const Page = () => {
     }
   };
 
-  const importAssetData = async (jsonData: RowData[]) => {
+  const importAsetData = async (jsonData: RowData[]) => {
     try {
       const { data: dataProperties, error: errorProperties } = await supabase
         .from("properties")
@@ -356,7 +356,7 @@ const Page = () => {
 
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
-        validateRow(item, "asset");
+        validateRow(item, "aset");
 
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
@@ -375,7 +375,7 @@ const Page = () => {
           buildingArea: item.buildingArea,
           LocationId: formattedDataLocations.id,
           objectType: item.objectType,
-          propertiesType: "asset",
+          propertiesType: "aset",
           UserId: user?.id,
         };
 
@@ -741,14 +741,14 @@ const Page = () => {
   };
 
   const handleExport = async (exportAll: boolean) => {
-    const asset = exportAll
+    const aset = exportAll
       ? await fetchProperties(query, currentPage, 9999999, {
           ...filters,
-          propertiesType: "asset",
+          propertiesType: "aset",
         })
       : await fetchProperties(query, currentPage, itemsPerPage, {
           ...filters,
-          propertiesType: "asset",
+          propertiesType: "aset",
         });
 
     const data = exportAll
@@ -763,11 +763,11 @@ const Page = () => {
 
     const workbook = XLSX.utils.book_new();
 
-    const assetData = asset.data
-      ?.flatMap((property) => flattenAsset(property))
+    const asetData = aset.data
+      ?.flatMap((property) => flattenAset(property))
       .filter(Boolean);
-    const assetSheet = XLSX.utils?.json_to_sheet(assetData);
-    XLSX.utils.book_append_sheet(workbook, assetSheet, "Asset Sheet");
+    const asetSheet = XLSX.utils?.json_to_sheet(asetData);
+    XLSX.utils.book_append_sheet(workbook, asetSheet, "Aset Sheet");
 
     const dataData = data.data
       ?.flatMap((property) => flattenData(property))

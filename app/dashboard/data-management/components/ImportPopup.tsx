@@ -28,7 +28,7 @@ interface RowData {
 }
 
 const requiredFields = {
-  asset: [
+  aset: [
     "TANGGAL PENILAIAN",
     "JENIS OBJEK",
     "NAMA DEBITUR",
@@ -57,10 +57,10 @@ const requiredFields = {
 };
 
 const exampleRows = {
-  asset: [
+  aset: [
     [
       "2023-01-01",
-      "asset",
+      "aset",
       "John Doe",
       "Jalan Raya No. 1",
       "123.456,789.012",
@@ -89,7 +89,7 @@ const exampleRows = {
   ],
 };
 
-const downloadTemplate = (templateType: "asset" | "data") => {
+const downloadTemplate = (templateType: "aset" | "data") => {
   const ws = XLSX.utils.aoa_to_sheet([
     requiredFields[templateType],
     ...exampleRows[templateType],
@@ -110,7 +110,7 @@ const downloadTemplate = (templateType: "asset" | "data") => {
   const link = document.createElement("a");
   link.href = url;
   link.download =
-    templateType === "asset" ? "asset_template.xlsx" : "data_template.xlsx";
+    templateType === "aset" ? "aset_template.xlsx" : "data_template.xlsx";
   link.click();
   window.URL.revokeObjectURL(url);
 };
@@ -135,8 +135,8 @@ const parseDate = (dateValue: any): string | null => {
   return null;
 };
 
-const mapData = (row: any, dataType: "asset" | "data"): RowData => {
-  if (dataType === "asset") {
+const mapData = (row: any, dataType: "aset" | "data"): RowData => {
+  if (dataType === "aset") {
     return {
       valuationDate: parseDate(row["TANGGAL PENILAIAN"]) || null,
       objectType: row["JENIS OBJEK"] || null,
@@ -173,7 +173,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
   onImport,
 }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [dataType, setDataType] = useState<"asset" | "data">("asset");
+  const [dataType, setDataType] = useState<"aset" | "data">("aset");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -184,7 +184,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
   };
 
   const handleDataTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setDataType(event.target.value as "asset" | "data");
+    setDataType(event.target.value as "aset" | "data");
   };
 
   const validateHeaders = (headers: string[]): string[] => {
@@ -306,8 +306,8 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
             <label className="mr-4">
               <input
                 type="radio"
-                value="asset"
-                checked={dataType === "asset"}
+                value="aset"
+                checked={dataType === "aset"}
                 onChange={handleDataTypeChange}
               />
               Aset
@@ -331,7 +331,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
           <div className="flex flex-col justify-end items-start">
             <button
               className="text-center text-sm mb-2 underline text-blue-500"
-              onClick={() => downloadTemplate("asset")}
+              onClick={() => downloadTemplate("aset")}
             >
               Download template aset
             </button>
