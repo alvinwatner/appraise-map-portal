@@ -12,7 +12,8 @@ export default function Home() {
           name="description"
           content="Profil perusahaan spesialis di bidang aset properti"
         />
-        <link rel="icon" href="/favicon.ico" />
+
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </Head>
 
       <div
