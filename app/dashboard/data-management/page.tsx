@@ -239,8 +239,6 @@ const Page = () => {
         "landArea",
         "buildingArea",
         "appraiser",
-        "buildingValue",
-        "landValue",
         "totalValue",
         "reportNumber",
       ],
@@ -252,18 +250,12 @@ const Page = () => {
         "coordinates",
         "landArea",
         "buildingArea",
-        "landValue",
-        "buildingValue",
         "totalValue",
       ],
     };
 
     const missingFields: string[] = [];
 
-    // Check if objectType is valid
-    if (!["aset", "data"].includes(row.objectType ?? "")) {
-      throw new Error("Invalid objectType. Must be 'aset' or 'data'.");
-    }
 
     requiredFields[dataType].forEach((field) => {
       const value = row[field];
