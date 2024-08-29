@@ -99,8 +99,7 @@ export default function Page() {
   // Utility Hooks
   const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "",
-    // googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!,
     libraries: libraries as any,
   });
 

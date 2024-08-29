@@ -238,7 +238,6 @@ const Page = () => {
         "coordinates",
         "landArea",
         "buildingArea",
-        "appraiser",
         "totalValue",
         "reportNumber",
       ],
