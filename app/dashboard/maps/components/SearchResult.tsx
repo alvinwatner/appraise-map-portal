@@ -112,7 +112,7 @@ const SearchResultItem: React.FC<{
     <div className="py-4">
       <div className="grid grid-cols-8 h-32 mt-2 px-12 ">
         <div className="col-span-5  flex flex-col">
-          <h3 className="text-xl mb-2">{property.objectType}</h3>
+          <h3 className="text-xl mb-2 line-clamp-1">{property.objectType} </h3>
 
           {property.propertiesType == "aset" ? (
             <PropertyChip type={PropertyType.ASSET} className="mb-2" />
