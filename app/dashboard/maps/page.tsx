@@ -479,9 +479,12 @@ export default function Page() {
         </div>
       </button>
 
+
+      
+
       <GoogleMaps
-        initLatitude={initLat ?? 3.560506}
-        initLongitude={initLng ?? 98.636445}
+        initLatitude={initLat ?? 5.531881}
+        initLongitude={initLng ?? 95.343405}
         key={googleMapKey}
         ref={mapRef}
         properties={properties}

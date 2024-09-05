@@ -246,7 +246,7 @@ const Page = () => {
         "objectType",
         "address",
         "phoneNumber",
-        "coordinates",
+        // "coordinates",
         "landArea",
         "buildingArea",
         "totalValue",
@@ -274,6 +274,7 @@ const Page = () => {
   };
 
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
+    console.log(`Importing data`)
     setLoading(true);
     try {
       if (dataType === "aset") {
@@ -295,6 +296,7 @@ const Page = () => {
       setFeedbackType("success");
       setIsFeedbackModalOpen(true);
     } catch (error: any) {
+      console.log(`error import data = ${error}`)
       console.error("Error handling import data:", error);
       setFeedbackMessage("Import failed! " + error.message);
       setFeedbackType("error");
@@ -311,55 +313,50 @@ const Page = () => {
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountProperties =
-        dataProperties !== null ? dataProperties[0].id : null;
-
+  
+      const totalCountProperties = (dataProperties?.length && dataProperties[0]?.id) || 0;
+  
       if (errorProperties) {
         throw errorProperties;
       }
-
+  
       const { data: dataValuations, error: errorValuations } = await supabase
         .from("valuations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountValuations =
-        dataValuations !== null ? dataValuations[0].id : null;
-
+  
+      const totalCountValuations = (dataValuations?.length && dataValuations[0]?.id) || 0;
+  
       if (errorValuations) {
         throw errorValuations;
       }
-
+  
       const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountLocations =
-        dataLocations !== null ? dataLocations[0].id : null;
-
+  
+      const totalCountLocations = (dataLocations?.length && dataLocations[0]?.id) || 0;
+  
       if (errorLocations) {
         throw errorLocations;
       }
-
+  
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
         validateRow(item, "aset");
-
+  
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
-          id: (totalCountLocations || 0) + i + 1,
+          id: totalCountLocations + i + 1,
           address: item.address,
-          // latitude: coordinatesArray?.[0],
-          // longitude: coordinatesArray?.[1],
           coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
-
+  
         const formattedDataProperties = {
-          id: (totalCountProperties || 0) + i + 1,
+          id: totalCountProperties + i + 1,
           debitur: item.debitur,
           phoneNumber: item.phoneNumber,
           landArea: item.landArea,
@@ -369,16 +366,16 @@ const Page = () => {
           propertiesType: "aset",
           UserId: user?.id,
         };
-
+  
         const formattedValuationDate =
           typeof item.valuationDate === "string"
             ? item.valuationDate.includes("/")
               ? item.valuationDate.split("/").reverse().join("-")
               : item.valuationDate
             : null;
-
+  
         const formattedDataValuations = {
-          id: (totalCountValuations || 0) + i + 1,
+          id: totalCountValuations + i + 1,
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
           valuationDate: formattedValuationDate,
@@ -387,33 +384,33 @@ const Page = () => {
           totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
-
-        const insertLocations = await (await supabase)
+  
+        const insertLocations = await supabase
           .from("locations")
           .insert([formattedDataLocations])
           .select();
-
-        const insertProperties = await (await supabase)
+  
+        const insertProperties = await supabase
           .from("properties")
           .insert([formattedDataProperties])
           .select();
-
-        const insertValuations = await (await supabase)
+  
+        const insertValuations = await supabase
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
-
+  
         const error =
           insertProperties.error ||
           insertValuations.error ||
           insertLocations.error;
-
+  
         if (error) {
           throw error;
         }
       }
     } catch (error: any) {
-      throw new Error(error.message || "Failed to import data data");
+      throw new Error(error.message || "Failed to import data");
     }
   };
 
@@ -424,55 +421,52 @@ const Page = () => {
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountProperties =
-        dataProperties !== null ? dataProperties[0].id : null;
-
+  
+      const totalCountProperties = (dataProperties?.length && dataProperties[0]?.id) || 0;
+  
       if (errorProperties) {
         throw errorProperties;
       }
-
+  
       const { data: dataValuations, error: errorValuations } = await supabase
         .from("valuations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountValuations =
-        dataValuations !== null ? dataValuations[0].id : null;
-
+  
+      const totalCountValuations = (dataValuations?.length && dataValuations[0]?.id) || 0;
+  
       if (errorValuations) {
         throw errorValuations;
       }
-
+  
       const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-
-      const totalCountLocations =
-        dataLocations !== null ? dataLocations[0].id : null;
-
+  
+      const totalCountLocations = (dataLocations?.length && dataLocations[0]?.id) || 0;
+  
       if (errorLocations) {
         throw errorLocations;
       }
-
+  
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
         validateRow(item, "data");
-
+  
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
-          id: (totalCountLocations || 0) + i + 1,
+          id: totalCountLocations + i + 1,
           address: item.address,
-          // latitude: coordinatesArray?.[0],
-          // longitude: coordinatesArray?.[1],
-          coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
+          coordinate: coordinatesArray
+            ? `POINT(${coordinatesArray[1]} ${coordinatesArray[0]})`
+            : null, // Allow nullable coordinate
         };
-
+  
         const formattedDataProperties = {
-          id: (totalCountProperties || 0) + i + 1,
+          id: totalCountProperties + i + 1,
           propertiesType: "data",
           debitur: item.debitur,
           phoneNumber: item.phoneNumber,
@@ -482,53 +476,55 @@ const Page = () => {
           objectType: item.objectType,
           UserId: user?.id,
         };
-
+  
         const formattedValuationDate =
           typeof item.valuationDate === "string"
             ? item.valuationDate.includes("/")
               ? item.valuationDate.split("/").reverse().join("-")
               : item.valuationDate
             : null;
-
+  
         const formattedDataValuations = {
-          id: (totalCountValuations || 0) + i + 1,
+          id: totalCountValuations + i + 1,
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
           valuationDate: formattedValuationDate,
-          buildingValue: item.buildingValue,
-          landValue: item.landValue,
+          buildingValue: item.buildingValue || null, // Allow nullable values
+          landValue: item.landValue || null,         // Allow nullable values
           totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
-
-        const insertLocations = await (await supabase)
+  
+        const insertLocations = await supabase
           .from("locations")
           .insert([formattedDataLocations])
           .select();
-
-        const insertProperties = await (await supabase)
+  
+        const insertProperties = await supabase
           .from("properties")
           .insert([formattedDataProperties])
           .select();
-
-        const insertValuations = await (await supabase)
+  
+        const insertValuations = await supabase
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
-
+  
         const error =
           insertProperties.error ||
           insertValuations.error ||
           insertLocations.error;
-
+  
         if (error) {
           throw error;
         }
       }
     } catch (error: any) {
-      throw new Error(error.message || "Failed to import data data");
+      throw new Error(error.message || "Failed to import data");
     }
   };
+  
+  
 
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams?.get("page") as string) || 1;
