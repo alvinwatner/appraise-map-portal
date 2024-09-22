@@ -16,7 +16,7 @@ const LoginPage = () => {
     const response = await login(formData);
 
     if (response?.error) {
-      setError(`error : ${response.error.message}`);
+      setError(`Error : ${response.error.message}`);
     } else {
       // Handle success here, e.g., redirect to dashboard or show success message
       // For simplicity, let's assume you handle redirection in the login function
