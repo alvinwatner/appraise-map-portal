@@ -169,6 +169,58 @@ export const fetchProperties = async (
   return { data: data as unknown as Property[], total: data.length };
 };
 
+export const createNewUser = async ({
+  name,
+  RoleId,
+  email,
+  username,
+  password,
+  isActive = false,
+}: {
+  name: string;
+  RoleId: number;
+  email: string;
+  username: string;
+  password: string;
+  isActive?: boolean;
+}) => {
+  try {
+    // Step 1: Sign up the user with Supabase Auth
+    const { data: authUser, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      throw authError;
+    }
+
+    const userId = authUser.user?.id ?? '';
+
+    // Step 2: Insert the user into the users table with the provided role and details
+    let { data: user, error: userError } = await supabase.from("users").insert([
+      {
+        RoleId: RoleId || null, 
+        email,
+        username,
+        password: null, 
+        isActive: isActive || false, 
+        name,
+        auth_id: userId, 
+        lastLogin: new Date(),
+      },
+    ]);
+
+    if (userError) {
+      throw userError;
+    }
+
+    console.log("User created successfully:", user);
+  } catch (error) {
+    console.error("Error creating user:", error);
+  }
+};
+
 export const fetchPropertiesByBoundingBox = async (
   swLat: number,
   swLng: number,

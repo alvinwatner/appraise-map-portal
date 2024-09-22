@@ -16,7 +16,7 @@ const LoginPage = () => {
     const response = await login(formData);
 
     if (response?.error) {
-      setError(response.error.message);
+      setError(`error : ${response.error.message}`);
     } else {
       // Handle success here, e.g., redirect to dashboard or show success message
       // For simplicity, let's assume you handle redirection in the login function
@@ -31,7 +31,11 @@ const LoginPage = () => {
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
           Log In
         </h2>
-        {error && <div className="mb-4 text-red-600 text-center">{error}</div>}
+        {error && (
+          <div className="mb-4 bg-red-300 ring-1 ring-red-500 rounded-md p-2 text-black text-center ">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
@@ -68,7 +72,11 @@ const LoginPage = () => {
             className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={loading}
           >
-            {loading ? <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2"  /> : "Submit"}
+            {loading ? (
+              <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
+            ) : (
+              "Submit"
+            )}
           </button>
         </form>
       </div>
