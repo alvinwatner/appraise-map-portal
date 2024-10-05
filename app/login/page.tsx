@@ -1,7 +1,18 @@
 "use client";
 import { useState, FormEvent } from "react";
 import { login } from "./action";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
 import Loading from "../components/Loading";
+
+// Define the structure of the login response
+interface LoginResponse {
+  error?: {
+    message: string;
+  };
+}
 
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -12,73 +23,79 @@ const LoginPage = () => {
     setError(null);
     setLoading(true);
 
+    // Retrieve form data and make sure it conforms to FormData
     const formData = new FormData(event.currentTarget);
-    const response = await login(formData);
 
-    if (response?.error) {
-      setError(`Error : ${response.error.message}`);
-    } else {
-      // Handle success here, e.g., redirect to dashboard or show success message
-      // For simplicity, let's assume you handle redirection in the login function
+    try {
+      // Ensure the login function returns the expected shape of response
+      const response = (await login(formData)) as LoginResponse;
+
+      if (response?.error) {
+        setError(`Error: ${response.error.message}`);
+      }
+    } catch (error) {
+      // Add error handling for unexpected issues
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          Log In
-        </h2>
-        {error && (
-          <div className="mb-4 bg-red-300 ring-1 ring-red-500 rounded-md p-2 text-black text-center ">
-            {error}
+    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <h1 className="text-3xl font-bold">Login</h1>
+            <p className="text-muted-foreground">
+              Enter your email below to login to your account
+            </p>
           </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
-            ) : (
-              "Submit"
-            )}
-          </button>
-        </form>
+
+          {error && (
+            <div className="mb-4 bg-red-300 ring-1 ring-red-500 rounded-md p-2 text-black text-center ">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="m@example.com"
+                required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+              </div>
+              <Input id="password" type="password" name="password" required />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+
+      <div className="hidden bg-muted lg:block">
+        <Image
+          src="/building.png"
+          alt="Image"
+          width="1920"
+          height="1080"
+          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
     </div>
   );

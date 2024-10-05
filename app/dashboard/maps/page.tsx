@@ -47,6 +47,7 @@ import {
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
 import FilterModal from "../data-management/components/FilterModal";
+import { Button } from "@/components/ui/button";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -457,7 +458,7 @@ export default function Page() {
         >
           <div className="relative w-full ">
             <input
-              className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+              className="w-72 pl-8 py-2 placeholder:text-sm placeholder:text-gray-400 rounded-md ring-1 ring-gray-200"
               type="text"
               placeholder="       Search Address"
             />
@@ -478,9 +479,6 @@ export default function Page() {
           </>
         </div>
       </button>
-
-
-      
 
       <GoogleMaps
         initLatitude={initLat ?? 5.531881}
@@ -547,12 +545,9 @@ const ModalUpdateResult: React.FC<{
           <IoCloseCircleOutline size={48} color="red" />
         )}
         <p className="text-lg my-2">{message}</p>
-        <button
-          className="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={onClose}
-        >
-          Close
-        </button>
+        <Button className="mt-3" variant="outline" onClick={onClose}>
+          CLOSE
+        </Button>
       </div>
     </div>
   );

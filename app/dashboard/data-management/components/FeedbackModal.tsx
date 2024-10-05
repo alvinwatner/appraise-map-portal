@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React from "react";
 import Modal from "react-modal";
 
@@ -20,7 +21,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      contentLabel="Feedback Modal"
+      contentLabel="FEEDBACK MODAL"
       ariaHideApp={false}
       className="flex items-center justify-center mt-52"
       overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75"
@@ -38,24 +39,21 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {type === "success" ? "Success" : "Error"}
         </div>
         <div className="mb-4 text-gray-700">{message}</div>
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-2">
           {type === "success" ? (
-            <button
+            <Button
               onClick={() => {
                 if (onOk) onOk();
                 onClose();
               }}
-              className="bg-green-400 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"
+              className="bg-green-600 hover:bg-green-800 text-white"
             >
-              Ok
-            </button>
+              OK
+            </Button>
           ) : (
-            <button
-              onClick={onClose}
-              className="bg-red-400 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              Close
-            </button>
+            <Button onClick={onClose} variant="outline">
+              CLOSE
+            </Button>
           )}
         </div>
       </div>

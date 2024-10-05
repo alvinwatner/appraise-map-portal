@@ -1,6 +1,6 @@
 import { PropertyRowItem } from "@/app/dashboard/maps/components/PropertyRowItem";
 import { Valuation } from "@/app/types/types";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   MdOutlineCalendarMonth,
   MdOutlineKeyboardArrowDown,
@@ -22,7 +22,6 @@ interface ValuationCardAssetProps {
 export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
   valuation,
 }: ValuationCardAssetProps) => {
-
   const [isExpand, setIsExpand] = useState<boolean>(false);
 
   return (
@@ -52,7 +51,10 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           )}
         </button>
 
-        <p className="text-2sm mb-1 font-medium">{`${ format(valuation.valuationDate, 'dd/MM/yyyy')} (${valuation.appraiser})`}</p>
+        <p className="text-2sm mb-1 font-medium">{`${format(
+          valuation.valuationDate,
+          "dd/MM/yyyy"
+        )} (${valuation.appraiser})`}</p>
         <p className="text-2sm mb-1 font-thin font-100 italic tracking-wide">
           {" "}
           {valuation.reportNumber}
@@ -67,27 +69,27 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
           />
           <PropertyRowItem
             icon={TbReportAnalytics}
-            title="Nomor Laporan :"
+            title="Nomor Laporan"
             body={valuation.reportNumber}
             className="mb-1"
           />
           <PropertyRowItem
             icon={IoPersonSharp}
-            title="Dinilai Oleh :"
+            title="Dinilai Oleh"
             body={valuation.appraiser}
             className="mb-1"
           />
 
           <PropertyRowItem
             icon={MdOutlineCalendarMonth}
-            title="Tanngal Penilaian :"
-            body={format(valuation.valuationDate, 'dd/MM/yyyy')}
+            title="Tanggal Penilaian"
+            body={format(valuation.valuationDate, "dd/MM/yyyy")}
             className="mb-1"
           />
 
           <PropertyRowItem
             icon={BsBuildingCheck}
-            title="Nilai Bangunan/Meter :"
+            title="Nilai Bangunan/Meter"
             body={
               valuation.buildingValue != null
                 ? formatRupiah(valuation.buildingValue)
@@ -98,7 +100,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
 
           <PropertyRowItem
             icon={TiChartAreaOutline}
-            title="Nilai Tanah/Meter :"
+            title="Nilai Tanah/Meter"
             body={
               valuation.landValue != null
                 ? formatRupiah(valuation.landValue)
@@ -109,7 +111,7 @@ export const ValuationCardAsset: React.FC<ValuationCardAssetProps> = ({
 
           <PropertyRowItem
             icon={TbReportMoney}
-            title="Total Nilai :"
+            title="Total Nilai"
             body={
               valuation.totalValue != null
                 ? formatRupiah(valuation.totalValue)

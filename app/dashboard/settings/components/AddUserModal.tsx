@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { createNewUser } from "@/app/services/dataManagement.service";
 import Loading from "@/app/components/Loading";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AddUserModalProps {
   onClose: () => void;
@@ -47,74 +57,70 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
             {error}
           </div>
         )}
-        <h2 className="text-2xl font-semibold mb-4">Add New User</h2>
         <div className="mb-4">
-          <label className="block text-sm font-medium">Fullname</label>
-          <input
+          <Label>Fullname</Label>
+          <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium">Username</label>
-          <input
+          <Label>Username</Label>
+          <Input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium">Email</label>
-          <input
+          <Label>Email</Label>
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium">Password</label>
-          <input
+          <Label className="block text-sm font-medium">Password</Label>
+          <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium">Role</label>
-          <select
-            value={roleId}
-            onChange={(e) => setRoleId(parseInt(e.target.value))}
-            className="w-full p-2 border border-gray-300 rounded-md"
+          <Label className="block text-sm font-medium">Role</Label>
+          <Select
+            value={String(roleId)}
+            onValueChange={(value) => setRoleId(parseInt(value))}
           >
-            <option value={1}>Admin</option>
-            <option value={2}>Editor</option>
-            <option value={3}>Viewer</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Admin</SelectItem>
+              <SelectItem value="2">Editor</SelectItem>
+              <SelectItem value="3">Viewer</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <button
-            className="px-4 py-2 bg-gray-300 rounded-md"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        <div className="w-full flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            CANCEL
+          </Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-800 text-white w-full"
             onClick={handleSave}
             disabled={isSaving}
           >
             {isSaving ? (
               <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
             ) : (
-              "Save"
+              "SAVE"
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

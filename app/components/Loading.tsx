@@ -11,7 +11,7 @@ const Loading: React.FC<{ size?: string; strokeWidth?: string }> = ({
       ></div>
       <style jsx>{`
         .loader {
-          border-top-color: #3498db;
+          border-top-color: #ffffff;
           animation: spin 1s infinite linear;
         }
         @keyframes spin {

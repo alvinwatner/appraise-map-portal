@@ -1,10 +1,35 @@
 "use client";
 
-import Loading from "@/app/components/Loading";
+import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabaseClient";
 import { User } from "@/app/types/types";
-import { useEffect, useState } from "react";
-import { UsersTableSkeleton } from "./UsersTableSkeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Toast, ToastAction } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UsersTabProps {
   onAddUser: () => void;
@@ -27,15 +52,16 @@ export const UsersTab: React.FC<UsersTabProps> = ({
 
     if (error) {
       console.error("Error fetching users:", error);
+      toast({
+        title: "Failed to fetch users",
+        description: error.message,
+        action: <ToastAction altText="Retry fetching users">Retry</ToastAction>,
+      });
     } else if (data) {
       setUsers(data);
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -47,8 +73,18 @@ export const UsersTab: React.FC<UsersTabProps> = ({
 
     if (error) {
       console.error("Error deleting user:", error);
+      toast({
+        title: "Failed to delete user",
+        description: error.message,
+        action: <ToastAction altText="Retry deleting user">Retry</ToastAction>,
+      });
     } else {
       setUsers(users.filter((user) => user.id !== id));
+      toast({
+        title: "User deleted successfully",
+        description: `User deleted at ${new Date().toLocaleString()}`,
+        action: <ToastAction altText="Undo deleting user">Undo</ToastAction>,
+      });
     }
     setLoading(false);
   };
@@ -78,6 +114,11 @@ export const UsersTab: React.FC<UsersTabProps> = ({
 
     if (error) {
       console.error("Error updating user:", error);
+      toast({
+        title: "Failed to update user",
+        description: `Error updating user at ${new Date().toLocaleString()}`,
+        action: <ToastAction altText="Goto users to retry">Retry</ToastAction>,
+      });
     } else {
       setUsers(
         users.map((user) =>
@@ -86,217 +127,201 @@ export const UsersTab: React.FC<UsersTabProps> = ({
       );
       setEditingUserId(null);
       setEditingUser(null);
-      setDropdownOpen(null); // Close the dropdown after saving
+      setDropdownOpen(null);
+      toast({
+        title: "Updated: User",
+        description: `User updated at ${new Date().toLocaleString()}`,
+        action: <ToastAction altText="Goto users to undo">Undo</ToastAction>,
+      });
     }
     setLoading(false);
   };
 
   return (
-    <div className="p-8">
-      <div
-        className="table-container"
-        style={{ maxHeight: "60vh", maxWidth: "140vh" }}
-      >
-        <button
-          className="text-white px-4 py-2 rounded btn-rounded flex items-center mb-4"
-          style={{ backgroundColor: "#20744A" }}
+    <div className="pb-8 px-8 pt-4">
+      <div className="flex justify-end mb-4">
+        <Button
           onClick={onAddUser}
+          className="bg-green-600 hover:bg-green-800 text-white"
         >
-          Add User
-        </button>
-        {loading ? (
-          <UsersTableSkeleton/>
-        ) : (
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Name
-                </th>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Username
-                </th>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Email
-                </th>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Status
-                </th>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Role
-                </th>
-                <th className="w-10 break-words border border-gray-300 p-2">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="border border-gray-300 p-2">
-                    {editingUserId === user.id ? (
-                      <input
-                        type="text"
-                        value={editingUser?.name}
-                        onChange={(e) =>
-                          setEditingUser((prevUser) => ({
-                            ...prevUser!,
-                            name: e.target.value,
-                          }))
-                        }
-                        className="w-full p-1 border border-gray-300 rounded-md"
-                      />
-                    ) : (
-                      user.name
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {editingUserId === user.id ? (
-                      <input
-                        type="text"
-                        value={editingUser?.username}
-                        onChange={(e) =>
-                          setEditingUser((prevUser) => ({
-                            ...prevUser!,
-                            username: e.target.value,
-                          }))
-                        }
-                        className="w-full p-1 border border-gray-300 rounded-md"
-                      />
-                    ) : (
-                      user.username
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {editingUserId === user.id ? (
-                      <input
-                        type="text"
-                        value={editingUser?.email}
-                        onChange={(e) =>
-                          setEditingUser((prevUser) => ({
-                            ...prevUser!,
-                            email: e.target.value,
-                          }))
-                        }
-                        className="w-full p-1 border border-gray-300 rounded-md"
-                      />
-                    ) : (
-                      user.email
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {editingUserId === user.id ? (
-                      <select
-                        value={editingUser?.isActive ? "active" : "inactive"}
-                        onChange={(e) =>
-                          setEditingUser((prevUser) => ({
-                            ...prevUser!,
-                            isActive: e.target.value === "active",
-                          }))
-                        }
-                        className="w-full p-1 border border-gray-300 rounded-md"
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    ) : (
-                      <span
-                        className={`inline-block px-2 py-1 rounded-md text-sm font-semibold ${
-                          user.isActive
-                            ? "bg-green-500 text-white"
-                            : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {user.isActive ? "Active" : "Inactive"}
-                      </span>
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {editingUserId === user.id ? (
-                      <select
-                        value={editingUser?.RoleId}
-                        onChange={(e) =>
-                          setEditingUser((prevUser) => ({
-                            ...prevUser!,
-                            RoleId: parseInt(e.target.value),
-                          }))
-                        }
-                        className="p-1 border border-gray-300 rounded-md"
-                      >
-                        <option value={1}>Admin</option>
-                        <option value={2}>Editor</option>
-                        <option value={3}>Viewer</option>
-                      </select>
-                    ) : user.RoleId === 1 ? (
-                      "Admin"
-                    ) : user.RoleId === 2 ? (
-                      "Editor"
-                    ) : user.RoleId === 3 ? (
-                      "Viewer"
-                    ) : (
-                      "Unknown"
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2 relative">
-                    <div className="relative inline-block text-left">
-                      <div>
-                        <button
-                          onClick={() => toggleDropdown(user.id)}
-                          className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                        >
-                          Actions
-                          <svg
-                            className="-mr-1 ml-2 h-5 w-5"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      {dropdownOpen === user.id && (
-                        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                          <div
-                            className="py-1"
-                            role="menu"
-                            aria-orientation="vertical"
-                            aria-labelledby="options-menu"
-                          >
-                            <button
-                              onClick={() =>
-                                editingUserId === user.id
-                                  ? handleSaveUser()
-                                  : handleEditUser(user)
-                              }
-                              className="block px-4 py-2 text-sm text-gray-700 w-full text-left hover:bg-gray-100"
-                              role="menuitem"
-                            >
-                              {editingUserId === user.id ? "Save" : "Edit"}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="block px-4 py-2 text-sm text-gray-700 w-full text-left hover:bg-gray-100"
-                              role="menuitem"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+          CREATE USER
+        </Button>
       </div>
+
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="flex space-x-4">
+              <Skeleton className="w-1/4 h-8" />
+              <Skeleton className="w-1/4 h-8" />
+              <Skeleton className="w-1/4 h-8" />
+              <Skeleton className="w-1/4 h-8" />
+              <Skeleton className="w-1/4 h-8" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Username</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  {editingUserId === user.id ? (
+                    <input
+                      type="text"
+                      value={editingUser?.name}
+                      onChange={(e) =>
+                        setEditingUser((prevUser) => ({
+                          ...prevUser!,
+                          name: e.target.value,
+                        }))
+                      }
+                      className="w-full p-1 border border-gray-300 rounded-md"
+                    />
+                  ) : (
+                    user.name
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingUserId === user.id ? (
+                    <input
+                      type="text"
+                      value={editingUser?.username}
+                      onChange={(e) =>
+                        setEditingUser((prevUser) => ({
+                          ...prevUser!,
+                          username: e.target.value,
+                        }))
+                      }
+                      className="w-full p-1 border border-gray-300 rounded-md"
+                    />
+                  ) : (
+                    user.username
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingUserId === user.id ? (
+                    <input
+                      type="text"
+                      value={editingUser?.email}
+                      onChange={(e) =>
+                        setEditingUser((prevUser) => ({
+                          ...prevUser!,
+                          email: e.target.value,
+                        }))
+                      }
+                      className="w-full p-1 border border-gray-300 rounded-md"
+                    />
+                  ) : (
+                    user.email
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingUserId === user.id ? (
+                    <Select
+                      value={editingUser?.isActive ? "active" : "inactive"}
+                      onValueChange={(e) =>
+                        setEditingUser((prevUser) => ({
+                          ...prevUser!,
+                          isActive: e === "active",
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Status</SelectLabel>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span
+                      className={`inline-block px-2 py-1 rounded-md ${
+                        user.isActive
+                          ? "bg-green-800 text-white"
+                          : "bg-red-800 text-white"
+                      }`}
+                    >
+                      {user.isActive ? "Active" : "Inactive"}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingUserId === user.id ? (
+                    <Select
+                      value={editingUser?.RoleId?.toString()}
+                      onValueChange={(e) =>
+                        setEditingUser((prevUser) => ({
+                          ...prevUser!,
+                          RoleId: parseInt(e),
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Roles</SelectLabel>
+                          <SelectItem value="1">Admin</SelectItem>
+                          <SelectItem value="2">Editor</SelectItem>
+                          <SelectItem value="3">Viewer</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : user.RoleId === 1 ? (
+                    "Admin"
+                  ) : user.RoleId === 2 ? (
+                    "Editor"
+                  ) : user.RoleId === 3 ? (
+                    "Viewer"
+                  ) : (
+                    "Unknown"
+                  )}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button variant="outline">Actions</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          editingUserId === user.id
+                            ? handleSaveUser()
+                            : handleEditUser(user)
+                        }
+                      >
+                        {editingUserId === user.id ? "Save" : "Edit"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="bg-red-600 hover:bg-red-800 text-white"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

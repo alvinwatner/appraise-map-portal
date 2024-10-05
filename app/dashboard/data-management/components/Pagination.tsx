@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import {
   MdKeyboardArrowRight,
@@ -66,13 +67,13 @@ export const Pagination: React.FC<PaginationProps> = ({
     // Always show the first page button unless it's the current page
     if (currentPage !== 1) {
       newButtons.push(
-        <button
+        <Button
           key="first"
-          className="px-4 py-2 text-sm border rounded-md"
+          variant="outline"
           onClick={() => handlePageChange(1)}
         >
           1
-        </button>
+        </Button>
       );
     }
 
@@ -86,36 +87,36 @@ export const Pagination: React.FC<PaginationProps> = ({
     // Show the previous page button if applicable
     if (currentPage > 2) {
       newButtons.push(
-        <button
+        <Button
           key="prev"
-          className="px-4 py-2 text-sm border rounded-md"
+          variant="outline"
           onClick={() => handlePageChange(currentPage - 1)}
         >
           {currentPage - 1}
-        </button>
+        </Button>
       );
     }
 
     // Show the current page button
     newButtons.push(
-      <button
+      <Button
         key={currentPage}
-        className="px-4 py-2 text-sm border rounded-md bg-gray-300"
+        className="bg-blue-600 hover:bg-blue-800 text-white w-full"
       >
         {currentPage}
-      </button>
+      </Button>
     );
 
     // Show the next page button if applicable
     if (currentPage < totalPages - 1) {
       newButtons.push(
-        <button
+        <Button
           key="next"
-          className="px-4 py-2 text-sm border rounded-md"
+          variant="outline"
           onClick={() => handlePageChange(currentPage + 1)}
         >
           {currentPage + 1}
-        </button>
+        </Button>
       );
     }
 
@@ -127,13 +128,13 @@ export const Pagination: React.FC<PaginationProps> = ({
     // Always show the last page button unless it's the current page
     if (currentPage !== totalPages) {
       newButtons.push(
-        <button
+        <Button
           key="last"
-          className="px-4 py-2 text-sm border rounded-md"
+          variant="outline"
           onClick={() => handlePageChange(totalPages)}
         >
           {totalPages}
-        </button>
+        </Button>
       );
     }
 
@@ -148,21 +149,21 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="flex items-center space-x-2">
-      <button
-        className="px-2 py-2 text-sm border rounded-md"
+      <Button
+        variant="outline"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
         <MdOutlineKeyboardArrowLeft size={20} />
-      </button>
+      </Button>
       <div className="flex space-x-2">{buttons}</div>
-      <button
-        className="px-2 py-2 text-sm border rounded-md"
+      <Button
+        variant="outline"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
         <MdKeyboardArrowRight size={20} />
-      </button>
+      </Button>
     </div>
   );
 };

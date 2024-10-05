@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import Modal from "react-modal";
 
@@ -30,7 +31,9 @@ const ExportPopup: React.FC<ExportPopupProps> = ({
     >
       <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md">
         <div className="px-6 py-4">
-          <div className="text-center font-bold text-xl mb-4">Export Data</div>
+          <div className="text-xl font-semibold mb-4 text-center">
+            EXPORT DATA
+          </div>
           <div className="mb-4">
             <label className="block mb-2">
               <input
@@ -40,7 +43,7 @@ const ExportPopup: React.FC<ExportPopupProps> = ({
                 onChange={() => setExportAll(false)}
                 className="mr-2"
               />
-              Halaman ini saja
+              Export Current Page Only
             </label>
             <label className="block">
               <input
@@ -50,22 +53,19 @@ const ExportPopup: React.FC<ExportPopupProps> = ({
                 onChange={() => setExportAll(true)}
                 className="mr-2"
               />
-              Semua halaman
+              Export All Pages
             </label>
           </div>
-          <div className="flex justify-end">
-            <button
+          <div className="w-full flex justify-end gap-2">
+            <Button
               onClick={handleExport}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"
+              className="bg-blue-600 hover:bg-blue-800 text-white w-full"
             >
-              Export
-            </button>
-            <button
-              onClick={onClose}
-              className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              Cancel
-            </button>
+              EXPORT
+            </Button>
+            <Button onClick={onClose} variant="outline" className="w-full">
+              CANCEL
+            </Button>
           </div>
         </div>
       </div>

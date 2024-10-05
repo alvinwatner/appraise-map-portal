@@ -24,7 +24,7 @@ export const Search: React.FC<{
   return (
     <form onSubmit={onSubmit}>
       <input
-        className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+        className="w-72 pl-8 py-2 placeholder:text-sm placeholder:text-gray-400 rounded-md ring-1 ring-gray-200 text-sm"
         type="text"
         placeholder="       Search Property"
         onChange={(e) => {

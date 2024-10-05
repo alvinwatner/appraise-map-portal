@@ -3,9 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BarChart from "./components/BarChart";
-import NumberCard from "./components/NumberCard";
 import PieChart from "./components/PieChart";
-
 import {
   fetchMaxTotalValueCurrentMonth,
   fetchMonthlyValuations2024,
@@ -14,6 +12,15 @@ import {
   fetchYearlyValuations,
 } from "../services/dataManagement.service";
 import { formatRupiah } from "../utils/helper";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"; // Import Card components
+import { Skeleton } from "@/components/ui/skeleton"; // Import a skeleton component
+import React from "react";
 
 export default function Page() {
   const router = useRouter();
@@ -23,6 +30,7 @@ export default function Page() {
   const [totalAssesedData, setTotalAssesedData] = useState<number>(0);
   const [totalAnnualValuation, setTotalAnnualValuation] = useState<number>(0);
   const [maxMonthlyValuation, setMaxMonthlyValuation] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchData = async () => {
     try {
@@ -44,6 +52,8 @@ export default function Page() {
       setMaxMonthlyValuation(results[5]);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,47 +62,98 @@ export default function Page() {
   }, [router]);
 
   return (
-    <div className="w-full h-full bg-gray-100 flex justify-center items-center px-4">
-      <div className="w-full max-w-6xl bg-white px-10 shadow-lg flex flex-col h-full overflow-hidden">
-        <h1 className="text-3xl font-semibold my-4">Dashboard</h1>
-        <div className="flex-1 flex flex-col">
-          {" "}
-          <div
-            className="flex-initial ring-1 w-full bg-white shadow rounded-lg flex justify-center items-center mb-6"
-            style={{ maxHeight: "50%" }}
-          >
+    <>
+      <div className="flex items-center">
+        <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
+      </div>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="w-full h-3/6 mb-6">
+          {loading ? (
+            <Skeleton className="w-full h-64" />
+          ) : (
             <BarChart data={monthlyData} />
-          </div>
-          <div className="flex-grow w-full mb-6">
-            <div className="flex justify-center gap-6 h-full">
-              <div className="grid grid-cols-2 gap-4 flex-1">
-                <NumberCard
-                  title="Total Aset Ternilai"
-                  value={totalAssesedAset.toString()}
-                />
-                <NumberCard
-                  title="Total Data Pembanding"
-                  value={totalAssesedData.toString()}
-                />
-                <NumberCard
-                  title="Total Valuasi Tahunan"
-                  value={totalAnnualValuation.toString()}
-                />
-                <NumberCard
-                  title="Valuasi Tertinggi Bulanan"
-                  value={formatRupiah(maxMonthlyValuation)}
-                />
-              </div>
-              <div
-                className="bg-white ring-1 shadow rounded-lg p-5 flex justify-center items-center"
-                style={{ width: "35%" }}
-              >
-                <PieChart data={yearlyData} />
-              </div>
+          )}
+        </div>
+        <div className="flex-grow w-full mb-6">
+          <div className="flex justify-center gap-6 h-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+              {/* Cards with Skeletons */}
+              {loading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <Card key={index} className="flex flex-col p-6 shadow-md">
+                    <CardHeader>
+                      <Skeleton className="h-4 w-1/2 mb-2" />
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="h-10 w-1/2 mb-2" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <>
+                  {/* Card for Total Aset Ternilai */}
+                  <Card className="flex flex-col items-center justify-center">
+                    <CardHeader className="flex items-center justify-center">
+                      <CardTitle>Total Aset Ternilai</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {totalAssesedAset.toString()}
+                      </span>
+                    </CardContent>
+                  </Card>
+                  {/* Card for Total Data Pembanding */}
+                  <Card className="flex flex-col items-center justify-center">
+                    <CardHeader>
+                      <CardTitle>Total Data Pembanding</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {totalAssesedData.toString()}
+                      </span>
+                    </CardContent>
+                  </Card>
+                  {/* Card for Total Valuasi Tahunan */}
+                  <Card className="flex flex-col items-center justify-center">
+                    <CardHeader>
+                      <CardTitle>Total Valuasi Tahunan</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {totalAnnualValuation.toString()}
+                      </span>
+                    </CardContent>
+                  </Card>
+                  {/* Card for Valuasi Tertinggi Bulanan */}
+                  <Card className="flex flex-col items-center justify-center">
+                    <CardHeader>
+                      <CardTitle>Valuasi Tertinggi Bulanan</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {formatRupiah(maxMonthlyValuation)}
+                      </span>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </div>
+            <Card
+              className="flex justify-center items-center"
+              style={{ width: "35%" }}
+            >
+              {loading ? (
+                <Skeleton className="w-full h-full" />
+              ) : (
+                <CardContent className="flex items-center justify-center w-full h-full">
+                  <PieChart data={yearlyData} />
+                </CardContent>
+              )}
+            </Card>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

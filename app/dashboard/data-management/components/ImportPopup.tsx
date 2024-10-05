@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { parse, format } from "date-fns";
 import Loading from "@/app/components/Loading";
+import { Button } from "@/components/ui/button";
 
 interface ImportPopupProps {
   isOpen: boolean;
@@ -295,7 +296,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
       <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-md">
         <div className="px-6 py-4">
           <div className="text-center font-bold text-xl mb-4">
-            Import Property
+            IMPORT PROPERTY
           </div>
           {errorMessage && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-400 rounded-lg">
@@ -309,7 +310,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
                 value="aset"
                 checked={dataType === "aset"}
                 onChange={handleDataTypeChange}
-              />
+              />{" "}
               Aset
             </label>
             <label>
@@ -318,7 +319,7 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
                 value="data"
                 checked={dataType === "data"}
                 onChange={handleDataTypeChange}
-              />
+              />{" "}
               Data
             </label>
           </div>
@@ -333,29 +334,26 @@ const ImportPopup: React.FC<ImportPopupProps> = ({
               className="text-center text-sm mb-2 underline text-blue-500"
               onClick={() => downloadTemplate("aset")}
             >
-              Download template aset
+              Download Template Aset
             </button>
             <button
               className="text-center text-sm mb-2 underline text-blue-500"
               onClick={() => downloadTemplate("data")}
             >
-              Download template data
+              Download Template Data
             </button>
           </div>
-          <div className="flex justify-end mb-4">
-            <button
+          <div className="w-full flex justify-end mb-4 gap-2">
+            <Button
               onClick={handleImport}
               disabled={loading}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mr-2"
+              className="bg-blue-600 hover:bg-blue-800 text-white w-full"
             >
-              {loading ? <Loading size="w-5 h-5" /> : "Import"}
-            </button>
-            <button
-              onClick={onClose}
-              className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
-            >
-              Cancel
-            </button>
+              {loading ? <Loading size="w-5 h-5" /> : "IMPORT"}
+            </Button>
+            <Button onClick={onClose} className="w-full" variant="outline">
+              CANCEL
+            </Button>
           </div>
         </div>
       </div>

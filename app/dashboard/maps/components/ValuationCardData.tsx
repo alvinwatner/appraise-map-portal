@@ -68,14 +68,14 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
 
           <PropertyRowItem
             icon={MdOutlineCalendarMonth}
-            title="Tanggal :"
+            title="Tanggal"
             body={format(valuation.valuationDate, "dd/MM/yyyy")}
             className="mb-1"
           />
 
           <PropertyRowItem
             icon={BsBuildingCheck}
-            title="Nilai Bangunan/Meter :"
+            title="Nilai Bangunan/Meter"
             body={
               valuation.buildingValue != null
                 ? formatRupiah(valuation.buildingValue)
@@ -86,7 +86,7 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
 
           <PropertyRowItem
             icon={TiChartAreaOutline}
-            title="Nilai Tanah/Meter :"
+            title="Nilai Tanah/Meter"
             body={
               valuation.landValue != null
                 ? formatRupiah(valuation.landValue)
@@ -97,7 +97,7 @@ export const ValuationCardData: React.FC<ValuationCardDataProps> = ({
 
           <PropertyRowItem
             icon={TbReportMoney}
-            title="Total Nilai :"
+            title="Total Nilai"
             body={
               valuation.totalValue != null
                 ? formatRupiah(valuation.totalValue)

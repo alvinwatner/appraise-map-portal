@@ -52,7 +52,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={!readonly ? toggleDropdown : () => {}}
-        className=" w-full pl-2 py-2 rounded-lg text-left ring-2 ring-[#D9D9D9] text-sm"
+        className=" w-full pl-2 py-2 rounded-md text-left ring-1 ring-gray-200 text-sm"
       >
         <span
           className={`${selectedOption != "" ? "text-black" : "text-gray-400"}`}

@@ -1,31 +1,32 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabaseClient'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabaseClient";
+import React from "react";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession()
+      const { data } = await supabase.auth.getSession();
       if (data.session) {
-        setIsAuthenticated(true)
+        setIsAuthenticated(true);
       } else {
-        router.push('/login')
+        router.push("/login");
       }
-    }
+    };
 
-    checkSession()
-  }, [router])
+    checkSession();
+  }, [router]);
 
   if (!isAuthenticated) {
-    return null
+    return null;
   }
 
-  return <>{children}</>
-}
+  return <>{children}</>;
+};
 
-export default ProtectedRoute
+export default ProtectedRoute;

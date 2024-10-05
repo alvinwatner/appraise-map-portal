@@ -1,39 +1,29 @@
-import React from "react";
+"use client";
+
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+  Bar,
+  BarChart as ReBarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+} from "recharts";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
-export const options = {
-  responsive: true,
-
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-    title: {
-      display: true,
-      text: "Monthly Asset Valuation Totals for 2024",
-    },
-  },
-};
-
-const labels = [
+// List of months to be used for labels
+const months = [
   "January",
   "February",
   "March",
@@ -48,18 +38,74 @@ const labels = [
   "December",
 ];
 
-export const BarChart: React.FC<{ data: number[] }> = ({ data }) => {
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: "Total Valuation",
-        data: data,
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
-  };
-  return <Bar options={options} data={chartData} />;
+export const chartConfig = {
+  valuation: {
+    label: " ",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+// Utility function to format numbers with K and M
+const formatValue = (value: number): string => {
+  if (value >= 1_000_000) {
+    return `${Math.round(value / 1_000_000).toLocaleString()}M`; // Millions
+  } else if (value >= 1_000) {
+    return `${Math.round(value / 1_000).toLocaleString()}K`; // Thousands
+  }
+  return `${value.toLocaleString()}`; // Below 1K
 };
+
+// Modify BarChart to accept dynamic data through props
+export function BarChart({ data }: { data: number[] }) {
+  // Create chartData dynamically by combining months with valuation data
+  const chartData = months.map((month, index) => ({
+    month,
+    valuation: data[index] || 0,
+  }));
+
+  return (
+    <Card className="w-full h-full">
+      <CardHeader>
+        <CardTitle>Bar Chart - Total Valuation</CardTitle>
+        <CardDescription>
+          January - December {new Date().getFullYear()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="w-full h-5/6">
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <ReBarChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              top: 20,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="valuation" fill="var(--color-valuation)" radius={8}>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+                formatter={(value: number) => formatValue(value as number)}
+              />
+            </Bar>
+          </ReBarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default BarChart;
