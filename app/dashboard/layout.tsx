@@ -120,36 +120,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[220px_1fr]">
       {/* Sidebar */}
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
+      <div className="hidden border-r bg-slate-200 md:block ">
+        <div className="flex h-full max-h-screen flex-col gap-2s">
           {/* Logo and Notifications */}
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 justify-between">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-4 justify-between">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Image
                 className="mx-auto"
                 src="/company_logo.png"
                 alt="Company Logo"
-                width={80}
-                height={80}
+                width={60}
+                height={60}
               />
-            </Link>
-            <Button
-              variant="outline"
-              size="icon"
-              className=" h-8 w-8 relative"
-              onClick={() => {
-                setShowNotifModal(!isShowNotifModal);
-                setUnreadNotifCount(0);
-              }}
-            >
-              {unreadNotifCount > 0 && (
-                <div className="absolute top-[-2px] right-[-2px] h-2 w-2 rounded-full bg-red-500" />
-              )}
-              <Bell className="h-4 w-4" />
-              <span className="sr-only">Toggle notifications</span>
-            </Button>
+            </Link>     
+            <h3 className="text-sm">MAPPI Sumbagut</h3>    
           </div>
 
           {/* Navigation Links */}
@@ -195,7 +181,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="flex flex-col h-screen">
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 bg-slate-200">
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -248,6 +234,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Search Bar */}
           <div className="w-full flex-1"></div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className=" h-8 w-8 relative"
+            onClick={() => {
+              setShowNotifModal(!isShowNotifModal);
+              setUnreadNotifCount(0);
+            }}
+          >
+            {unreadNotifCount > 0 && (
+              <div className="absolute top-[-2px] right-[-2px] h-2 w-2 rounded-full bg-red-500" />
+            )}
+            <Bell className="h-4 w-4" />
+            <span className="sr-only">Toggle notifications</span>
+          </Button>
 
           {/* User Menu */}
           <DropdownMenu>
