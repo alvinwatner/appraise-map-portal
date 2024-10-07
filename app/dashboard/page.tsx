@@ -63,94 +63,96 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
-      </div>
-      <div className="flex flex-col items-center gap-4 text-center">
-        <div className="w-full h-3/6 mb-6">
-          {loading ? (
-            <Skeleton className="w-full h-64" />
-          ) : (
-            <BarChart data={monthlyData} />
-          )}
+      <div className="p-4 lg:p-6 flex flex-col gap-6">
+        <div className="flex items-center">
+          <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
         </div>
-        <div className="flex-grow w-full mb-6">
-          <div className="flex justify-center gap-6 h-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-              {/* Cards with Skeletons */}
-              {loading ? (
-                Array.from({ length: 4 }).map((_, index) => (
-                  <Card key={index} className="flex flex-col p-6 shadow-md">
-                    <CardHeader>
-                      <Skeleton className="h-4 w-1/2 mb-2" />
-                    </CardHeader>
-                    <CardContent>
-                      <Skeleton className="h-10 w-1/2 mb-2" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <>
-                  {/* Card for Total Aset Ternilai */}
-                  <Card className="flex flex-col items-center justify-center">
-                    <CardHeader className="flex items-center justify-center">
-                      <CardTitle>Total Aset Ternilai</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <span className="text-2xl font-bold text-blue-600">
-                        {totalAssesedAset.toString()}
-                      </span>
-                    </CardContent>
-                  </Card>
-                  {/* Card for Total Data Pembanding */}
-                  <Card className="flex flex-col items-center justify-center">
-                    <CardHeader>
-                      <CardTitle>Total Data Pembanding</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <span className="text-2xl font-bold text-blue-600">
-                        {totalAssesedData.toString()}
-                      </span>
-                    </CardContent>
-                  </Card>
-                  {/* Card for Total Valuasi Tahunan */}
-                  <Card className="flex flex-col items-center justify-center">
-                    <CardHeader>
-                      <CardTitle>Total Valuasi Tahunan</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <span className="text-2xl font-bold text-blue-600">
-                        {totalAnnualValuation.toString()}
-                      </span>
-                    </CardContent>
-                  </Card>
-                  {/* Card for Valuasi Tertinggi Bulanan */}
-                  <Card className="flex flex-col items-center justify-center">
-                    <CardHeader>
-                      <CardTitle>Valuasi Tertinggi Bulanan</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <span className="text-2xl font-bold text-blue-600">
-                        {formatRupiah(maxMonthlyValuation)}
-                      </span>
-                    </CardContent>
-                  </Card>
-                </>
-              )}
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-full h-3/6 mb-6">
+            {loading ? (
+              <Skeleton className="w-full h-64" />
+            ) : (
+              <BarChart data={monthlyData} />
+            )}
+          </div>
+          <div className="flex-grow w-full mb-6">
+            <div className="flex justify-center gap-6 h-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                {/* Cards with Skeletons */}
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <Card key={index} className="flex flex-col p-6 shadow-md">
+                      <CardHeader>
+                        <Skeleton className="h-4 w-1/2 mb-2" />
+                      </CardHeader>
+                      <CardContent>
+                        <Skeleton className="h-10 w-1/2 mb-2" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <>
+                    {/* Card for Total Aset Ternilai */}
+                    <Card className="flex flex-col items-center justify-center">
+                      <CardHeader className="flex items-center justify-center">
+                        <CardTitle>Total Aset Ternilai</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {totalAssesedAset.toString()}
+                        </span>
+                      </CardContent>
+                    </Card>
+                    {/* Card for Total Data Pembanding */}
+                    <Card className="flex flex-col items-center justify-center">
+                      <CardHeader>
+                        <CardTitle>Total Data Pembanding</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {totalAssesedData.toString()}
+                        </span>
+                      </CardContent>
+                    </Card>
+                    {/* Card for Total Valuasi Tahunan */}
+                    <Card className="flex flex-col items-center justify-center">
+                      <CardHeader>
+                        <CardTitle>Total Valuasi Tahunan</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {totalAnnualValuation.toString()}
+                        </span>
+                      </CardContent>
+                    </Card>
+                    {/* Card for Valuasi Tertinggi Bulanan */}
+                    <Card className="flex flex-col items-center justify-center">
+                      <CardHeader>
+                        <CardTitle>Valuasi Tertinggi Bulanan</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-2xl font-bold text-blue-600">
+                          {formatRupiah(maxMonthlyValuation)}
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+              </div>
+              <Card
+                className="flex justify-center items-center"
+                style={{ width: "35%" }}
+              >
+                {loading ? (
+                  <Skeleton className="w-full h-full" />
+                ) : (
+                  <CardContent className="flex items-center justify-center w-full h-full">
+                    <PieChart data={yearlyData} />
+                  </CardContent>
+                )}
+              </Card>
             </div>
-            <Card
-              className="flex justify-center items-center"
-              style={{ width: "35%" }}
-            >
-              {loading ? (
-                <Skeleton className="w-full h-full" />
-              ) : (
-                <CardContent className="flex items-center justify-center w-full h-full">
-                  <PieChart data={yearlyData} />
-                </CardContent>
-              )}
-            </Card>
           </div>
         </div>
       </div>

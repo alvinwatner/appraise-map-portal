@@ -6,13 +6,6 @@ import { Bell, CircleUser, Home, Menu, MapPin, Database } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -32,6 +25,13 @@ import { NotificationModal } from "./components/NotificationModal";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/supabaseClient";
 import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -134,8 +134,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 width={60}
                 height={60}
               />
-            </Link>     
-            <h3 className="text-sm">MAPPI Sumbagut</h3>    
+            </Link>
+            <h3 className="text-sm">MAPPI Sumbagut</h3>
           </div>
 
           {/* Navigation Links */}
@@ -176,11 +176,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </nav>
           </div>
+          <div className="mt-auto p-4">
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full"
+              onClick={handleLogout}
+            >
+              Log out
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen overflow-hidden">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 bg-slate-200">
           <Sheet>
             <SheetTrigger asChild>
@@ -281,9 +291,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Children with scrolling */}
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
 
         {isShowNotifModal && (
           <NotificationModal

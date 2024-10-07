@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-
-const poppins = Poppins({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-});
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Graha Paramita Konsultan",
@@ -20,7 +16,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className}>{children}</body>
+      <body
+        className={cn(
+          "min-h-screen bg-background antialiased font-sans",
+          GeistMono.variable,
+          GeistSans.variable
+        )}
+      >
+        {children}
+      </body>
     </html>
   );
 }

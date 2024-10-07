@@ -460,7 +460,7 @@ export default function Page() {
             <input
               className="w-72 pl-8 py-2 placeholder:text-sm placeholder:text-gray-400 rounded-md ring-1 ring-gray-200"
               type="text"
-              placeholder="       Search Address"
+              placeholder="Search Address"
             />
             <IoSearchOutline className="absolute left-2 top-2 " color="grey" />
           </div>

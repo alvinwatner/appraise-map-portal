@@ -42,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -223,21 +224,6 @@ const Page = () => {
 
   const handleCloseImportModal = () => {
     setShowImportModal(false);
-  };
-
-  const parseAndFormatFloat = (
-    value: string | null | undefined
-  ): number | null => {
-    if (value == null) return null;
-    const cleanedValue = value.replace(/[.,]/g, "");
-
-    const floatValue = parseFloat(cleanedValue);
-
-    if (isNaN(floatValue)) {
-      throw new Error(`Invalid number format for value: ${value}`);
-    }
-
-    return floatValue;
   };
 
   const validateRow = (row: RowData, dataType: string): boolean => {
@@ -693,6 +679,7 @@ const Page = () => {
         return newEditedValuations;
       });
     }
+
     const newEditedData = new Map(editedData);
     const editedItem = newEditedData.get(id) || {};
     editedItem[field] = value;
@@ -706,6 +693,7 @@ const Page = () => {
     setError(null);
 
     try {
+      console.log(editedData);
       for (const [id, changes] of Array.from(editedData.entries())) {
         await updateProperty(id, changes);
       }
@@ -845,15 +833,9 @@ const Page = () => {
     setSortConfig({ key: field, direction });
   };
 
-  const products = [
-    { id: 1, name: "Product A", price: "$25", stock: 100 },
-    { id: 2, name: "Product B", price: "$40", stock: 150 },
-    { id: 3, name: "Product C", price: "$30", stock: 200 },
-  ];
-
   return (
     <>
-      <div className="flex flex-col gap-6">
+      <div className="p-4 lg:p-6 flex flex-col gap-6">
         <div className="flex items-center">
           <h1 className="text-lg font-semibold md:text-2xl">Data Management</h1>
         </div>
@@ -862,7 +844,7 @@ const Page = () => {
           <CardContent>
             <div className="w-full pt-8">
               {error && (
-                <div className="bg-red-500 text-white p-4 rounded mt-4">
+                <div className="bg-red-600 text-white p-4 rounded mb-4">
                   {error}
                 </div>
               )}
@@ -967,7 +949,13 @@ const Page = () => {
               </div>
 
               {loading ? (
-                <PropertyTableSkeleton />
+                <div className="space-y-2">
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                </div>
               ) : (
                 <PropertyTable
                   currentData={properties}
@@ -983,12 +971,13 @@ const Page = () => {
                   onSelectProperty={handleSelectProperty}
                 />
               )}
-              <div className="mt-4 flex justify-between">
+
+              <div className="mt-4 flex justify-between items-center">
                 <div>
                   <span className="text-sm text-gray-700">
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                    {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-                    {totalItems} Results
+                    {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
+                    to {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
+                    {totalItems}
                   </span>
                 </div>
                 <Pagination
@@ -1053,238 +1042,6 @@ const Page = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* <div className="m-10">
-        <h1 className="text-3xl font-semibold mt-4">Data Management</h1>
-        {error && (
-          <div className="bg-red-500 text-white p-4 rounded mt-4">{error}</div>
-        )}
-        <div className="border border-inherit min-h-96 mt-10 rounded-lg shadow-lg">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-4 ">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="px-4 py-2 border rounded btn-rounded"
-                  value={search}
-                  onChange={handleSearchChange}
-                  onKeyPress={handleSearchKeyPress}
-                />
-                {(roleId == 1 || roleId == 2) && (
-                  <button
-                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    style={{ backgroundColor: "#20744A" }}
-                    onClick={handleImportClick}
-                  >
-                    <BiImport className="mr-2" />
-                    Import
-                  </button>
-                )}
-                {roleId == 1 && (
-                  <button
-                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    style={{ backgroundColor: "#20744A" }}
-                    onClick={handleExportClick}
-                  >
-                    <PiExportBold className="mr-2" />
-                    Export
-                  </button>
-                )}
-              </div>
-              <div className="flex space-x-2">
-                <div className="flex space-x-2">
-                  {(roleId === 1 || roleId === 2) && !editMode && (
-                    <button
-                      className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                      onClick={() => handleEditSelected(true)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="1em"
-                        height="1em"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"
-                        ></path>
-                      </svg>
-                      &nbsp;Ubah
-                    </button>
-                  )}
-                  {selectedProperty !== null && (
-                    <div>
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                        onClick={handleNavigateToMap}
-                      >
-                        Go to Map
-                      </button>
-                    </div>
-                  )}
-                  {selectedRows.size > 0 && editMode && (
-                    <>
-                      {editMode && (
-                        <button
-                          className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                          onClick={handleSave}
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Loading
-                                size="w-5 h-5"
-                                strokeWidth="border-2 border-t-2"
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="1em"
-                                height="1em"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"
-                                ></path>
-                              </svg>
-                              Simpan
-                            </>
-                          )}
-                        </button>
-                      )}
-                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                        onClick={handleDeleteConfirmation}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="1em"
-                          height="1em"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M15 3H9V1h6v2zm5 0h-4V1c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v1h20V5c0-1.1-.9-2-2-2zM4 7v15c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7H4z"
-                          ></path>
-                        </svg>
-                        &nbsp; Hapus
-                      </button>
-                    </>
-                  )}
-                </div>
-                {editMode && (
-                  <button
-                    className="bg-yellow-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    onClick={() => handleEditSelected(false)}
-                  >
-                    Cancel
-                  </button>
-                )}
-                <button
-                  className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center"
-                  onClick={() => setShowFilterModal(true)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M22 18.605a.75.75 0 0 1-.75.75h-5.1a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h7.74a2.93 2.93 0 0 1 5.66 0h5.1a.75.75 0 0 1 .75.75m0-13.21a.75.75 0 0 1-.75.75H18.8a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h10.39a2.93 2.93 0 0 1 5.66 0h2.45a.74.74 0 0 1 .75.75m0 6.6a.74.74 0 0 1-.75.75H9.55a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h1.14a2.93 2.93 0 0 1 5.66 0h11.7a.75.75 0 0 1 .75.75"
-                    ></path>
-                  </svg>
-                  &nbsp;Filter
-                </button>
-              </div>
-            </div>
-
-            {loading ? (
-              <PropertyTableSkeleton />
-            ) : (
-              <PropertyTable
-                currentData={properties}
-                selectedRows={selectedRows}
-                handleSelectRow={handleSelectRow}
-                handleSelectAll={handleSelectAll}
-                handleChange={handleChange}
-                editMode={editMode}
-                editedData={editedData}
-                editedValuations={editedValuations}
-                handleHeaderClick={handleHeaderClick}
-                sortConfig={sortConfig}
-                onSelectProperty={handleSelectProperty}
-              />
-            )}
-            <div className="mt-4 flex justify-between">
-              <div>
-                <span className="text-sm text-gray-700">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                  {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-                  {totalItems} results
-                </span>
-              </div>
-              <Pagination
-                totalPages={totalPages}
-                onPageChanged={(page) => {
-                  handlePageChange(page);
-                }}
-              />
-
-              <div>
-                <label className="mr-2 text-sm">Items per page:</label>
-                <select
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                  className="px-4 py-2 border rounded-md"
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        {showFilterModal && (
-          <FilterModal
-            onApply={handleFilterApply}
-            onClose={() => setShowFilterModal(false)}
-            defaultFilters={filters}
-          />
-        )}
-        <ImportPopup
-          isOpen={showImportModal}
-          onClose={handleCloseImportModal}
-          onImport={handleImportData}
-        />
-        {showExportModal && (
-          <ExportPopup
-            isOpen={showExportModal}
-            onClose={handleCloseExportModal}
-            onExport={handleExport}
-          />
-        )}
-        <FeedbackModal
-          isOpen={isFeedbackModalOpen}
-          onClose={() => setIsFeedbackModalOpen(false)}
-          message={feedbackMessage}
-          type={feedbackType}
-          onOk={handleOk}
-        />
-        <ConfirmationModal
-          isOpen={isConfirmationModalOpen}
-          onClose={() => setIsConfirmationModalOpen(false)}
-          onConfirm={actionToConfirm}
-          message="Yakin hapus data?"
-        />
-      </div> */}
     </>
   );
 };
