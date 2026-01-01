@@ -27,9 +27,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Toast, ToastAction } from "@/components/ui/toast";
+import {
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Plus, MoreHorizontal } from "lucide-react";
 
 interface UsersTabProps {
   onAddUser: () => void;
@@ -92,11 +99,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({
   const handleEditUser = (user: User) => {
     setEditingUserId(user.id);
     setEditingUser(user);
-    setDropdownOpen(null); // Close the dropdown when editing
-  };
-
-  const toggleDropdown = (id: string) => {
-    setDropdownOpen(dropdownOpen === id ? null : id);
+    setDropdownOpen(null);
   };
 
   const handleSaveUser = async () => {
@@ -138,190 +141,197 @@ export const UsersTab: React.FC<UsersTabProps> = ({
   };
 
   return (
-    <div className="pb-8 px-8 pt-4">
-      <div className="flex justify-end mb-4">
-        <Button
-          onClick={onAddUser}
-          className="bg-green-600 hover:bg-green-800 text-white"
-        >
-          CREATE USER
-        </Button>
-      </div>
-
-      {loading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="flex space-x-4">
-              <Skeleton className="w-1/4 h-8" />
-              <Skeleton className="w-1/4 h-8" />
-              <Skeleton className="w-1/4 h-8" />
-              <Skeleton className="w-1/4 h-8" />
-              <Skeleton className="w-1/4 h-8" />
-            </div>
-          ))}
+    <>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div>
+          <CardTitle className="text-lg">Users</CardTitle>
+          <CardDescription>Manage user accounts and permissions</CardDescription>
         </div>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  {editingUserId === user.id ? (
-                    <input
-                      type="text"
-                      value={editingUser?.name}
-                      onChange={(e) =>
-                        setEditingUser((prevUser) => ({
-                          ...prevUser!,
-                          name: e.target.value,
-                        }))
-                      }
-                      className="w-full p-1 border border-gray-300 rounded-md"
-                    />
-                  ) : (
-                    user.name
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingUserId === user.id ? (
-                    <input
-                      type="text"
-                      value={editingUser?.username}
-                      onChange={(e) =>
-                        setEditingUser((prevUser) => ({
-                          ...prevUser!,
-                          username: e.target.value,
-                        }))
-                      }
-                      className="w-full p-1 border border-gray-300 rounded-md"
-                    />
-                  ) : (
-                    user.username
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingUserId === user.id ? (
-                    <input
-                      type="text"
-                      value={editingUser?.email}
-                      onChange={(e) =>
-                        setEditingUser((prevUser) => ({
-                          ...prevUser!,
-                          email: e.target.value,
-                        }))
-                      }
-                      className="w-full p-1 border border-gray-300 rounded-md"
-                    />
-                  ) : (
-                    user.email
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingUserId === user.id ? (
-                    <Select
-                      value={editingUser?.isActive ? "active" : "inactive"}
-                      onValueChange={(e) =>
-                        setEditingUser((prevUser) => ({
-                          ...prevUser!,
-                          isActive: e === "active",
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Status</SelectLabel>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <span
-                      className={`inline-block px-2 py-1 rounded-md ${
-                        user.isActive
-                          ? "bg-green-800 text-white"
-                          : "bg-red-800 text-white"
-                      }`}
-                    >
-                      {user.isActive ? "Active" : "Inactive"}
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingUserId === user.id ? (
-                    <Select
-                      value={editingUser?.RoleId?.toString()}
-                      onValueChange={(e) =>
-                        setEditingUser((prevUser) => ({
-                          ...prevUser!,
-                          RoleId: parseInt(e),
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Roles</SelectLabel>
-                          <SelectItem value="1">Admin</SelectItem>
-                          <SelectItem value="2">Editor</SelectItem>
-                          <SelectItem value="3">Viewer</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  ) : user.RoleId === 1 ? (
-                    "Admin"
-                  ) : user.RoleId === 2 ? (
-                    "Editor"
-                  ) : user.RoleId === 3 ? (
-                    "Viewer"
-                  ) : (
-                    "Unknown"
-                  )}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button variant="outline">Actions</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          editingUserId === user.id
-                            ? handleSaveUser()
-                            : handleEditUser(user)
+        <Button onClick={onAddUser} variant="success" size="sm">
+          <Plus className="h-4 w-4 mr-2" />
+          Create User
+        </Button>
+      </CardHeader>
+
+      <CardContent>
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex space-x-4">
+                <Skeleton className="w-1/4 h-8" />
+                <Skeleton className="w-1/4 h-8" />
+                <Skeleton className="w-1/4 h-8" />
+                <Skeleton className="w-1/4 h-8" />
+                <Skeleton className="w-1/4 h-8" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {editingUserId === user.id ? (
+                      <input
+                        type="text"
+                        value={editingUser?.name}
+                        onChange={(e) =>
+                          setEditingUser((prevUser) => ({
+                            ...prevUser!,
+                            name: e.target.value,
+                          }))
+                        }
+                        className="w-full p-1 border border-gray-300 rounded-md"
+                      />
+                    ) : (
+                      user.name
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingUserId === user.id ? (
+                      <input
+                        type="text"
+                        value={editingUser?.username}
+                        onChange={(e) =>
+                          setEditingUser((prevUser) => ({
+                            ...prevUser!,
+                            username: e.target.value,
+                          }))
+                        }
+                        className="w-full p-1 border border-gray-300 rounded-md"
+                      />
+                    ) : (
+                      user.username
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingUserId === user.id ? (
+                      <input
+                        type="text"
+                        value={editingUser?.email}
+                        onChange={(e) =>
+                          setEditingUser((prevUser) => ({
+                            ...prevUser!,
+                            email: e.target.value,
+                          }))
+                        }
+                        className="w-full p-1 border border-gray-300 rounded-md"
+                      />
+                    ) : (
+                      user.email
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingUserId === user.id ? (
+                      <Select
+                        value={editingUser?.isActive ? "active" : "inactive"}
+                        onValueChange={(e) =>
+                          setEditingUser((prevUser) => ({
+                            ...prevUser!,
+                            isActive: e === "active",
+                          }))
                         }
                       >
-                        {editingUserId === user.id ? "Save" : "Edit"}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="bg-red-600 hover:bg-red-800 text-white"
-                        onClick={() => handleDeleteUser(user.id)}
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Status</SelectLabel>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <span
+                        className={`inline-block px-2 py-1 rounded-md text-xs ${
+                          user.isActive
+                            ? "bg-teal-600 text-white"
+                            : "bg-red-800 text-white"
+                        }`}
                       >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
+                        {user.isActive ? "Active" : "Inactive"}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingUserId === user.id ? (
+                      <Select
+                        value={editingUser?.RoleId?.toString()}
+                        onValueChange={(e) =>
+                          setEditingUser((prevUser) => ({
+                            ...prevUser!,
+                            RoleId: parseInt(e),
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Roles</SelectLabel>
+                            <SelectItem value="1">Admin</SelectItem>
+                            <SelectItem value="2">Editor</SelectItem>
+                            <SelectItem value="3">Viewer</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    ) : user.RoleId === 1 ? (
+                      "Admin"
+                    ) : user.RoleId === 2 ? (
+                      "Editor"
+                    ) : user.RoleId === 3 ? (
+                      "Viewer"
+                    ) : (
+                      "Unknown"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Actions</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            editingUserId === user.id
+                              ? handleSaveUser()
+                              : handleEditUser(user)
+                          }
+                        >
+                          {editingUserId === user.id ? "Save" : "Edit"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </>
   );
 };

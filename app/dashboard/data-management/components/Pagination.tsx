@@ -101,7 +101,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     newButtons.push(
       <Button
         key={currentPage}
-        className="bg-blue-600 hover:bg-blue-800 text-white w-full"
+        className="bg-teal-600 hover:bg-teal-700 text-white w-full"
       >
         {currentPage}
       </Button>

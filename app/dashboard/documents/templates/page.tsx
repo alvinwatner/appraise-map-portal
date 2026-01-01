@@ -32,10 +32,14 @@ export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null
+  );
   const [showMappingModal, setShowMappingModal] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
-  const [generateTemplate, setGenerateTemplate] = useState<Template | null>(null);
+  const [generateTemplate, setGenerateTemplate] = useState<Template | null>(
+    null
+  );
 
   useEffect(() => {
     loadTemplates();
@@ -125,7 +129,7 @@ export default function TemplatesPage() {
             {templates.length} template tersedia
           </p>
         </div>
-        <Button onClick={() => setShowUploadModal(true)}>
+        <Button variant="success" onClick={() => setShowUploadModal(true)}>
           <Upload className="mr-2 h-4 w-4" />
           Upload Template
         </Button>
@@ -154,8 +158,8 @@ export default function TemplatesPage() {
               Belum ada template
             </h3>
             <p className="mt-1 text-sm text-gray-500 text-center max-w-sm">
-              Upload template dokumen DOCX dengan variabel {`{{nama_variabel}}`} untuk
-              memulai generate dokumen otomatis.
+              Upload template dokumen DOCX dengan variabel {`{{nama_variabel}}`}{" "}
+              untuk memulai generate dokumen otomatis.
             </p>
             <Button className="mt-4" onClick={() => setShowUploadModal(true)}>
               <Plus className="mr-2 h-4 w-4" />
@@ -247,17 +251,25 @@ export default function TemplatesPage() {
                 <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
                   <span>{formatFileSize(template.file_size_bytes)}</span>
                   <span>•</span>
-                  <span>{template.variables_detected.total_count} variabel</span>
+                  <span>
+                    {template.variables_detected.total_count} variabel
+                  </span>
                 </div>
 
                 {/* Mapping Status */}
                 <div className="mt-3">
                   {template.has_mapping ? (
-                    <Badge variant="default" className="bg-green-100 text-green-800">
+                    <Badge
+                      variant="default"
+                      className="bg-green-100 text-green-800"
+                    >
                       Mapping Configured
                     </Badge>
                   ) : (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                    <Badge
+                      variant="secondary"
+                      className="bg-yellow-100 text-yellow-800"
+                    >
                       Perlu Konfigurasi
                     </Badge>
                   )}

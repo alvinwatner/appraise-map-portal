@@ -141,51 +141,72 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Navigation Links */}
           <div className="flex-1">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-1">
+              {/* Overview Section */}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2 mt-2">
+                Overview
+              </p>
               <Link
                 href="/dashboard"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                   pathname === "/dashboard"
-                    ? "bg-muted text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                    : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                 }`}
               >
+                {pathname === "/dashboard" && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                )}
                 <Home className="h-4 w-4" />
                 Dashboard
               </Link>
+
+              {/* Management Section */}
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2 mt-4">
+                Management
+              </p>
               <Link
                 href="/dashboard/data-management"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                   pathname === "/dashboard/data-management"
-                    ? "bg-muted text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                    : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                 }`}
               >
+                {pathname === "/dashboard/data-management" && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                )}
                 <Database className="h-4 w-4" />
                 Data
               </Link>
               <Link
                 href="/dashboard/maps"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                   pathname === "/dashboard/maps"
-                    ? "bg-muted text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                    : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                 }`}
               >
+                {pathname === "/dashboard/maps" && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                )}
                 <MapPin className="h-4 w-4" />
                 Maps
               </Link>
               <Link
                 href="/dashboard/documents"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                   pathname?.startsWith("/dashboard/documents")
-                    ? "bg-muted text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                    : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                 }`}
               >
+                {pathname?.startsWith("/dashboard/documents") && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                )}
                 <FileText className="h-4 w-4" />
                 Dokumen
-                <Badge variant="secondary" className="ml-auto text-xs">Beta</Badge>
+                <Badge variant="secondary" className="ml-auto text-xs bg-teal-100 text-teal-700 hover:bg-teal-100">Beta</Badge>
               </Link>
             </nav>
           </div>
@@ -217,51 +238,72 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
-              <nav className="grid gap-2 text-lg font-medium">
+              <nav className="grid gap-1 text-sm font-medium mt-4">
+                {/* Overview Section */}
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
+                  Overview
+                </p>
                 <Link
                   href="/dashboard"
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
+                      ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                      : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                   }`}
                 >
+                  {pathname === "/dashboard" && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                  )}
                   <Home className="h-4 w-4" />
                   Dashboard
                 </Link>
+
+                {/* Management Section */}
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2 mt-4">
+                  Management
+                </p>
                 <Link
                   href="/dashboard/data-management"
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard/data-management"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
+                      ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                      : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                   }`}
                 >
+                  {pathname === "/dashboard/data-management" && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                  )}
                   <Database className="h-4 w-4" />
                   Data
                 </Link>
                 <Link
                   href="/dashboard/maps"
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard/maps"
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
+                      ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                      : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                   }`}
                 >
+                  {pathname === "/dashboard/maps" && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                  )}
                   <MapPin className="h-4 w-4" />
                   Maps
                 </Link>
                 <Link
                   href="/dashboard/documents"
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname?.startsWith("/dashboard/documents")
-                      ? "bg-muted text-primary"
-                      : "text-muted-foreground hover:text-primary"
+                      ? "bg-teal-50 text-teal-700 font-medium pl-4"
+                      : "text-muted-foreground hover:text-teal-600 hover:bg-teal-50/50"
                   }`}
                 >
+                  {pathname?.startsWith("/dashboard/documents") && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-500 rounded-r-full" />
+                  )}
                   <FileText className="h-4 w-4" />
                   Dokumen
-                  <Badge variant="secondary" className="ml-auto text-xs">Beta</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs bg-teal-100 text-teal-700 hover:bg-teal-100">Beta</Badge>
                 </Link>
               </nav>
             </SheetContent>
@@ -316,7 +358,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Children with scrolling */}
-        <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
+        <main className="flex flex-1 flex-col overflow-y-auto p-4 md:p-6 lg:p-8">{children}</main>
 
         {isShowNotifModal && (
           <NotificationModal

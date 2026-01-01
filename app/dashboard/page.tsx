@@ -12,13 +12,7 @@ import {
   fetchYearlyValuations,
 } from "../services/dataManagement.service";
 import { formatRupiah } from "../utils/helper";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"; // Import Card components
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton"; // Import a skeleton component
 import React from "react";
 
@@ -62,100 +56,82 @@ export default function Page() {
   }, [router]);
 
   return (
-    <>
-      <div className="p-4 lg:p-6 flex flex-col gap-6">
-        <div className="flex items-center">
-          <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
+    <div className="flex flex-col gap-4 h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center shrink-0">
+        <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
+      </div>
+
+      {/* KPI Strip - Primary Zone */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="p-4">
+              <Skeleton className="h-3 w-20 mb-2" />
+              <Skeleton className="h-7 w-16" />
+            </Card>
+          ))
+        ) : (
+          <>
+            <Card className="p-4 hover:shadow-md transition-shadow">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Total Aset Ternilai
+              </p>
+              <p className="text-2xl font-bold text-teal-600 mt-1">
+                {totalAssesedAset.toLocaleString()}
+              </p>
+            </Card>
+            <Card className="p-4 hover:shadow-md transition-shadow">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Total Data Pembanding
+              </p>
+              <p className="text-2xl font-bold text-teal-600 mt-1">
+                {totalAssesedData.toLocaleString()}
+              </p>
+            </Card>
+            <Card className="p-4 hover:shadow-md transition-shadow">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Total Valuasi Tahunan
+              </p>
+              <p className="text-2xl font-bold text-teal-600 mt-1">
+                {totalAnnualValuation.toLocaleString()}
+              </p>
+            </Card>
+            <Card className="p-4 hover:shadow-md transition-shadow">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Valuasi Tertinggi Bulanan
+              </p>
+              <p className="text-xl font-bold text-teal-600 mt-1">
+                {formatRupiah(maxMonthlyValuation)}
+              </p>
+            </Card>
+          </>
+        )}
+      </div>
+
+      {/* Charts Row - Secondary Zone */}
+      <div className="flex-1 flex gap-4 min-h-0">
+        {/* Bar Chart - 60% */}
+        <div className="flex-[60] min-w-0">
+          {loading ? (
+            <Card className="w-full h-full flex items-center justify-center">
+              <Skeleton className="w-full h-full" />
+            </Card>
+          ) : (
+            <BarChart data={monthlyData} />
+          )}
         </div>
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-full h-3/6 mb-6">
-            {loading ? (
-              <Skeleton className="w-full h-64" />
-            ) : (
-              <BarChart data={monthlyData} />
-            )}
-          </div>
-          <div className="flex-grow w-full mb-6">
-            <div className="flex justify-center gap-6 h-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                {/* Cards with Skeletons */}
-                {loading ? (
-                  Array.from({ length: 4 }).map((_, index) => (
-                    <Card key={index} className="flex flex-col p-6 shadow-md">
-                      <CardHeader>
-                        <Skeleton className="h-4 w-1/2 mb-2" />
-                      </CardHeader>
-                      <CardContent>
-                        <Skeleton className="h-10 w-1/2 mb-2" />
-                        <Skeleton className="h-4 w-3/4" />
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <>
-                    {/* Card for Total Aset Ternilai */}
-                    <Card className="flex flex-col items-center justify-center">
-                      <CardHeader className="flex items-center justify-center">
-                        <CardTitle>Total Aset Ternilai</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span className="text-2xl font-bold text-blue-600">
-                          {totalAssesedAset.toString()}
-                        </span>
-                      </CardContent>
-                    </Card>
-                    {/* Card for Total Data Pembanding */}
-                    <Card className="flex flex-col items-center justify-center">
-                      <CardHeader>
-                        <CardTitle>Total Data Pembanding</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span className="text-2xl font-bold text-blue-600">
-                          {totalAssesedData.toString()}
-                        </span>
-                      </CardContent>
-                    </Card>
-                    {/* Card for Total Valuasi Tahunan */}
-                    <Card className="flex flex-col items-center justify-center">
-                      <CardHeader>
-                        <CardTitle>Total Valuasi Tahunan</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span className="text-2xl font-bold text-blue-600">
-                          {totalAnnualValuation.toString()}
-                        </span>
-                      </CardContent>
-                    </Card>
-                    {/* Card for Valuasi Tertinggi Bulanan */}
-                    <Card className="flex flex-col items-center justify-center">
-                      <CardHeader>
-                        <CardTitle>Valuasi Tertinggi Bulanan</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span className="text-2xl font-bold text-blue-600">
-                          {formatRupiah(maxMonthlyValuation)}
-                        </span>
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-              </div>
-              <Card
-                className="flex justify-center items-center"
-                style={{ width: "35%" }}
-              >
-                {loading ? (
-                  <Skeleton className="w-full h-full" />
-                ) : (
-                  <CardContent className="flex items-center justify-center w-full h-full">
-                    <PieChart data={yearlyData} />
-                  </CardContent>
-                )}
-              </Card>
-            </div>
-          </div>
+        {/* Pie Chart - 40% */}
+        <div className="flex-[40] min-w-0">
+          {loading ? (
+            <Card className="w-full h-full flex items-center justify-center">
+              <Skeleton className="w-3/4 h-3/4" />
+            </Card>
+          ) : (
+            <PieChart data={yearlyData} />
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

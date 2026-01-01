@@ -17,8 +17,6 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 
 interface PieChartProps {
@@ -45,38 +43,54 @@ export function PieChart({ data }: PieChartProps) {
     new Date().getFullYear() - 2,
   ];
 
+  // Use teal color palette for consistency
   const chartData = data.map((value, index) => ({
     year: years[index],
     value,
-    fill: `hsl(var(--chart-${index + 1}))`,
+    fill: [
+      "hsl(173, 72%, 44%)",  // teal-500
+      "hsl(170, 73%, 70%)",  // teal-300
+      "hsl(167, 76%, 90%)",  // teal-100
+    ][index],
   }));
 
   return (
-    <div className="w-full">
-      <CardHeader>
-        <CardTitle>Pie Chart - Yearly Data</CardTitle>
-        <CardDescription>Yearly Data Summary</CardDescription>
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-2 shrink-0">
+        <CardTitle className="text-base">Yearly Valuation Comparison</CardTitle>
+        <CardDescription>Last 3 years performance</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 items-center justify-center">
+      <CardContent className="flex-1 flex items-center justify-center min-h-0 p-4">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="aspect-square h-full w-full"
         >
           <RePieChart>
-            <ReTooltip formatter={(value) => [`${value}`]} cursor={false} />
-            <Pie data={chartData} dataKey="value" cx="50%" cy="50%">
+            <ReTooltip
+              formatter={(value) => [`${Number(value).toLocaleString()}`]}
+              cursor={false}
+            />
+            <Pie
+              data={chartData}
+              dataKey="value"
+              cx="50%"
+              cy="50%"
+              innerRadius="35%"
+              outerRadius="70%"
+            >
               <LabelList
                 dataKey="year"
-                className="fill-background"
+                className="fill-foreground"
                 stroke="none"
                 fontSize={12}
+                fontWeight={600}
                 formatter={(value: number) => `${value}`}
               />
             </Pie>
           </RePieChart>
         </ChartContainer>
       </CardContent>
-    </div>
+    </Card>
   );
 }
 

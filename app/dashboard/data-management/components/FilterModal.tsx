@@ -103,7 +103,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
       <div className="bg-white p-6 rounded shadow-md w-full max-w-lg">
         <div className="flex justify-end items-center">
           <button
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-teal-600 hover:text-teal-800"
             onClick={handleClear}
           >
             CLEAR
@@ -183,7 +183,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
             CANCEL
           </Button>
           <Button
-            className="bg-green-600 hover:bg-green-800 text-white w-1/2"
+            variant="success"
+            className="w-1/2"
             onClick={handleApply}
           >
             APPLY

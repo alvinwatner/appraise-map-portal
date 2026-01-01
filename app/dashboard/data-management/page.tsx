@@ -244,9 +244,6 @@ const Page = () => {
         "objectType",
         "address",
         "phoneNumber",
-        // "coordinates",
-        "landArea",
-        "buildingArea",
         "totalValue",
       ],
     };
@@ -859,7 +856,7 @@ const Page = () => {
                   />
                   {(roleId == 1 || roleId == 2) && (
                     <Button
-                      className="bg-green-600 hover:bg-green-800 text-white"
+                      variant="success"
                       onClick={handleImportClick}
                     >
                       <BiImport className="mr-2" />
@@ -868,7 +865,7 @@ const Page = () => {
                   )}
                   {roleId == 1 && (
                     <Button
-                      className="bg-green-600 hover:bg-green-800 text-white"
+                      variant="success"
                       onClick={handleExportClick}
                     >
                       <PiExportBold className="mr-2" />
@@ -880,7 +877,7 @@ const Page = () => {
                   <div className="flex space-x-2">
                     {(roleId === 1 || roleId === 2) && !editMode && (
                       <Button
-                        className="bg-blue-600 hover:bg-blue-800 text-white"
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
                         onClick={() => handleEditSelected(true)}
                       >
                         <Pencil size={16} className="mr-2" />
@@ -890,7 +887,7 @@ const Page = () => {
                     {selectedProperty !== null && (
                       <div>
                         <Button
-                          className="bg-blue-600 hover:bg-blue-800 text-white"
+                          className="bg-teal-600 hover:bg-teal-700 text-white"
                           onClick={handleNavigateToMap}
                         >
                           GO TO MAP
@@ -901,7 +898,7 @@ const Page = () => {
                       <>
                         {editMode && (
                           <Button
-                            className="bg-green-600 hover:bg-green-800 text-white"
+                            variant="success"
                             onClick={handleSave}
                             disabled={isSubmitting}
                           >
@@ -921,7 +918,7 @@ const Page = () => {
                           </Button>
                         )}
                         <Button
-                          className="bg-red-600 hover:bg-red-800 text-white"
+                          variant="destructive"
                           onClick={handleDeleteConfirmation}
                         >
                           <Trash size={16} className="mr-2" />

@@ -111,7 +111,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
             CANCEL
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-800 text-white w-full"
+          variant='success'
             onClick={handleSave}
             disabled={isSaving}
           >

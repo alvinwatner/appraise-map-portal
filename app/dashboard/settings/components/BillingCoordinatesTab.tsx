@@ -10,7 +10,14 @@ import {
   IoCheckmarkCircleOutline,
   IoCloseCircleOutline,
 } from "react-icons/io5";
-import { Skeleton } from "@/components/ui/skeleton"; // Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import Loading from "@/app/components/Loading";
 
 export const BillingCoordinatesTab: React.FC = () => {
@@ -48,11 +55,11 @@ export const BillingCoordinatesTab: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Set loading to true when fetching data
+      setLoading(true);
       const result = await fetchSettingsData();
       console.log(`settingsData result = ${JSON.stringify(result)}`);
       setSettingsData(result);
-      setLoading(false); // Set loading to false after fetching data
+      setLoading(false);
     };
 
     fetchData();
@@ -72,70 +79,87 @@ export const BillingCoordinatesTab: React.FC = () => {
   };
 
   return (
-    <div className="relative p-8">
-      <div className="mb-4">
-        <label className="block text-xs">Maximum Billing</label>
-        {loading ? (
-          <Skeleton className="h-10" /> // Show skeleton while loading
-        ) : (
-          <Input
-            value={settingsData?.maxBilling?.toString() || ""}
-            onChange={(event) => {
-              handleOnChangeSettingsData("maxBilling", event.target.value);
-            }}
-            type="number"
-            placeholder="Enter Maximum Billing"
-          />
-        )}
-      </div>
-      <div className="mb-4">
-        <label className="block text-xs">Default Longtitude</label>
-        {loading ? (
-          <Skeleton className="h-10" />
-        ) : (
-          <Input
-            value={settingsData?.longitude?.toString() || ""}
-            onChange={(event) => {
-              handleOnChangeSettingsData("longitude", event.target.value);
-            }}
-            type="text"
-            placeholder="Enter Default Longtitude"
-          />
-        )}
-      </div>
-      <div className="mb-4">
-        <label className="block text-xs">Default Latitude</label>
-        {loading ? (
-          <Skeleton className="h-10" />
-        ) : (
-          <Input
-            value={settingsData?.latitude?.toString() || ""}
-            onChange={(event) => {
-              handleOnChangeSettingsData("latitude", event.target.value);
-            }}
-            type="text"
-            placeholder="Enter Default Latitude"
-          />
-        )}
-      </div>
-      <Button
-        className="bg-blue-600 hover:bg-blue-800 text-white w-full"
-        disabled={loading}
-        onClick={handleUpdateSettingsData}
-      >
-        {loading ? (
-          <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
-        ) : (
-          "SAVE"
-        )}
-      </Button>
+    <>
+      <CardHeader>
+        <CardTitle className="text-lg">Billing & Coordinates</CardTitle>
+        <CardDescription>
+          Configure billing limits and default map coordinates
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="maxBilling">Maximum Billing</Label>
+          {loading ? (
+            <Skeleton className="h-10" />
+          ) : (
+            <Input
+              id="maxBilling"
+              value={settingsData?.maxBilling?.toString() || ""}
+              onChange={(event) => {
+                handleOnChangeSettingsData("maxBilling", event.target.value);
+              }}
+              type="number"
+              placeholder="Enter Maximum Billing"
+            />
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="longitude">Default Longitude</Label>
+          {loading ? (
+            <Skeleton className="h-10" />
+          ) : (
+            <Input
+              id="longitude"
+              value={settingsData?.longitude?.toString() || ""}
+              onChange={(event) => {
+                handleOnChangeSettingsData("longitude", event.target.value);
+              }}
+              type="text"
+              placeholder="Enter Default Longitude"
+            />
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="latitude">Default Latitude</Label>
+          {loading ? (
+            <Skeleton className="h-10" />
+          ) : (
+            <Input
+              id="latitude"
+              value={settingsData?.latitude?.toString() || ""}
+              onChange={(event) => {
+                handleOnChangeSettingsData("latitude", event.target.value);
+              }}
+              type="text"
+              placeholder="Enter Default Latitude"
+            />
+          )}
+        </div>
+
+        <Button
+          variant="success"
+          className="w-full"
+          disabled={loading}
+          onClick={handleUpdateSettingsData}
+        >
+          {loading ? (
+            <Loading size="w-5 h-5" strokeWidth="border-2 border-t-2" />
+          ) : (
+            "Save Changes"
+          )}
+        </Button>
+      </CardContent>
+
       <ModalUpdateResult
         isOpen={modalInfo.isOpen}
         onClose={() => setModalInfo({ ...modalInfo, isOpen: false })}
         isSuccess={modalInfo.isSuccess}
         message={modalInfo.message}
       />
-    </div>
+    </>
   );
 };
 
@@ -151,13 +175,13 @@ const ModalUpdateResult: React.FC<{
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-5 mx-4 rounded-lg flex flex-col items-center">
         {isSuccess ? (
-          <IoCheckmarkCircleOutline size={48} color="green" />
+          <IoCheckmarkCircleOutline size={48} className="text-teal-600" />
         ) : (
-          <IoCloseCircleOutline size={48} color="red" />
+          <IoCloseCircleOutline size={48} className="text-destructive" />
         )}
         <p className="text-lg my-2">{message}</p>
         <Button className="mt-3" variant="outline" onClick={onClose}>
-          CLOSE
+          Close
         </Button>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton from shadcn-ui
+import { Card } from "@/components/ui/card";
 import { BillingCoordinatesTab } from "./components/BillingCoordinatesTab";
 import { UsersTab } from "./components/UsersTab";
 import AddUserModal from "./components/AddUserModal";
@@ -32,31 +32,37 @@ const SettingsPage: React.FC = () => {
           onSuccessCreateUser={refreshUsersTable}
         />
       )}
-      <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl">Settings</h1>
-      </div>
-      <div>
-        <div className="flex gap-4">
-          <div className="w-full border border-inherit rounded-lg shadow-lg">
-            <Tabs defaultValue="users">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="users">List Users</TabsTrigger>
-                <TabsTrigger value="billingCoordinates">
-                  Billing & Coordinates
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="users">
-                <UsersTab
-                  onAddUser={handleAddUser}
-                  refreshTrigger={refreshTrigger}
-                />
-              </TabsContent>
-              <TabsContent value="billingCoordinates">
-                <BillingCoordinatesTab />
-              </TabsContent>
-            </Tabs>
-          </div>
+
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-semibold">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage users, roles, and system configurations
+          </p>
         </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="users">
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="billingCoordinates">
+              Billing & Coordinates
+            </TabsTrigger>
+          </TabsList>
+
+          <Card className="mt-4">
+            <TabsContent value="users" className="mt-0">
+              <UsersTab
+                onAddUser={handleAddUser}
+                refreshTrigger={refreshTrigger}
+              />
+            </TabsContent>
+            <TabsContent value="billingCoordinates" className="mt-0">
+              <BillingCoordinatesTab />
+            </TabsContent>
+          </Card>
+        </Tabs>
       </div>
     </>
   );

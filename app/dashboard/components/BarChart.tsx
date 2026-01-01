@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   LabelList,
   XAxis,
+  Cell,
 } from "recharts";
 
 import {
@@ -40,8 +41,8 @@ const months = [
 
 export const chartConfig = {
   valuation: {
-    label: " ",
-    color: "hsl(var(--chart-1))",
+    label: "Valuation",
+    color: "hsl(var(--teal-500))",
   },
 } satisfies ChartConfig;
 
@@ -63,41 +64,67 @@ export function BarChart({ data }: { data: number[] }) {
     valuation: data[index] || 0,
   }));
 
+  // Find the peak month index
+  const peakIndex = data.reduce(
+    (maxIdx, val, idx, arr) => (val > arr[maxIdx] ? idx : maxIdx),
+    0
+  );
+
   return (
-    <Card className="w-full h-full">
-      <CardHeader>
-        <CardTitle>Bar Chart - Total Valuation</CardTitle>
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-2 shrink-0">
+        <CardTitle className="text-base">Total Valuation Performance</CardTitle>
         <CardDescription>
           January - December {new Date().getFullYear()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="w-full h-5/6">
+      <CardContent className="flex-1 min-h-0 pb-4">
         <ChartContainer config={chartConfig} className="w-full h-full">
           <ReBarChart
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 20,
+              top: 24,
+              right: 12,
+              left: 12,
+              bottom: 0,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(173, 72%, 44%)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="hsl(173, 72%, 44%)" stopOpacity={0.5} />
+              </linearGradient>
+              <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(175, 77%, 36%)" stopOpacity={1} />
+                <stop offset="100%" stopColor="hsl(175, 77%, 36%)" stopOpacity={0.7} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.3} />
             <XAxis
               dataKey="month"
               tickLine={false}
-              tickMargin={10}
+              tickMargin={8}
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
+              fontSize={11}
             />
             <ChartTooltip
-              cursor={false}
+              cursor={{ fill: "hsl(var(--teal-100))", opacity: 0.3 }}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="valuation" fill="var(--color-valuation)" radius={8}>
+            <Bar dataKey="valuation" radius={[4, 4, 0, 0]}>
+              {chartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={index === peakIndex ? "url(#barGradientPeak)" : "url(#barGradient)"}
+                />
+              ))}
               <LabelList
                 position="top"
-                offset={12}
+                offset={8}
                 className="fill-foreground"
-                fontSize={12}
+                fontSize={10}
                 formatter={(value: number) => formatValue(value as number)}
               />
             </Bar>

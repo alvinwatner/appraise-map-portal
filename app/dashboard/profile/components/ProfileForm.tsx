@@ -171,7 +171,8 @@ export const ProfileForm: React.FC = () => {
                 </div>
                 <Button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-800 text-white w-full"
+                  variant="success"
+                  className="w-full"
                   disabled={loading}
                 >
                   {loading ? (
