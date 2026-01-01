@@ -63,23 +63,27 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
 
   const headers = [
     { label: "Jenis Data", field: "propertiesType", sortable: false },
-    { label: "No. Laporan", field: "reportNumber", sortable: false },
-    { label: "Tanggal Penilaian", field: "valuationDate", sortable: false },
-    { label: "Penilai", field: "appraiser", sortable: false },
+    { label: "Delete", field: "reportNumber", sortable: false },
+    { label: "Tanggal Input", field: "valuationDate", sortable: false },
+    { label: "Sumber Data", field: "appraiser", sortable: false },
     { label: "Jenis Objek", field: "objectType", sortable: false },
     { label: "Koordinat", field: "locations(latitude)", sortable: false },
-    { label: "Nama Debitor", field: "debitur", sortable: false },
+    { label: "Delete", field: "debitur", sortable: false },
     { label: "Nomor Tlp", field: "phoneNumber", sortable: false },
-    { label: "Alamat", field: "locations(address)", sortable: false },
+    { label: "Tipe Data", field: "aaa", sortable: false },
+    { label: "Desa", field: "locations(address)", sortable: false },
+    { label: "Kecamatan", field: "desa", sortable: false },
+    { label: "Kabupaten", field: "kabupaten", sortable: false },
+    { label: "Provinsi", field: "provinsi", sortable: false },
     { label: "Luas Tanah", field: "landArea", sortable: true },
     { label: "Luas Bangunan", field: "buildingArea", sortable: true },
-    { label: "Nilai Tanah / Meter", field: "landValue", sortable: true },
+    { label: "Indikasi Nilai Tanah", field: "landValue", sortable: true },
     {
-      label: "Nilai Bangunan / Meter",
+      label: "Indikasi Nilai Bangunan",
       field: "buildingValue",
       sortable: true,
     },
-    { label: "Nilai", field: "totalValue", sortable: true },
+    { label: "Indikasi Harga Penawaran", field: "totalValue", sortable: true },
   ];
 
   const renderSortIcon = (field: string) => {
@@ -524,6 +528,10 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
                       </TableCell>
                       <TableCell>{item.debitur ?? "-"}</TableCell>
                       <TableCell>{item.phoneNumber ?? "-"}</TableCell>
+                      <TableCell>{"-"}</TableCell>
+                      <TableCell>{"-"}</TableCell>
+                      <TableCell>{"-"}</TableCell>
+                      <TableCell>{"-"}</TableCell>
                       <TableCell>{item.locations?.address ?? "-"}</TableCell>
                       <TableCell>{item.landArea ?? "-"}</TableCell>
                       <TableCell>{item.buildingArea ?? "-"}</TableCell>

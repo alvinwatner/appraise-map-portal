@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Import usePathname
-import { Bell, CircleUser, Home, Menu, MapPin, Database } from "lucide-react";
+import { Bell, CircleUser, Home, Menu, MapPin, Database, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -135,7 +136,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 height={60}
               />
             </Link>
-            <h3 className="text-sm">MAPPI Sumbagut</h3>
+            <h3 className="text-sm">Paramita Konsultan</h3>
           </div>
 
           {/* Navigation Links */}
@@ -173,6 +174,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               >
                 <MapPin className="h-4 w-4" />
                 Maps
+              </Link>
+              <Link
+                href="/dashboard/documents"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  pathname?.startsWith("/dashboard/documents")
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <FileText className="h-4 w-4" />
+                Dokumen
+                <Badge variant="secondary" className="ml-auto text-xs">Beta</Badge>
               </Link>
             </nav>
           </div>
@@ -237,6 +250,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 >
                   <MapPin className="h-4 w-4" />
                   Maps
+                </Link>
+                <Link
+                  href="/dashboard/documents"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    pathname?.startsWith("/dashboard/documents")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  Dokumen
+                  <Badge variant="secondary" className="ml-auto text-xs">Beta</Badge>
                 </Link>
               </nav>
             </SheetContent>
