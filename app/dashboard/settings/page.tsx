@@ -33,7 +33,7 @@ const SettingsPage: React.FC = () => {
         />
       )}
 
-      <div className="space-y-6">
+      <div className="p-4 md:p-6 lg:p-8 space-y-6">
         {/* Page Header */}
         <div>
           <h1 className="text-2xl font-semibold">Settings</h1>

@@ -56,7 +56,7 @@ export default function Page() {
   }, [router]);
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-hidden">
+    <div className="p-4 lg:p-6 flex flex-col gap-4 h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center shrink-0">
         <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
