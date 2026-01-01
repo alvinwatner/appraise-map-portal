@@ -1,37 +1,97 @@
-// components/PieChart.tsx
-import React from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, Tooltip, Legend, ArcElement, Title } from "chart.js";
+"use client";
 
-ChartJS.register(Tooltip, Legend, ArcElement, Title);
+import {
+  LabelList,
+  Pie,
+  PieChart as RePieChart,
+  Tooltip as ReTooltip,
+} from "recharts";
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "bottom" as const,
-    },
-    title: {
-      display: true,
-      text: "Annual Asset Valuation Summary for the Past Three Years",
-    },
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+} from "@/components/ui/chart";
+
+interface PieChartProps {
+  data: number[];
+}
+
+// Dynamic chart configuration
+const chartConfig: ChartConfig = {
+  currentYear: {
+    label: new Date().getFullYear().toString(),
   },
-};
+  lastYear: {
+    label: (new Date().getFullYear() - 1).toString(),
+  },
+  twoYearsAgo: {
+    label: (new Date().getFullYear() - 2).toString(),
+  },
+} satisfies ChartConfig;
 
-const PieChart: React.FC<{ data: number[] }> = ({ data }) => {
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear, currentYear - 1, currentYear - 2];
-  const chartData = {
-    labels: years,
-    datasets: [
-      {
-        data: data,
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-        hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      },
-    ],
-  };
-  return <Pie data={chartData} options={options} />;
-};
+export function PieChart({ data }: PieChartProps) {
+  const years = [
+    new Date().getFullYear(),
+    new Date().getFullYear() - 1,
+    new Date().getFullYear() - 2,
+  ];
+
+  // Use teal color palette for consistency
+  const chartData = data.map((value, index) => ({
+    year: years[index],
+    value,
+    fill: [
+      "hsl(173, 72%, 44%)",  // teal-500
+      "hsl(170, 73%, 70%)",  // teal-300
+      "hsl(167, 76%, 90%)",  // teal-100
+    ][index],
+  }));
+
+  return (
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-2 shrink-0">
+        <CardTitle className="text-base">Yearly Valuation Comparison</CardTitle>
+        <CardDescription>Last 3 years performance</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 flex items-center justify-center min-h-0 p-4">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-square h-full w-full"
+        >
+          <RePieChart>
+            <ReTooltip
+              formatter={(value) => [`${Number(value).toLocaleString()}`]}
+              cursor={false}
+            />
+            <Pie
+              data={chartData}
+              dataKey="value"
+              cx="50%"
+              cy="50%"
+              innerRadius="35%"
+              outerRadius="70%"
+            >
+              <LabelList
+                dataKey="year"
+                className="fill-foreground"
+                stroke="none"
+                fontSize={12}
+                fontWeight={600}
+                formatter={(value: number) => `${value}`}
+              />
+            </Pie>
+          </RePieChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default PieChart;

@@ -15,7 +15,7 @@ export const AreaInput: React.FC<AreaInputProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex items-center ring-2 ring-[#D9D9D9] rounded-lg">
+      <div className="flex items-center rounded-md ring-1 ring-gray-200">
         <input
           className="w-full pl-2 py-2 text-left text-sm rounded-lg outline-none"
           type="text"

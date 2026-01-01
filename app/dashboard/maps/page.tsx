@@ -46,7 +46,16 @@ import {
 } from "react-icons/io5";
 import { BsSliders } from "react-icons/bs";
 import { FiPlus, FiX } from "react-icons/fi";
+import { HiOutlineSearch } from "react-icons/hi";
 import FilterModal from "../data-management/components/FilterModal";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 enum LeftWhiteSheetComponent {
   markerDetail,
@@ -93,6 +102,7 @@ export default function Page() {
   );
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
+  const [isPropertySearchOpen, setIsPropertySearchOpen] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapRef = useRef<any>();
 
@@ -400,87 +410,147 @@ export default function Page() {
         <div className="fixed inset-0 bg-black bg-opacity-25 pointer-events-none z-10"></div>
       )}
 
+      {/* Desktop: Left side panel for property details, search results, add/edit forms */}
       {isShowLeftWhiteSheet && (
         <div
-          className={`absolute top-0 h-full overflow-auto bg-white w-[380px] ${
+          className={`hidden lg:block absolute top-0 h-full overflow-auto bg-white w-[380px] ${
             leftWhiteSheetComponent == LeftWhiteSheetComponent.searchResult
               ? "z-20 pt-20"
               : "z-50 pt-0"
-          }   `}
+          }`}
         >
           {renderLeftWhiteSheetComponent()}
         </div>
       )}
 
-      <div
-        className={`absolute top-0 left-8 z-30 p-4 ${
-          isShowLeftWhiteSheet && "bg-white"
-        }`}
-      >
-        <div className="relative w-72 h-10">
-          <div className=""></div>
-          <Search
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!searchParams.get("search")?.trim()) {
-                return;
-              }
+      {/* Mobile: Bottom sheet for property details, add/edit forms (not search - that's handled separately) */}
+      {isShowLeftWhiteSheet && leftWhiteSheetComponent !== LeftWhiteSheetComponent.searchResult && (
+        <Sheet open={true} onOpenChange={(open) => {
+          if (!open) {
+            setLeftWhiteSheet(false);
+            setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+          }
+        }}>
+          <SheetContent side="bottom" className="lg:hidden h-[90vh] rounded-t-2xl overflow-auto p-0">
+            {renderLeftWhiteSheetComponent()}
+          </SheetContent>
+        </Sheet>
+      )}
 
-              setLeftWhiteSheet(true);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.searchResult);
-            }}
-          />
-
-          <button
-            onClick={() => {
-              setLeftWhiteSheet(false);
-              setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
-            }}
-          >
-            {leftWhiteSheetComponent ==
-              LeftWhiteSheetComponent.searchResult && (
-              <IoClose
-                className="absolute right-3 top-2 "
-                color="grey"
-                size={21}
-              />
-            )}
-          </button>
-        </div>
-      </div>
-
-      <div className="absolute top-0 left-96 z-30 p-4 w-1/3">
-        <Autocomplete
-          onLoad={onLoad}
-          onPlaceChanged={onPlaceChanged}
-          options={{ types: ["address"] }}
-        >
-          <div className="relative w-full ">
-            <input
-              className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
-              type="text"
-              placeholder="       Search Address"
-            />
-            <IoSearchOutline className="absolute left-2 top-2 " color="grey" />
+      {/* Search Controls - Responsive Layout */}
+      <div className="absolute top-0 left-0 right-0 z-30 p-3 lg:p-4">
+        <div className="flex flex-col lg:flex-row gap-2 lg:gap-3 lg:items-center">
+          {/* Address Search - Always visible at top (like Google Maps) */}
+          <div className="flex-1 lg:flex-none lg:w-72">
+            <Autocomplete
+              onLoad={onLoad}
+              onPlaceChanged={onPlaceChanged}
+              options={{ types: ["address"] }}
+            >
+              <div className="relative w-full">
+                <input
+                  className="w-full pl-10 pr-4 py-2.5 placeholder:text-sm placeholder:text-gray-400 rounded-lg bg-white shadow-md ring-1 ring-gray-200 focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  type="text"
+                  placeholder="Search location..."
+                />
+                <IoSearchOutline className="absolute left-3 top-3 text-gray-400" size={18} />
+              </div>
+            </Autocomplete>
           </div>
-        </Autocomplete>
-      </div>
 
-      <button
-        className="absolute top-[15px] left-[750px] z-50 w-24 h-9 bg-white  rounded-md ring-1  ring-gray-400 hover:ring-gray-900 hover:ring-2"
-        onClick={() => setShowFilterModal(true)}
-      >
-        <div className="relative w-full h-full flex items-center justify-center">
-          <>
+          {/* Desktop: Property Search inline */}
+          <div
+            className={`hidden lg:block ${
+              isShowLeftWhiteSheet ? "bg-white rounded-lg" : ""
+            }`}
+          >
+            <div className="relative w-72 h-10">
+              <Search
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!searchParams.get("search")?.trim()) {
+                    return;
+                  }
+                  setLeftWhiteSheet(true);
+                  setLeftWhiteSheetComponent(LeftWhiteSheetComponent.searchResult);
+                }}
+              />
+              <button
+                onClick={() => {
+                  setLeftWhiteSheet(false);
+                  setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+                }}
+              >
+                {leftWhiteSheetComponent === LeftWhiteSheetComponent.searchResult && (
+                  <IoClose className="absolute right-3 top-2" color="grey" size={21} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: Filter button inline */}
+          <button
+            className="hidden lg:flex items-center justify-center w-24 h-10 bg-white rounded-lg shadow-md ring-1 ring-gray-200 hover:ring-teal-500 hover:ring-2 transition-all"
+            onClick={() => setShowFilterModal(true)}
+          >
             <BsSliders className="mr-2" />
-
             <p className="text-sm">Filter</p>
-          </>
+          </button>
+
+          {/* Mobile: Property Search & Filter buttons */}
+          <div className="flex lg:hidden gap-2">
+            {/* Property Search Button - Opens Bottom Sheet */}
+            <Sheet open={isPropertySearchOpen} onOpenChange={setIsPropertySearchOpen}>
+              <SheetTrigger asChild>
+                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-md ring-1 ring-gray-200 hover:ring-teal-500 transition-all">
+                  <HiOutlineSearch className="text-gray-500" size={18} />
+                  <span className="text-sm text-gray-600">Search Property</span>
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
+                <SheetHeader className="pb-4">
+                  <SheetTitle>Search Property</SheetTitle>
+                </SheetHeader>
+                <div className="relative">
+                  <Search
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      // Keep sheet open - results show automatically as user types
+                    }}
+                  />
+                </div>
+                {/* Search Results in Bottom Sheet - Show as user types */}
+                {searchParams.get("search")?.trim() && (
+                  <div className="mt-4 overflow-auto h-[calc(85vh-140px)]">
+                    <SearchResult
+                      query={searchParams.get("search")?.toString() ?? ""}
+                      onDetailClicked={(property: Property) => {
+                        setIsPropertySearchOpen(false);
+                        handleShowMarkerDetail(property);
+                      }}
+                      onNavigateClicked={(lat, lng) => {
+                        setIsPropertySearchOpen(false);
+                        setLeftWhiteSheet(false);
+                        setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
+                        mapRef.current.setMapCenter(lat, lng);
+                      }}
+                    />
+                  </div>
+                )}
+              </SheetContent>
+            </Sheet>
+
+            {/* Mobile Filter Button */}
+            <button
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white rounded-lg shadow-md ring-1 ring-gray-200 hover:ring-teal-500 transition-all"
+              onClick={() => setShowFilterModal(true)}
+            >
+              <BsSliders className="text-gray-500" size={16} />
+              <span className="text-sm text-gray-600">Filter</span>
+            </button>
+          </div>
         </div>
-      </button>
-
-
-      
+      </div>
 
       <GoogleMaps
         initLatitude={initLat ?? 5.531881}
@@ -497,7 +567,7 @@ export default function Page() {
       {/* Floating action button */}
       {(userData?.RoleId == 1 || userData?.RoleId == 2) && (
         <button
-          className={`fixed bottom-10 right-10 z-50 p-4 rounded-full ${
+          className={`fixed bottom-6 right-4 lg:bottom-10 lg:right-10 z-50 p-3 lg:p-4 rounded-full shadow-lg ${
             isAdding
               ? "bg-white cursor-pointer ring-2 ring-black"
               : "bg-yellow-400"
@@ -506,9 +576,9 @@ export default function Page() {
           style={{ cursor: "pointer", outline: "none" }}
         >
           {isAdding ? (
-            <FiX className="text-3xl text-gray-800" />
+            <FiX className="text-2xl lg:text-3xl text-gray-800" />
           ) : (
-            <FiPlus className="text-3xl text-black" />
+            <FiPlus className="text-2xl lg:text-3xl text-black" />
           )}
         </button>
       )}
@@ -547,12 +617,9 @@ const ModalUpdateResult: React.FC<{
           <IoCloseCircleOutline size={48} color="red" />
         )}
         <p className="text-lg my-2">{message}</p>
-        <button
-          className="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={onClose}
-        >
-          Close
-        </button>
+        <Button className="mt-3" variant="outline" onClick={onClose}>
+          CLOSE
+        </Button>
       </div>
     </div>
   );

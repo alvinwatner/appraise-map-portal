@@ -1,14 +1,13 @@
 "use client";
 
-import Loading from "@/app/components/Loading"
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { BillingCoordinatesTab } from "./components/BillingCoordinatesTab";
 import { UsersTab } from "./components/UsersTab";
 import AddUserModal from "./components/AddUserModal";
 
 const SettingsPage: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("users");
   const [isModalOpen, setModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -33,50 +32,37 @@ const SettingsPage: React.FC = () => {
           onSuccessCreateUser={refreshUsersTable}
         />
       )}
-      <div className="m-10">
-        <h1 className="text-3xl font-semibold mt-4">
-          {activeTab === "users" ? "List Users" : "Billing & Coordinates"}
-        </h1>
-        <div className="flex gap-4">
-          <div className="w-1/5 mt-10">
-            <nav className="flex flex-col space-y-2">
-              <button
-                className={`p-2 text-left ${
-                  activeTab === "users"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-700"
-                } rounded-md`}
-                onClick={() => setActiveTab("users")}
-              >
-                List Users
-              </button>
-              <button
-                className={`p-2 text-left ${
-                  activeTab === "billingCoordinates"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-700"
-                } rounded-md`}
-                onClick={() => setActiveTab("billingCoordinates")}
-              >
-                Billing & Coordinates
-              </button>
-            </nav>
-          </div>
-          <div className="w-4/5 border border-inherit mt-10 rounded-lg shadow-lg">
-            {loading ? (
-              <Loading size="w-16 h-16" strokeWidth="border-4 border-t-4" />
-            ) : (
-              <div>
-                {activeTab === "users" && (
-                  <UsersTab onAddUser={handleAddUser} refreshTrigger={refreshTrigger} />
-                )}
-                {activeTab === "billingCoordinates" && (
-                  <BillingCoordinatesTab />
-                )}
-              </div>
-            )}
-          </div>
+
+      <div className="p-4 md:p-6 lg:p-8 space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-semibold">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage users, roles, and system configurations
+          </p>
         </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="users">
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="billingCoordinates">
+              Billing & Coordinates
+            </TabsTrigger>
+          </TabsList>
+
+          <Card className="mt-4">
+            <TabsContent value="users" className="mt-0">
+              <UsersTab
+                onAddUser={handleAddUser}
+                refreshTrigger={refreshTrigger}
+              />
+            </TabsContent>
+            <TabsContent value="billingCoordinates" className="mt-0">
+              <BillingCoordinatesTab />
+            </TabsContent>
+          </Card>
+        </Tabs>
       </div>
     </>
   );

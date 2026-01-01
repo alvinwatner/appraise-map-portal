@@ -1,39 +1,31 @@
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+  Bar,
+  BarChart as ReBarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  Cell,
+} from "recharts";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
-export const options = {
-  responsive: true,
-
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-    title: {
-      display: true,
-      text: "Monthly Asset Valuation Totals for 2024",
-    },
-  },
-};
-
-const labels = [
+// List of months to be used for labels
+const months = [
   "January",
   "February",
   "March",
@@ -48,18 +40,111 @@ const labels = [
   "December",
 ];
 
-export const BarChart: React.FC<{ data: number[] }> = ({ data }) => {
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: "Total Valuation",
-        data: data,
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
-  };
-  return <Bar options={options} data={chartData} />;
+export const chartConfig = {
+  valuation: {
+    label: "Valuation",
+    color: "hsl(var(--teal-500))",
+  },
+} satisfies ChartConfig;
+
+// Utility function to format numbers with K and M
+const formatValue = (value: number): string => {
+  if (value >= 1_000_000) {
+    return `${Math.round(value / 1_000_000).toLocaleString()}M`; // Millions
+  } else if (value >= 1_000) {
+    return `${Math.round(value / 1_000).toLocaleString()}K`; // Thousands
+  }
+  return `${value.toLocaleString()}`; // Below 1K
 };
+
+// Modify BarChart to accept dynamic data through props
+export function BarChart({ data }: { data: number[] }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Create chartData dynamically by combining months with valuation data
+  const chartData = months.map((month, index) => ({
+    month,
+    valuation: data[index] || 0,
+  }));
+
+  // Find the peak month index
+  const peakIndex = data.reduce(
+    (maxIdx, val, idx, arr) => (val > arr[maxIdx] ? idx : maxIdx),
+    0
+  );
+
+  return (
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-2 shrink-0">
+        <CardTitle className="text-base">Total Valuation Performance</CardTitle>
+        <CardDescription>
+          January - December {new Date().getFullYear()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 min-h-0 pb-4">
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <ReBarChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              top: 24,
+              right: 12,
+              left: 12,
+              bottom: 0,
+            }}
+          >
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(173, 72%, 44%)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="hsl(173, 72%, 44%)" stopOpacity={0.5} />
+              </linearGradient>
+              <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(175, 77%, 36%)" stopOpacity={1} />
+                <stop offset="100%" stopColor="hsl(175, 77%, 36%)" stopOpacity={0.7} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.3} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={8}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+              fontSize={11}
+            />
+            <ChartTooltip
+              cursor={{ fill: "hsl(var(--teal-100))", opacity: 0.3 }}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="valuation" radius={[4, 4, 0, 0]}>
+              {chartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={index === peakIndex ? "url(#barGradientPeak)" : "url(#barGradient)"}
+                />
+              ))}
+              {!isMobile && (
+                <LabelList
+                  position="top"
+                  offset={8}
+                  className="fill-foreground"
+                  fontSize={10}
+                  formatter={(value: number) => formatValue(value as number)}
+                />
+              )}
+            </Bar>
+          </ReBarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default BarChart;

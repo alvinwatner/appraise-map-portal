@@ -1,5 +1,12 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import React from "react";
-
 
 export const PropertyTableSkeleton: React.FC = () => {
   const skeletonHeaders = [
@@ -18,34 +25,36 @@ export const PropertyTableSkeleton: React.FC = () => {
     "Nilai",
   ];
 
+  const tableWidthPercentage = 100 - 26;
+
   return (
-    <div className="mt-10 w-[75vw]">
+    <div className="mt-6" style={{ width: `${tableWidthPercentage}vw` }}>
       <div className="overflow-x-auto">
-        <table className="w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+        <Table className="w-full bg-white border border-gray-200">
+          <TableHeader>
+            <TableRow className="bg-gray-100 uppercase text-sm leading-normal">
               {skeletonHeaders.map((header) => (
-                <th
+                <TableHead
                   key={header}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   {header}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+            </TableRow>
+          </TableHeader>
+          <TableBody className="bg-white divide-y divide-gray-200">
             {Array.from({ length: 10 }).map((_, index) => (
-              <tr key={index} className="animate-pulse">
+              <TableRow key={index} className="animate-pulse">
                 {Array.from({ length: skeletonHeaders.length }).map((_, i) => (
-                  <td key={i} className="px-6 py-4 whitespace-nowrap">
+                  <TableCell key={i} className="px-6 py-4 whitespace-nowrap">
                     <div className="h-4 bg-gray-300 rounded w-full"></div>
-                  </td>
+                  </TableCell>
                 ))}
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

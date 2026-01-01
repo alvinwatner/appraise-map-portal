@@ -30,6 +30,19 @@ import FeedbackModal from "./components/FeedbackModal";
 import { PropertyTableSkeleton } from "./components/PropertyTableSkeleton";
 import { Pagination } from "./components/Pagination";
 import { ConfirmationModal } from "./components/ConfirmationModal";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Filter, Pencil, PencilIcon, Save, Trash } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
@@ -213,21 +226,6 @@ const Page = () => {
     setShowImportModal(false);
   };
 
-  const parseAndFormatFloat = (
-    value: string | null | undefined
-  ): number | null => {
-    if (value == null) return null;
-    const cleanedValue = value.replace(/[.,]/g, "");
-
-    const floatValue = parseFloat(cleanedValue);
-
-    if (isNaN(floatValue)) {
-      throw new Error(`Invalid number format for value: ${value}`);
-    }
-
-    return floatValue;
-  };
-
   const validateRow = (row: RowData, dataType: string): boolean => {
     const requiredFields: { [key: string]: (keyof RowData)[] } = {
       aset: [
@@ -246,15 +244,11 @@ const Page = () => {
         "objectType",
         "address",
         "phoneNumber",
-        // "coordinates",
-        "landArea",
-        "buildingArea",
         "totalValue",
       ],
     };
 
     const missingFields: string[] = [];
-
 
     requiredFields[dataType].forEach((field) => {
       const value = row[field];
@@ -274,7 +268,7 @@ const Page = () => {
   };
 
   const handleImportData = async (jsonData: RowData[], dataType: string) => {
-    console.log(`Importing data`)
+    console.log(`Importing data`);
     setLoading(true);
     try {
       if (dataType === "aset") {
@@ -296,7 +290,7 @@ const Page = () => {
       setFeedbackType("success");
       setIsFeedbackModalOpen(true);
     } catch (error: any) {
-      console.log(`error import data = ${error}`)
+      console.log(`error import data = ${error}`);
       console.error("Error handling import data:", error);
       setFeedbackMessage("Import failed! " + error.message);
       setFeedbackType("error");
@@ -313,48 +307,51 @@ const Page = () => {
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountProperties = (dataProperties?.length && dataProperties[0]?.id) || 0;
-  
+
+      const totalCountProperties =
+        (dataProperties?.length && dataProperties[0]?.id) || 0;
+
       if (errorProperties) {
         throw errorProperties;
       }
-  
+
       const { data: dataValuations, error: errorValuations } = await supabase
         .from("valuations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountValuations = (dataValuations?.length && dataValuations[0]?.id) || 0;
-  
+
+      const totalCountValuations =
+        (dataValuations?.length && dataValuations[0]?.id) || 0;
+
       if (errorValuations) {
         throw errorValuations;
       }
-  
+
       const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountLocations = (dataLocations?.length && dataLocations[0]?.id) || 0;
-  
+
+      const totalCountLocations =
+        (dataLocations?.length && dataLocations[0]?.id) || 0;
+
       if (errorLocations) {
         throw errorLocations;
       }
-  
+
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
         validateRow(item, "aset");
-  
+
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: totalCountLocations + i + 1,
           address: item.address,
           coordinate: `POINT(${coordinatesArray?.[1]} ${coordinatesArray?.[0]})`,
         };
-  
+
         const formattedDataProperties = {
           id: totalCountProperties + i + 1,
           debitur: item.debitur,
@@ -366,14 +363,14 @@ const Page = () => {
           propertiesType: "aset",
           UserId: user?.id,
         };
-  
+
         const formattedValuationDate =
           typeof item.valuationDate === "string"
             ? item.valuationDate.includes("/")
               ? item.valuationDate.split("/").reverse().join("-")
               : item.valuationDate
             : null;
-  
+
         const formattedDataValuations = {
           id: totalCountValuations + i + 1,
           PropertyId: formattedDataProperties.id,
@@ -384,27 +381,27 @@ const Page = () => {
           totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
-  
+
         const insertLocations = await supabase
           .from("locations")
           .insert([formattedDataLocations])
           .select();
-  
+
         const insertProperties = await supabase
           .from("properties")
           .insert([formattedDataProperties])
           .select();
-  
+
         const insertValuations = await supabase
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
-  
+
         const error =
           insertProperties.error ||
           insertValuations.error ||
           insertLocations.error;
-  
+
         if (error) {
           throw error;
         }
@@ -421,41 +418,44 @@ const Page = () => {
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountProperties = (dataProperties?.length && dataProperties[0]?.id) || 0;
-  
+
+      const totalCountProperties =
+        (dataProperties?.length && dataProperties[0]?.id) || 0;
+
       if (errorProperties) {
         throw errorProperties;
       }
-  
+
       const { data: dataValuations, error: errorValuations } = await supabase
         .from("valuations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountValuations = (dataValuations?.length && dataValuations[0]?.id) || 0;
-  
+
+      const totalCountValuations =
+        (dataValuations?.length && dataValuations[0]?.id) || 0;
+
       if (errorValuations) {
         throw errorValuations;
       }
-  
+
       const { data: dataLocations, error: errorLocations } = await supabase
         .from("locations")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
-  
-      const totalCountLocations = (dataLocations?.length && dataLocations[0]?.id) || 0;
-  
+
+      const totalCountLocations =
+        (dataLocations?.length && dataLocations[0]?.id) || 0;
+
       if (errorLocations) {
         throw errorLocations;
       }
-  
+
       for (let i = 0; i < jsonData.length; i++) {
         const item = jsonData[i];
         validateRow(item, "data");
-  
+
         const coordinatesArray = item.coordinates?.split(",").map(Number);
         const formattedDataLocations = {
           id: totalCountLocations + i + 1,
@@ -464,7 +464,7 @@ const Page = () => {
             ? `POINT(${coordinatesArray[1]} ${coordinatesArray[0]})`
             : null, // Allow nullable coordinate
         };
-  
+
         const formattedDataProperties = {
           id: totalCountProperties + i + 1,
           propertiesType: "data",
@@ -476,45 +476,45 @@ const Page = () => {
           objectType: item.objectType,
           UserId: user?.id,
         };
-  
+
         const formattedValuationDate =
           typeof item.valuationDate === "string"
             ? item.valuationDate.includes("/")
               ? item.valuationDate.split("/").reverse().join("-")
               : item.valuationDate
             : null;
-  
+
         const formattedDataValuations = {
           id: totalCountValuations + i + 1,
           PropertyId: formattedDataProperties.id,
           reportNumber: item.reportNumber,
           valuationDate: formattedValuationDate,
           buildingValue: item.buildingValue || null, // Allow nullable values
-          landValue: item.landValue || null,         // Allow nullable values
+          landValue: item.landValue || null, // Allow nullable values
           totalValue: item.totalValue,
           appraiser: item.appraiser,
         };
-  
+
         const insertLocations = await supabase
           .from("locations")
           .insert([formattedDataLocations])
           .select();
-  
+
         const insertProperties = await supabase
           .from("properties")
           .insert([formattedDataProperties])
           .select();
-  
+
         const insertValuations = await supabase
           .from("valuations")
           .insert([formattedDataValuations])
           .select();
-  
+
         const error =
           insertProperties.error ||
           insertValuations.error ||
           insertLocations.error;
-  
+
         if (error) {
           throw error;
         }
@@ -523,8 +523,6 @@ const Page = () => {
       throw new Error(error.message || "Failed to import data");
     }
   };
-  
-  
 
   const searchParams = useSearchParams();
   const currentPage = parseInt(searchParams?.get("page") as string) || 1;
@@ -621,10 +619,8 @@ const Page = () => {
     replace(`?search=${query}&page=${page}&perPage=${itemsPerPage}`);
   };
 
-  const handleItemsPerPageChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newPerPage = parseInt(event.target.value);
+  const handleItemsPerPageChange = (newPerPage: number) => {
+    // Assuming you're using a replace function for URL handling
     replace(`?search=${query}&page=1&perPage=${newPerPage}`);
   };
 
@@ -680,6 +676,7 @@ const Page = () => {
         return newEditedValuations;
       });
     }
+
     const newEditedData = new Map(editedData);
     const editedItem = newEditedData.get(id) || {};
     editedItem[field] = value;
@@ -693,6 +690,7 @@ const Page = () => {
     setError(null);
 
     try {
+      console.log(editedData);
       for (const [id, changes] of Array.from(editedData.entries())) {
         await updateProperty(id, changes);
       }
@@ -834,236 +832,215 @@ const Page = () => {
 
   return (
     <>
-      <div className="m-10">
-        <h1 className="text-3xl font-semibold mt-4">Data Management</h1>
-        {error && (
-          <div className="bg-red-500 text-white p-4 rounded mt-4">{error}</div>
-        )}
-        <div className="border border-inherit min-h-96 mt-10 rounded-lg shadow-lg">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-4 ">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="px-4 py-2 border rounded btn-rounded"
-                  value={search}
-                  onChange={handleSearchChange}
-                  onKeyPress={handleSearchKeyPress}
-                />
-                {(roleId == 1 || roleId == 2) && (
-                  <button
-                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    style={{ backgroundColor: "#20744A" }}
-                    onClick={handleImportClick}
-                  >
-                    <BiImport className="mr-2" />
-                    Import
-                  </button>
-                )}
-                {roleId == 1 && (
-                  <button
-                    className="text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    style={{ backgroundColor: "#20744A" }}
-                    onClick={handleExportClick}
-                  >
-                    <PiExportBold className="mr-2" />
-                    Export
-                  </button>
-                )}
-              </div>
-              <div className="flex space-x-2">
-                <div className="flex space-x-2">
+      <div className="p-4 lg:p-6 flex flex-col gap-6">
+        <div className="flex items-center">
+          <h1 className="text-lg font-semibold md:text-2xl">Data Management</h1>
+        </div>
+
+        <Card>
+          <CardContent>
+            <div className="w-full pt-8">
+              {error && (
+                <div className="bg-red-600 text-white p-4 rounded mb-4">
+                  {error}
+                </div>
+              )}
+              <div className="flex flex-col gap-3 mb-4 lg:flex-row lg:justify-between lg:items-center">
+                {/* Search and Import/Export */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={handleSearchChange}
+                    onKeyPress={handleSearchKeyPress}
+                    className="w-full sm:w-auto sm:min-w-[200px]"
+                  />
+                  <div className="flex gap-2">
+                    {(roleId == 1 || roleId == 2) && (
+                      <Button
+                        variant="success"
+                        onClick={handleImportClick}
+                        className="flex-1 sm:flex-none"
+                      >
+                        <BiImport className="sm:mr-2" />
+                        <span className="hidden sm:inline">IMPORT</span>
+                      </Button>
+                    )}
+                    {roleId == 1 && (
+                      <Button
+                        variant="success"
+                        onClick={handleExportClick}
+                        className="flex-1 sm:flex-none"
+                      >
+                        <PiExportBold className="sm:mr-2" />
+                        <span className="hidden sm:inline">EXPORT</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
                   {(roleId === 1 || roleId === 2) && !editMode && (
-                    <button
-                      className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
+                    <Button
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
                       onClick={() => handleEditSelected(true)}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="1em"
-                        height="1em"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"
-                        ></path>
-                      </svg>
-                      &nbsp;Ubah
-                    </button>
+                      <Pencil size={16} className="sm:mr-2" />
+                      <span className="hidden sm:inline">EDIT</span>
+                    </Button>
                   )}
                   {selectedProperty !== null && (
-                    <div>
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                        onClick={handleNavigateToMap}
-                      >
-                        Go to Map
-                      </button>
-                    </div>
+                    <Button
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                      onClick={handleNavigateToMap}
+                    >
+                      GO TO MAP
+                    </Button>
                   )}
                   {selectedRows.size > 0 && editMode && (
                     <>
-                      {editMode && (
-                        <button
-                          className="bg-green-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                          onClick={handleSave}
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Loading
-                                size="w-5 h-5"
-                                strokeWidth="border-2 border-t-2"
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="1em"
-                                height="1em"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z"
-                                ></path>
-                              </svg>
-                              Simpan
-                            </>
-                          )}
-                        </button>
-                      )}
-                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
+                      <Button
+                        variant="success"
+                        onClick={handleSave}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <Loading
+                            size="w-5 h-5"
+                            strokeWidth="border-2 border-t-2"
+                          />
+                        ) : (
+                          <>
+                            <Save size={16} className="sm:mr-2" />
+                            <span className="hidden sm:inline">SAVE</span>
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="destructive"
                         onClick={handleDeleteConfirmation}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="1em"
-                          height="1em"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M15 3H9V1h6v2zm5 0h-4V1c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v1h20V5c0-1.1-.9-2-2-2zM4 7v15c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7H4z"
-                          ></path>
-                        </svg>
-                        &nbsp; Hapus
-                      </button>
+                        <Trash size={16} className="sm:mr-2" />
+                        <span className="hidden sm:inline">DELETE</span>
+                      </Button>
                     </>
                   )}
+                  {editMode && (
+                    <Button
+                      className="bg-yellow-400 hover:bg-yellow-500 text-white"
+                      onClick={() => handleEditSelected(false)}
+                    >
+                      CANCEL
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowFilterModal(true)}
+                  >
+                    <Filter size={16} className="sm:mr-2" />
+                    <span className="hidden sm:inline">FILTER</span>
+                  </Button>
                 </div>
-                {editMode && (
-                  <button
-                    className="bg-yellow-500 text-white px-4 py-2 rounded btn-rounded flex items-center"
-                    onClick={() => handleEditSelected(false)}
-                  >
-                    Cancel
-                  </button>
-                )}
-                <button
-                  className="bg-gray-200 text-black px-4 py-2 rounded btn-rounded flex items-center"
-                  onClick={() => setShowFilterModal(true)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M22 18.605a.75.75 0 0 1-.75.75h-5.1a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h7.74a2.93 2.93 0 0 1 5.66 0h5.1a.75.75 0 0 1 .75.75m0-13.21a.75.75 0 0 1-.75.75H18.8a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h10.39a2.93 2.93 0 0 1 5.66 0h2.45a.74.74 0 0 1 .75.75m0 6.6a.74.74 0 0 1-.75.75H9.55a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h1.14a2.93 2.93 0 0 1 5.66 0h11.7a.75.75 0 0 1 .75.75"
-                    ></path>
-                  </svg>
-                  &nbsp;Filter
-                </button>
               </div>
-            </div>
 
-            {loading ? (
-              <PropertyTableSkeleton />
-            ) : (
-              <PropertyTable
-                currentData={properties}
-                selectedRows={selectedRows}
-                handleSelectRow={handleSelectRow}
-                handleSelectAll={handleSelectAll}
-                handleChange={handleChange}
-                editMode={editMode}
-                editedData={editedData}
-                editedValuations={editedValuations}
-                handleHeaderClick={handleHeaderClick}
-                sortConfig={sortConfig}
-                onSelectProperty={handleSelectProperty}
-              />
-            )}
-            <div className="mt-4 flex justify-between">
-              <div>
-                <span className="text-sm text-gray-700">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                  {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-                  {totalItems} results
+              {loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                  <Skeleton className="h-10 w-full mt-1" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                  <div className="min-w-[1200px] px-4 sm:px-0">
+                    <PropertyTable
+                      currentData={properties}
+                      selectedRows={selectedRows}
+                      handleSelectRow={handleSelectRow}
+                      handleSelectAll={handleSelectAll}
+                      handleChange={handleChange}
+                      editMode={editMode}
+                      editedData={editedData}
+                      editedValuations={editedValuations}
+                      handleHeaderClick={handleHeaderClick}
+                      sortConfig={sortConfig}
+                      onSelectProperty={handleSelectProperty}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+                <span className="text-sm text-gray-700 order-2 sm:order-1 text-center sm:text-left">
+                  {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
+                  to {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
+                  {totalItems}
                 </span>
+                <div className="order-1 sm:order-2 flex justify-center">
+                  <Pagination
+                    totalPages={totalPages}
+                    onPageChanged={(page) => {
+                      handlePageChange(page);
+                    }}
+                  />
+                </div>
+                <div className="w-full sm:w-24 order-3">
+                  <Select
+                    value={String(itemsPerPage)}
+                    onValueChange={(value) =>
+                      handleItemsPerPageChange(parseInt(value))
+                    }
+                  >
+                    <SelectTrigger className="px-4 py-2 border rounded-md">
+                      <SelectValue placeholder="Select items per page" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <Pagination
-                totalPages={totalPages}
-                onPageChanged={(page) => {
-                  handlePageChange(page);
-                }}
+              {showFilterModal && (
+                <FilterModal
+                  onApply={handleFilterApply}
+                  onClose={() => setShowFilterModal(false)}
+                  defaultFilters={filters}
+                />
+              )}
+              <ImportPopup
+                isOpen={showImportModal}
+                onClose={handleCloseImportModal}
+                onImport={handleImportData}
               />
-
-              <div>
-                <label className="mr-2 text-sm">Items per page:</label>
-                <select
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                  className="px-4 py-2 border rounded-md"
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
+              {showExportModal && (
+                <ExportPopup
+                  isOpen={showExportModal}
+                  onClose={handleCloseExportModal}
+                  onExport={handleExport}
+                />
+              )}
+              <FeedbackModal
+                isOpen={isFeedbackModalOpen}
+                onClose={() => setIsFeedbackModalOpen(false)}
+                message={feedbackMessage}
+                type={feedbackType}
+                onOk={handleOk}
+              />
+              <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setIsConfirmationModalOpen(false)}
+                onConfirm={actionToConfirm}
+                message="Are you sure you want to delete the data?"
+              />
             </div>
-          </div>
-        </div>
-        {showFilterModal && (
-          <FilterModal
-            onApply={handleFilterApply}
-            onClose={() => setShowFilterModal(false)}
-            defaultFilters={filters}
-          />
-        )}
-        <ImportPopup
-          isOpen={showImportModal}
-          onClose={handleCloseImportModal}
-          onImport={handleImportData}
-        />
-        {showExportModal && (
-          <ExportPopup
-            isOpen={showExportModal}
-            onClose={handleCloseExportModal}
-            onExport={handleExport}
-          />
-        )}
-        <FeedbackModal
-          isOpen={isFeedbackModalOpen}
-          onClose={() => setIsFeedbackModalOpen(false)}
-          message={feedbackMessage}
-          type={feedbackType}
-          onOk={handleOk}
-        />
-        <ConfirmationModal
-          isOpen={isConfirmationModalOpen}
-          onClose={() => setIsConfirmationModalOpen(false)}
-          onConfirm={actionToConfirm}
-          message="Yakin hapus data?"
-        />
+          </CardContent>
+        </Card>
       </div>
     </>
   );

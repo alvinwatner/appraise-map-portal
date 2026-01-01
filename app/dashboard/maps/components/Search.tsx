@@ -24,15 +24,15 @@ export const Search: React.FC<{
   return (
     <form onSubmit={onSubmit}>
       <input
-        className="w-72 pl-8 py-2 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
+        className="w-full lg:w-72 pl-10 pr-4 py-2.5 placeholder:text-sm placeholder:text-gray-400 rounded-lg ring-1 ring-gray-200 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
         type="text"
-        placeholder="       Search Property"
+        placeholder="Search Property"
         onChange={(e) => {
           handleSearch(e.target.value);
         }}
         defaultValue={searchParams.get("query")?.toString()}
       />
-      <IoSearchOutline className="absolute left-2 top-2 " color="grey" />
+      <IoSearchOutline className="absolute left-3 top-3 text-gray-400" size={18} />
     </form>
   );
 };

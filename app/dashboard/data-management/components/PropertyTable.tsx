@@ -2,6 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Property } from "@/app/types/types";
 import { formatRupiah } from "@/app/utils/helper";
 import { fetchObjectTypes } from "@/app/services/dataManagement.service";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type PropertyTableProps = {
   currentData: Property[];
@@ -87,454 +96,452 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
     setClickedRowId(id);
   };
 
-  const tableWidthPercentage = 100 - 25;
-
   return (
-    <div className="mt-10" style={{ width: `${tableWidthPercentage}vw` }}>
-      <div className="overflow-x-auto">
-        <table className="w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              {editMode ? (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input
-                    className="block w-full rounded-md"
-                    type="checkbox"
-                    onChange={handleSelectAll}
-                    checked={selectedRows.size === currentData.length}
-                  />
-                </th>
-              ) : null}
-              {headers.map((header) => (
-                <th
-                  key={header.field}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    header.sortable ? "cursor-pointer" : ""
-                  }`}
-                  onClick={
-                    header.sortable
-                      ? () => handleHeaderClick(header.field)
-                      : undefined
-                  }
-                >
-                  {header.label}{" "}
-                  {header.sortable && renderSortIcon(header.field)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((item) => (
-              <tr
-                key={item.id}
-                className={`cursor-pointer ${
-                  clickedRowId === item.id ? "!bg-blue-200" : ""
-                }`}
-                onClick={() => handleRowClick(item.id)}
-              >
+    <div className="w-full">
+      <div className="rounded-md border">
+        <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
                 {editMode ? (
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <TableHead>
                     <input
                       className="block w-full rounded-md"
                       type="checkbox"
-                      checked={selectedRows.has(item.id)}
-                      onChange={() => handleSelectRow(item.id)}
+                      onChange={handleSelectAll}
+                      checked={selectedRows.size === currentData.length}
                     />
-                  </td>
+                  </TableHead>
                 ) : null}
-                {editMode && selectedRows.has(item.id) ? (
-                  <>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                {headers.map((header) => (
+                  <TableHead
+                    key={header.field}
+                    className={`${header.sortable ? "cursor-pointer" : ""}`}
+                    onClick={
+                      header.sortable
+                        ? () => handleHeaderClick(header.field)
+                        : undefined
+                    }
+                  >
+                    {header.label}{" "}
+                    {header.sortable && renderSortIcon(header.field)}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((item) => (
+                <TableRow
+                  key={item.id}
+                  className={`cursor-pointer ${
+                    clickedRowId === item.id ? "!bg-teal-100" : ""
+                  }`}
+                  onClick={() => handleRowClick(item.id)}
+                >
+                  {editMode ? (
+                    <TableCell>
                       <input
                         className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.propertiesType === null
-                            ? ""
-                            : editedData.get(item.id)?.propertiesType ??
-                              item.propertiesType ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          handleChange(
-                            item.id,
-                            "propertiesType",
-                            newBuildingValue
-                          );
-                        }}
+                        type="checkbox"
+                        checked={selectedRows.has(item.id)}
+                        onChange={() => handleSelectRow(item.id)}
                       />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.reportNumber ||
-                          item.valuations?.[0]?.reportNumber ||
-                          ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          const currentValuation =
+                    </TableCell>
+                  ) : null}
+                  {editMode && selectedRows.has(item.id) ? (
+                    <>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
+                            editedData.get(item.id)?.propertiesType === null
+                              ? ""
+                              : editedData.get(item.id)?.propertiesType ??
+                                item.propertiesType ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            handleChange(
+                              item.id,
+                              "propertiesType",
+                              newBuildingValue
+                            );
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            {
-                              ...currentValuation,
-                              reportNumber: newBuildingValue,
-                            },
-                          ]);
-                        }}
-                        disabled={item.propertiesType === "data"}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="date"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.valuationDate ||
-                          item.valuations?.[0]?.valuationDate ||
-                          ""
-                        }
-                        onChange={(e) => {
-                          const newValuationDate = e.target.value || null;
-                          const currentValuation =
+                            )?.reportNumber ||
+                            item.valuations?.[0]?.reportNumber ||
+                            ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                reportNumber: newBuildingValue,
+                              },
+                            ]);
+                          }}
+                          disabled={item.propertiesType === "data"}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="date"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            {
-                              ...currentValuation,
-                              valuationDate: newValuationDate,
-                            },
-                          ]);
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.appraiser ||
-                          item.valuations?.[0]?.appraiser ||
-                          ""
-                        }
-                        onChange={(e) => {
-                          const newAppraiser = e.target.value || null;
-                          const currentValuation =
+                            )?.valuationDate ||
+                            item.valuations?.[0]?.valuationDate ||
+                            ""
+                          }
+                          onChange={(e) => {
+                            const newValuationDate = e.target.value || null;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                valuationDate: newValuationDate,
+                              },
+                            ]);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            {
-                              ...currentValuation,
-                              appraiser: newAppraiser,
-                            },
-                          ]);
-                        }}
-                        disabled={item.propertiesType === "data"}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <select
-                        className="block w-full rounded-md"
-                        value={
-                          editedData.get(item.id)?.objectType === null
-                            ? ""
-                            : editedData.get(item.id)?.objectType ??
-                              item.objectType ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newObjectType = e.target.value || null;
-                          handleChange(item.id, "objectType", newObjectType);
-                        }}
-                      >
-                        <option value="">Select</option>
-                        {objectTypes?.map((objectType, index) => (
-                          <option key={index} value={objectType}>
-                            {objectType}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.locations?.coordinate ??
-                          `${
+                            )?.appraiser ||
+                            item.valuations?.[0]?.appraiser ||
+                            ""
+                          }
+                          onChange={(e) => {
+                            const newAppraiser = e.target.value || null;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                appraiser: newAppraiser,
+                              },
+                            ]);
+                          }}
+                          disabled={item.propertiesType === "data"}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <select
+                          className="block w-full rounded-md"
+                          value={
+                            editedData.get(item.id)?.objectType === null
+                              ? ""
+                              : editedData.get(item.id)?.objectType ??
+                                item.objectType ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newObjectType = e.target.value || null;
+                            handleChange(item.id, "objectType", newObjectType);
+                          }}
+                        >
+                          <option value="">Select</option>
+                          {objectTypes?.map((objectType, index) => (
+                            <option key={index} value={objectType}>
+                              {objectType}
+                            </option>
+                          ))}
+                        </select>
+                      </TableCell>
+                      <TableCell className="flex flex-col">
+                        <input
+                          className="block w-full rounded-md mb-2"
+                          type="text"
+                          placeholder="Latitude"
+                          value={
                             editedData.get(item.id)?.locations?.latitude ??
                             item.locations?.latitude ??
                             ""
-                          }, ${
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+
+                            const currentLocations =
+                              editedData.get(item.id)?.locations ||
+                              item.locations;
+                            handleChange(item.id, "locations", {
+                              ...currentLocations,
+                              latitude: value,
+                            });
+                          }}
+                        />
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          placeholder="Longitude"
+                          value={
                             editedData.get(item.id)?.locations?.longitude ??
                             item.locations?.longitude ??
                             ""
-                          }`
-                        }
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const [latitude, longitude] = value
-                            .split(",")
-                            .map((coord) => coord.trim());
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
 
-                          console.log("Latitude:", latitude);
-                          console.log("Longitude:", longitude);
-
-                          const currentLocations =
-                            editedData.get(item.id)?.locations ||
-                            item.locations;
-                          handleChange(item.id, "locations", {
-                            ...currentLocations,
-                            coordinate: `${latitude}, ${longitude}`,
-
-                            latitude: latitude,
-                            longitude: longitude,
-                          });
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.debitur === null
-                            ? ""
-                            : editedData.get(item.id)?.debitur ??
-                              item.debitur ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          handleChange(item.id, "debitur", newBuildingValue);
-                        }}
-                        disabled={item.propertiesType === "data"}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.phoneNumber === null
-                            ? ""
-                            : editedData.get(item.id)?.phoneNumber ??
-                              item.phoneNumber ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          handleChange(
-                            item.id,
-                            "phoneNumber",
-                            newBuildingValue
-                          );
-                        }}
-                        disabled={item.propertiesType === "aset"}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="text"
-                        value={
-                          editedData.get(item.id)?.locations?.address === null
-                            ? ""
-                            : editedData.get(item.id)?.locations?.address ??
-                              item.locations?.address ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const address = e.target.value || null;
-                          const currentLocations =
-                            editedData.get(item.id)?.locations ||
-                            item.locations;
-                          handleChange(item.id, "locations", {
-                            ...currentLocations,
-                            address: address,
-                          });
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="number"
-                        value={
-                          editedData.get(item.id)?.landArea === null
-                            ? ""
-                            : editedData.get(item.id)?.landArea ??
-                              item.landArea ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          handleChange(item.id, "landArea", newBuildingValue);
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="number"
-                        value={
-                          editedData.get(item.id)?.buildingArea === null
-                            ? ""
-                            : editedData.get(item.id)?.buildingArea ??
-                              item.buildingArea ??
-                              ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = e.target.value || null;
-                          handleChange(
-                            item.id,
-                            "buildingArea",
-                            newBuildingValue
-                          );
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="number"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.landValue || item.valuations?.[0]?.landValue
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = Number(e.target.value) || 0;
-                          const currentValuation =
+                            const currentLocations =
+                              editedData.get(item.id)?.locations ||
+                              item.locations;
+                            handleChange(item.id, "locations", {
+                              ...currentLocations,
+                              longitude: value,
+                            });
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
+                            editedData.get(item.id)?.debitur === null
+                              ? ""
+                              : editedData.get(item.id)?.debitur ??
+                                item.debitur ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            handleChange(item.id, "debitur", newBuildingValue);
+                          }}
+                          disabled={item.propertiesType === "data"}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
+                            editedData.get(item.id)?.phoneNumber === null
+                              ? ""
+                              : editedData.get(item.id)?.phoneNumber ??
+                                item.phoneNumber ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            handleChange(
+                              item.id,
+                              "phoneNumber",
+                              newBuildingValue
+                            );
+                          }}
+                          disabled={item.propertiesType === "aset"}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="text"
+                          value={
+                            editedData.get(item.id)?.locations?.address === null
+                              ? ""
+                              : editedData.get(item.id)?.locations?.address ??
+                                item.locations?.address ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const address = e.target.value || null;
+                            const currentLocations =
+                              editedData.get(item.id)?.locations ||
+                              item.locations;
+                            handleChange(item.id, "locations", {
+                              ...currentLocations,
+                              address: address,
+                            });
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="number"
+                          value={
+                            editedData.get(item.id)?.landArea === null
+                              ? ""
+                              : editedData.get(item.id)?.landArea ??
+                                item.landArea ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            handleChange(item.id, "landArea", newBuildingValue);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="number"
+                          value={
+                            editedData.get(item.id)?.buildingArea === null
+                              ? ""
+                              : editedData.get(item.id)?.buildingArea ??
+                                item.buildingArea ??
+                                ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue = e.target.value || null;
+                            handleChange(
+                              item.id,
+                              "buildingArea",
+                              newBuildingValue
+                            );
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="number"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            {
-                              ...currentValuation,
-                              landValue: newBuildingValue,
-                            },
-                          ]);
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="number"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.buildingValue ??
-                          item.valuations?.[0]?.buildingValue ??
-                          ""
-                        }
-                        onChange={(e) => {
-                          const newBuildingValue = Number(e.target.value) || 0;
-                          const currentValuation =
+                            )?.landValue || item.valuations?.[0]?.landValue
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue =
+                              Number(e.target.value) || 0;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                landValue: newBuildingValue,
+                              },
+                            ]);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="number"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            {
-                              ...currentValuation,
-                              buildingValue: newBuildingValue,
-                            },
-                          ]);
-                        }}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        className="block w-full rounded-md"
-                        type="number"
-                        value={
-                          editedValuations.get(
-                            item.valuations?.[0]?.id as number
-                          )?.totalValue ||
-                          item.valuations?.[0]?.totalValue ||
-                          ""
-                        }
-                        onChange={(e) => {
-                          const newTotalValue = Number(e.target.value) || 0;
-                          const currentValuation =
+                            )?.buildingValue ??
+                            item.valuations?.[0]?.buildingValue ??
+                            ""
+                          }
+                          onChange={(e) => {
+                            const newBuildingValue =
+                              Number(e.target.value) || 0;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                buildingValue: newBuildingValue,
+                              },
+                            ]);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <input
+                          className="block w-full rounded-md"
+                          type="number"
+                          value={
                             editedValuations.get(
                               item.valuations?.[0]?.id as number
-                            ) || item.valuations?.[0];
-                          handleChange(item.id, "valuations", [
-                            { ...currentValuation, totalValue: newTotalValue },
-                          ]);
-                        }}
-                      />
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.propertiesType}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.valuations?.[0]?.reportNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.valuations?.[0]?.valuationDate
-                        ? new Date(
-                            item.valuations?.[0]?.valuationDate
-                          ).toLocaleDateString("id-ID")
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.valuations?.[0]?.appraiser}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.objectType}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {`${item.locations?.latitude}, ${item.locations?.longitude}`}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.debitur}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.phoneNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.locations?.address}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.landArea}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.buildingArea}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {formatRupiah(item.valuations?.[0]?.landValue)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {formatRupiah(item.valuations?.[0]?.buildingValue)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {formatRupiah(item.valuations?.[0]?.totalValue)}
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                            )?.totalValue ||
+                            item.valuations?.[0]?.totalValue ||
+                            ""
+                          }
+                          onChange={(e) => {
+                            const newTotalValue = Number(e.target.value) || 0;
+                            const currentValuation =
+                              editedValuations.get(
+                                item.valuations?.[0]?.id as number
+                              ) || item.valuations?.[0];
+                            handleChange(item.id, "valuations", [
+                              {
+                                ...currentValuation,
+                                totalValue: newTotalValue,
+                              },
+                            ]);
+                          }}
+                        />
+                      </TableCell>
+                    </>
+                  ) : (
+                    <>
+                      <TableCell>{item.propertiesType ?? "-"}</TableCell>
+                      <TableCell>
+                        {item.valuations?.[0]?.reportNumber ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {item.valuations?.[0]?.valuationDate
+                          ? new Date(
+                              item.valuations?.[0]?.valuationDate
+                            ).toLocaleDateString("id-ID")
+                          : "-"}
+                      </TableCell>
+                      <TableCell>
+                        {item.valuations?.[0]?.appraiser ?? "-"}
+                      </TableCell>
+                      <TableCell>{item.objectType ?? "-"}</TableCell>
+                      <TableCell>
+                        {item.locations?.latitude && item.locations?.longitude
+                          ? `${item.locations?.latitude}, ${item.locations?.longitude}`
+                          : "-"}
+                      </TableCell>
+                      <TableCell>{item.debitur ?? "-"}</TableCell>
+                      <TableCell>{item.phoneNumber ?? "-"}</TableCell>
+                      <TableCell>{item.locations?.address ?? "-"}</TableCell>
+                      <TableCell>{item.landArea ?? "-"}</TableCell>
+                      <TableCell>{item.buildingArea ?? "-"}</TableCell>
+                      <TableCell>
+                        {formatRupiah(item.valuations?.[0]?.landValue) ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {formatRupiah(item.valuations?.[0]?.buildingValue) ??
+                          "-"}
+                      </TableCell>
+                      <TableCell>
+                        {formatRupiah(item.valuations?.[0]?.totalValue) ?? "-"}
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
     </div>
   );

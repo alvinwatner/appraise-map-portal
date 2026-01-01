@@ -15,6 +15,9 @@ import {
 import Loading from "../../../components/Loading";
 import { EditAssetValuationForms } from "./EditAssetValuationForms";
 import { EditDataValuationForms } from "./EditDataValuationForms";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // If the property is null, then it is on edit mode
 // else it is on add mode, hence, the lat and lng always given
@@ -226,7 +229,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
       </div>
 
       <div className="px-12">
-        <p className="text-2sm font-thin mb-2">Jenis Data :</p>
+        <p className="text-2sm font-thin mb-2">Jenis Data</p>
         <Dropdown
           readonly={true}
           placeholder="Jenis Data"
@@ -237,7 +240,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           )}
         />
 
-        <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek :</p>
+        <p className="text-2sm font-thin mb-2 mt-5">Jenis Objek</p>
         <DropdownInput
           placeholder="Jenis Objek"
           options={objectTypes}
@@ -247,10 +250,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
         {selectedPropertyType == "Data" && (
           <>
-            <p className="text-2sm font-thin mb-2 mt-5">Nomor HP :</p>
-            <input
+            <p className="text-2sm font-thin mb-2 mt-5">Nomor HP</p>
+            <Input
               value={phoneNumber}
-              className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
                 const value = event.target.value;
@@ -267,10 +269,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
 
         {selectedPropertyType == "Aset" && (
           <>
-            <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur :</p>
-            <input
+            <p className="text-2sm font-thin mb-2 mt-5">Nama Debitur</p>
+            <Input
               value={debitur}
-              className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
               type="text"
               onChange={(event) => {
                 const value = event.target.value;
@@ -284,10 +285,10 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
             )}
           </>
         )}
-        <p className="text-2sm font-thin mb-2 mt-5">Alamat:</p>
+        <p className="text-2sm font-thin mb-2 mt-5">Alamat</p>
         <textarea
           value={address}
-          className="w-full pl-2 py-2 h-20 rounded-lg placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm resize-none"
+          className="w-full pl-2 py-2 h-20 placeholder:text-sm placeholder:text-gray-400 rounded-md ring-1 ring-gray-200 text-sm resize-none"
           rows={4}
           onChange={(event) => {
             const value = event.target.value;
@@ -305,7 +306,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <p className="text-red-500 text-xs">{errors.address}</p>
         )}
 
-        <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah :</p>
+        <p className="text-2sm font-thin mb-2 mt-2">Luas Tanah</p>
         <AreaInput
           initialValue={property.landArea}
           onChange={(value) => {
@@ -316,7 +317,7 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <p className="text-red-500 text-xs">{errors.landArea}</p>
         )}
 
-        <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan :</p>
+        <p className="text-2sm font-thin mb-2 mt-5">Luas Bangunan</p>
         <AreaInput
           initialValue={property.buildingArea}
           onChange={(value) => {
@@ -327,10 +328,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           <p className="text-red-500 text-xs">{errors.buildingArea}</p>
         )}
 
-        <p className="text-2sm font-thin mb-2 mt-5">Koordinat :</p>
-        <input
+        <p className="text-2sm font-thin mb-2 mt-5">Koordinat</p>
+        <Input
           value={coordinate}
-          className="w-full pl-2 py-2 rounded-lg placeholder: placeholder:text-sm placeholder:text-gray-400 ring-2 ring-[#D9D9D9] text-sm"
           type="text"
           onChange={(event) => {
             const value = event.target.value;
@@ -347,10 +347,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
               longitude: longitude,
               id: property.locations.id ?? 0,
             });
-
           }}
           placeholder="Koordinat"
-        ></input>
+        ></Input>
 
         {selectedPropertyType == "Aset" ? (
           <EditAssetValuationForms
@@ -372,15 +371,12 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
           />
         )}
 
-        <div className="grid grid-cols-2 gap-2 mb-10 mt-8">
-          <button
-            className="flex items-center justify-center  col-span-1 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={onClose}
-          >
-            Batal
-          </button>
-          <button
-            className="flex items-center justify-center col-span-1 bg-[#5EABEE] hover:bg-blue-700 text-white font-bold py-2 rounded"
+        <div className="grid grid-cols-2 gap-2 mb-10 mt-8 w-full">
+          <Button variant="outline" onClick={onClose}>
+            CANCEL
+          </Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-800 text-white w-full"
             onClick={() => {
               handleSave();
             }}
@@ -389,9 +385,9 @@ export const EditMarkerForm: React.FC<EditMarkerFormProps> = ({
             {isLoading ? (
               <Loading size="w-4 h-4" strokeWidth="border-2 border-t-2" />
             ) : (
-              "Simpan"
+              "SAVE"
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
