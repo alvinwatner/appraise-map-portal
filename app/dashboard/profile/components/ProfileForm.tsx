@@ -103,7 +103,7 @@ export const ProfileForm: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full max-w-md mx-auto">
       {fetching ? (
         <Card className="p-4">
           <CardContent className="space-y-4">

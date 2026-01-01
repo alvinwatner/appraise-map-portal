@@ -123,13 +123,11 @@ export default function TemplatesPage() {
   return (
     <div className="space-y-6">
       {/* Action Bar */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">
-            {templates.length} template tersedia
-          </p>
-        </div>
-        <Button variant="success" onClick={() => setShowUploadModal(true)}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="text-sm text-gray-500">
+          {templates.length} template tersedia
+        </p>
+        <Button variant="success" onClick={() => setShowUploadModal(true)} className="w-full sm:w-auto">
           <Upload className="mr-2 h-4 w-4" />
           Upload Template
         </Button>

@@ -110,9 +110,9 @@ export default function Page() {
       </div>
 
       {/* Charts Row - Secondary Zone */}
-      <div className="flex-1 flex gap-4 min-h-0">
-        {/* Bar Chart - 60% */}
-        <div className="flex-[60] min-w-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 overflow-auto lg:overflow-hidden">
+        {/* Bar Chart - full width on mobile, 60% on desktop */}
+        <div className="flex-1 lg:flex-[60] min-w-0 min-h-[300px] lg:min-h-0">
           {loading ? (
             <Card className="w-full h-full flex items-center justify-center">
               <Skeleton className="w-full h-full" />
@@ -121,8 +121,8 @@ export default function Page() {
             <BarChart data={monthlyData} />
           )}
         </div>
-        {/* Pie Chart - 40% */}
-        <div className="flex-[40] min-w-0">
+        {/* Pie Chart - full width on mobile, 40% on desktop */}
+        <div className="flex-1 lg:flex-[40] min-w-0 min-h-[300px] lg:min-h-0">
           {loading ? (
             <Card className="w-full h-full flex items-center justify-center">
               <Skeleton className="w-3/4 h-3/4" />

@@ -39,6 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [isShowNotifModal, setShowNotifModal] = useState(false);
   const [unreadNotifCount, setUnreadNotifCount] = useState<number>(0);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const router = useRouter();
   const [profile, setProfile] = useState({
     name: "",
@@ -226,7 +227,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex flex-col h-screen overflow-hidden">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 bg-slate-200">
-          <Sheet>
+          <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
@@ -245,6 +246,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </p>
                 <Link
                   href="/dashboard"
+                  onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard"
                       ? "bg-teal-50 text-teal-700 font-medium pl-4"
@@ -264,6 +266,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </p>
                 <Link
                   href="/dashboard/data-management"
+                  onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard/data-management"
                       ? "bg-teal-50 text-teal-700 font-medium pl-4"
@@ -278,6 +281,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   href="/dashboard/maps"
+                  onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname === "/dashboard/maps"
                       ? "bg-teal-50 text-teal-700 font-medium pl-4"
@@ -292,6 +296,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   href="/dashboard/documents"
+                  onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 relative ${
                     pathname?.startsWith("/dashboard/documents")
                       ? "bg-teal-50 text-teal-700 font-medium pl-4"

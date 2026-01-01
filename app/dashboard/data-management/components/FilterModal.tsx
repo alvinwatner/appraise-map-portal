@@ -99,8 +99,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4">
+      <div className="bg-white p-6 rounded shadow-md w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex justify-end items-center">
           <button
             className="text-sm text-teal-600 hover:text-teal-800"

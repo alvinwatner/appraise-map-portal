@@ -142,12 +142,12 @@ export const UsersTab: React.FC<UsersTabProps> = ({
 
   return (
     <>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 space-y-0 pb-4">
         <div>
           <CardTitle className="text-lg">Users</CardTitle>
           <CardDescription>Manage user accounts and permissions</CardDescription>
         </div>
-        <Button onClick={onAddUser} variant="success" size="sm">
+        <Button onClick={onAddUser} variant="success" size="sm" className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           Create User
         </Button>
@@ -167,17 +167,19 @@ export const UsersTab: React.FC<UsersTabProps> = ({
             ))}
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-x-auto -mx-6 sm:mx-0">
+            <div className="min-w-[700px] px-6 sm:px-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Username</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
@@ -328,8 +330,10 @@ export const UsersTab: React.FC<UsersTabProps> = ({
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+              </Table>
+            </div>
+          </div>
         )}
       </CardContent>
     </>

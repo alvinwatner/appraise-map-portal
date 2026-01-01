@@ -23,7 +23,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
       onRequestClose={onClose}
       contentLabel="FEEDBACK MODAL"
       ariaHideApp={false}
-      className="flex items-center justify-center mt-52"
+      className="fixed inset-0 flex items-center justify-center p-4"
       overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75"
     >
       <div

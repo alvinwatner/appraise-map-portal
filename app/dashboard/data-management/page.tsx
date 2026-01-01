@@ -845,88 +845,88 @@ const Page = () => {
                   {error}
                 </div>
               )}
-              <div className="flex justify-between items-center mb-4 ">
-                <div className="flex space-x-2">
+              <div className="flex flex-col gap-3 mb-4 lg:flex-row lg:justify-between lg:items-center">
+                {/* Search and Import/Export */}
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     type="text"
                     placeholder="Search..."
                     value={search}
                     onChange={handleSearchChange}
                     onKeyPress={handleSearchKeyPress}
+                    className="w-full sm:w-auto sm:min-w-[200px]"
                   />
-                  {(roleId == 1 || roleId == 2) && (
-                    <Button
-                      variant="success"
-                      onClick={handleImportClick}
-                    >
-                      <BiImport className="mr-2" />
-                      IMPORT
-                    </Button>
-                  )}
-                  {roleId == 1 && (
-                    <Button
-                      variant="success"
-                      onClick={handleExportClick}
-                    >
-                      <PiExportBold className="mr-2" />
-                      EXPORT
-                    </Button>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  <div className="flex space-x-2">
-                    {(roleId === 1 || roleId === 2) && !editMode && (
+                  <div className="flex gap-2">
+                    {(roleId == 1 || roleId == 2) && (
                       <Button
-                        className="bg-teal-600 hover:bg-teal-700 text-white"
-                        onClick={() => handleEditSelected(true)}
+                        variant="success"
+                        onClick={handleImportClick}
+                        className="flex-1 sm:flex-none"
                       >
-                        <Pencil size={16} className="mr-2" />
-                        EDIT
+                        <BiImport className="sm:mr-2" />
+                        <span className="hidden sm:inline">IMPORT</span>
                       </Button>
                     )}
-                    {selectedProperty !== null && (
-                      <div>
-                        <Button
-                          className="bg-teal-600 hover:bg-teal-700 text-white"
-                          onClick={handleNavigateToMap}
-                        >
-                          GO TO MAP
-                        </Button>
-                      </div>
-                    )}
-                    {selectedRows.size > 0 && editMode && (
-                      <>
-                        {editMode && (
-                          <Button
-                            variant="success"
-                            onClick={handleSave}
-                            disabled={isSubmitting}
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loading
-                                  size="w-5 h-5"
-                                  strokeWidth="border-2 border-t-2"
-                                />
-                              </>
-                            ) : (
-                              <>
-                                <Save size={16} className="mr-2" />
-                                SAVE
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        <Button
-                          variant="destructive"
-                          onClick={handleDeleteConfirmation}
-                        >
-                          <Trash size={16} className="mr-2" />
-                          DELETE
-                        </Button>
-                      </>
+                    {roleId == 1 && (
+                      <Button
+                        variant="success"
+                        onClick={handleExportClick}
+                        className="flex-1 sm:flex-none"
+                      >
+                        <PiExportBold className="sm:mr-2" />
+                        <span className="hidden sm:inline">EXPORT</span>
+                      </Button>
                     )}
                   </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {(roleId === 1 || roleId === 2) && !editMode && (
+                    <Button
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                      onClick={() => handleEditSelected(true)}
+                    >
+                      <Pencil size={16} className="sm:mr-2" />
+                      <span className="hidden sm:inline">EDIT</span>
+                    </Button>
+                  )}
+                  {selectedProperty !== null && (
+                    <Button
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                      onClick={handleNavigateToMap}
+                    >
+                      GO TO MAP
+                    </Button>
+                  )}
+                  {selectedRows.size > 0 && editMode && (
+                    <>
+                      <Button
+                        variant="success"
+                        onClick={handleSave}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <Loading
+                            size="w-5 h-5"
+                            strokeWidth="border-2 border-t-2"
+                          />
+                        ) : (
+                          <>
+                            <Save size={16} className="sm:mr-2" />
+                            <span className="hidden sm:inline">SAVE</span>
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteConfirmation}
+                      >
+                        <Trash size={16} className="sm:mr-2" />
+                        <span className="hidden sm:inline">DELETE</span>
+                      </Button>
+                    </>
+                  )}
                   {editMode && (
                     <Button
                       className="bg-yellow-400 hover:bg-yellow-500 text-white"
@@ -939,8 +939,8 @@ const Page = () => {
                     variant="outline"
                     onClick={() => setShowFilterModal(true)}
                   >
-                    <Filter size={16} className="mr-2" />
-                    FILTER
+                    <Filter size={16} className="sm:mr-2" />
+                    <span className="hidden sm:inline">FILTER</span>
                   </Button>
                 </div>
               </div>
@@ -954,37 +954,40 @@ const Page = () => {
                   <Skeleton className="h-10 w-full mt-1" />
                 </div>
               ) : (
-                <PropertyTable
-                  currentData={properties}
-                  selectedRows={selectedRows}
-                  handleSelectRow={handleSelectRow}
-                  handleSelectAll={handleSelectAll}
-                  handleChange={handleChange}
-                  editMode={editMode}
-                  editedData={editedData}
-                  editedValuations={editedValuations}
-                  handleHeaderClick={handleHeaderClick}
-                  sortConfig={sortConfig}
-                  onSelectProperty={handleSelectProperty}
-                />
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                  <div className="min-w-[1200px] px-4 sm:px-0">
+                    <PropertyTable
+                      currentData={properties}
+                      selectedRows={selectedRows}
+                      handleSelectRow={handleSelectRow}
+                      handleSelectAll={handleSelectAll}
+                      handleChange={handleChange}
+                      editMode={editMode}
+                      editedData={editedData}
+                      editedValuations={editedValuations}
+                      handleHeaderClick={handleHeaderClick}
+                      sortConfig={sortConfig}
+                      onSelectProperty={handleSelectProperty}
+                    />
+                  </div>
+                </div>
               )}
 
-              <div className="mt-4 flex justify-between items-center">
-                <div>
-                  <span className="text-sm text-gray-700">
-                    {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
-                    to {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-                    {totalItems}
-                  </span>
+              <div className="mt-4 flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+                <span className="text-sm text-gray-700 order-2 sm:order-1 text-center sm:text-left">
+                  {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}{" "}
+                  to {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
+                  {totalItems}
+                </span>
+                <div className="order-1 sm:order-2 flex justify-center">
+                  <Pagination
+                    totalPages={totalPages}
+                    onPageChanged={(page) => {
+                      handlePageChange(page);
+                    }}
+                  />
                 </div>
-                <Pagination
-                  totalPages={totalPages}
-                  onPageChanged={(page) => {
-                    handlePageChange(page);
-                  }}
-                />
-
-                <div className="w-24">
+                <div className="w-full sm:w-24 order-3">
                   <Select
                     value={String(itemsPerPage)}
                     onValueChange={(value) =>
