@@ -431,7 +431,7 @@ export default function Page() {
             setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
           }
         }}>
-          <SheetContent side="bottom" className="lg:hidden h-[90vh] rounded-t-2xl overflow-auto p-0">
+          <SheetContent side="bottom" className="lg:hidden h-[90vh] rounded-t-2xl overflow-auto p-0" overlayClassName="lg:hidden">
             {renderLeftWhiteSheetComponent()}
           </SheetContent>
         </Sheet>
