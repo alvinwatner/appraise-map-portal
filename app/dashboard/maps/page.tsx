@@ -103,8 +103,16 @@ export default function Page() {
   const [clickCoordinates, setClickCoordinates] =
     useState<null | google.maps.LatLngLiteral>(null);
   const [isPropertySearchOpen, setIsPropertySearchOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const mapRef = useRef<any>();
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Utility Hooks
   const libraries = useMemo(() => ["places"], []);
@@ -424,14 +432,19 @@ export default function Page() {
       )}
 
       {/* Mobile: Bottom sheet for property details, add/edit forms (not search - that's handled separately) */}
-      {isShowLeftWhiteSheet && leftWhiteSheetComponent !== LeftWhiteSheetComponent.searchResult && (
+      {!isDesktop && isShowLeftWhiteSheet && leftWhiteSheetComponent !== LeftWhiteSheetComponent.searchResult && (
         <Sheet open={true} onOpenChange={(open) => {
           if (!open) {
             setLeftWhiteSheet(false);
             setLeftWhiteSheetComponent(LeftWhiteSheetComponent.hide);
           }
         }}>
-          <SheetContent side="bottom" className="lg:hidden h-[90vh] rounded-t-2xl overflow-auto p-0" overlayClassName="lg:hidden">
+          <SheetContent
+            side="bottom"
+            className="h-[90vh] rounded-t-2xl overflow-auto p-0"
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onInteractOutside={(e) => e.preventDefault()}
+          >
             {renderLeftWhiteSheetComponent()}
           </SheetContent>
         </Sheet>
