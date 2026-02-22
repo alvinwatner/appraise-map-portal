@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/app/hooks/useLanguage";
 
 export function HeroSection() {
   const [mounted, setMounted] = useState(false);
+  const t = useTranslations("hero");
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 300);
@@ -38,24 +40,23 @@ export function HeroSection() {
       >
         <div className="max-w-2xl">
           <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold text-white leading-tight tracking-tight mb-6">
-            Leading the Way in Business Excellence
+            {t.heading}
           </h1>
           <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed">
-            Through reliable opinions, trustworthy relationships, and
-            sustainable strategies for a successful future.
+            {t.subheading}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <a
               href="#services"
               className="inline-flex items-center justify-center px-8 py-3.5 bg-accent-orange text-white font-semibold rounded-lg hover:brightness-110 hover:scale-[1.02] hover:shadow-lg transition-all duration-200 text-base"
             >
-              Our Services
+              {t.ourServices}
             </a>
             <a
               href="#contact"
               className="inline-flex items-center justify-center px-8 py-3.5 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 hover:scale-[1.02] transition-all duration-200 text-base"
             >
-              Contact Us
+              {t.contactUs}
             </a>
           </div>
         </div>

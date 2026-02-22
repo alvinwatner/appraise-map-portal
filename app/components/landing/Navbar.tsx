@@ -10,16 +10,19 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-
-const NAV_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
-];
+import { useLanguage, useTranslations } from "@/app/hooks/useLanguage";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { locale, setLocale } = useLanguage();
+  const t = useTranslations("navbar");
+
+  const navLinks = [
+    { label: t.services, href: "#services" },
+    { label: t.about, href: "#about" },
+    { label: t.contact, href: "#contact" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -34,6 +37,34 @@ export function Navbar() {
     el?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const languageToggle = (
+    <div className="flex items-center text-sm border border-white/20 rounded overflow-hidden">
+      <button
+        onClick={() => setLocale("id")}
+        className={cn(
+          "px-3 py-1 transition-colors",
+          locale === "id"
+            ? "text-white font-medium bg-white/10"
+            : "text-white/50 hover:text-white/70"
+        )}
+      >
+        ID
+      </button>
+      <span className="text-white/30">|</span>
+      <button
+        onClick={() => setLocale("en")}
+        className={cn(
+          "px-3 py-1 transition-colors",
+          locale === "en"
+            ? "text-white font-medium bg-white/10"
+            : "text-white/50 hover:text-white/70"
+        )}
+      >
+        EN
+      </button>
+    </div>
+  );
+
   return (
     <nav
       className={cn(
@@ -44,8 +75,6 @@ export function Navbar() {
       <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between h-16 lg:h-20">
         {/* Logo */}
         <div className="flex items-center gap-3 lg:gap-5">
-          {/* Left: Graha Paramita */}
-          {/* Logo & tagline */}
           <div>
             <Image
               src="/logo2.png"
@@ -54,13 +83,12 @@ export function Navbar() {
               height={50}
               className="h-14  w-auto brightness-0 invert opacity-80"
             />
-           
           </div>
         </div>
 
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -70,11 +98,7 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="flex items-center text-white/50 text-sm border border-white/20 rounded px-3 py-1 cursor-default">
-            <span className="text-white font-medium">ID</span>
-            <span className="mx-1.5">|</span>
-            <span>EN</span>
-          </div>
+          {languageToggle}
         </div>
 
         {/* Mobile hamburger */}
@@ -90,10 +114,10 @@ export function Navbar() {
               className="bg-navy border-navy-light w-[280px]"
             >
               <SheetTitle className="text-white sr-only">
-                Navigation Menu
+                {t.navigationMenu}
               </SheetTitle>
               <div className="flex flex-col gap-6 mt-8">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
@@ -103,11 +127,7 @@ export function Navbar() {
                     {link.label}
                   </a>
                 ))}
-                <div className="flex items-center text-white/50 text-sm border border-white/20 rounded px-3 py-1.5 w-fit cursor-default">
-                  <span className="text-white font-medium">ID</span>
-                  <span className="mx-1.5">|</span>
-                  <span>EN</span>
-                </div>
+                {languageToggle}
               </div>
             </SheetContent>
           </Sheet>

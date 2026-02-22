@@ -2,6 +2,7 @@
 
 import { useInView } from "@/app/hooks/useInView";
 import { useCountUp } from "@/app/hooks/useCountUp";
+import { useTranslations } from "@/app/hooks/useLanguage";
 
 interface StatItemProps {
   value: number;
@@ -25,15 +26,16 @@ function StatItem({ value, suffix, label, isActive }: StatItemProps) {
   );
 }
 
-const STATS = [
-  { value: 15, suffix: "+", label: "Years Experience" },
-  { value: 500, suffix: "+", label: "Projects Completed" },
-  { value: 2, suffix: "", label: "Gov & Private Sectors", displayText: "Gov & Private" },
-  { value: 50, suffix: "+", label: "Certified Appraisers" },
-];
-
 export function TrustIndicators() {
   const { ref, isInView } = useInView({ threshold: 0.3 });
+  const t = useTranslations("trust");
+
+  const stats = [
+    { key: "years", value: 15, suffix: "+", label: t.yearsExperience },
+    { key: "projects", value: 500, suffix: "+", label: t.projectsCompleted },
+    { key: "sectors", value: 2, suffix: "", label: t.govPrivateSectors },
+    { key: "appraisers", value: 50, suffix: "+", label: t.certifiedAppraisers },
+  ];
 
   return (
     <section
@@ -43,8 +45,8 @@ export function TrustIndicators() {
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x divide-gray-200">
-          {STATS.map((stat) => (
-            <StatItem key={stat.label} {...stat} isActive={isInView} />
+          {stats.map(({ key, ...stat }) => (
+            <StatItem key={key} {...stat} isActive={isInView} />
           ))}
         </div>
       </div>

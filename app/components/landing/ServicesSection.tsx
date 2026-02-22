@@ -4,8 +4,10 @@ import { Building2, FileCheck, Briefcase } from "lucide-react";
 import { useInView } from "@/app/hooks/useInView";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
+import { useTranslations } from "@/app/hooks/useLanguage";
 
 interface ServiceCard {
+  key: string;
   icon: LucideIcon;
   iconBg: string;
   iconColor: string;
@@ -13,35 +15,36 @@ interface ServiceCard {
   description: string;
 }
 
-const SERVICES: ServiceCard[] = [
-  {
-    icon: Building2,
-    iconBg: "bg-secondary-blue/10",
-    iconColor: "text-secondary-blue",
-    title: "Appraisal",
-    description:
-      "Independent and professional property valuation services covering residential properties (houses, apartments, condominiums), commercial properties (shophouses, offices, malls), industrial & warehouse properties, vacant land & development sites, and special assets as required.",
-  },
-  {
-    icon: FileCheck,
-    iconBg: "bg-accent-orange/10",
-    iconColor: "text-accent-orange",
-    title: "Purpose of Appraisal",
-    description:
-      "Our appraisal services serve diverse needs including banking & financing requirements, government and state-owned enterprise (BUMN) interests, and private corporate purposes across various sectors.",
-  },
-  {
-    icon: Briefcase,
-    iconBg: "bg-teal-500/10",
-    iconColor: "text-teal-600",
-    title: "Other Services",
-    description:
-      "Beyond property valuation, we offer comprehensive business feasibility studies (studi kelayakan bisnis) and construction physical development supervision (pengawasan pembangunan fisik proyek).",
-  },
-];
-
 export function ServicesSection() {
   const { ref, isInView } = useInView({ threshold: 0.15 });
+  const t = useTranslations("services");
+
+  const services: ServiceCard[] = [
+    {
+      key: "appraisal",
+      icon: Building2,
+      iconBg: "bg-secondary-blue/10",
+      iconColor: "text-secondary-blue",
+      title: t.appraisalTitle,
+      description: t.appraisalDesc,
+    },
+    {
+      key: "purpose",
+      icon: FileCheck,
+      iconBg: "bg-accent-orange/10",
+      iconColor: "text-accent-orange",
+      title: t.purposeTitle,
+      description: t.purposeDesc,
+    },
+    {
+      key: "other",
+      icon: Briefcase,
+      iconBg: "bg-teal-500/10",
+      iconColor: "text-teal-600",
+      title: t.otherTitle,
+      description: t.otherDesc,
+    },
+  ];
 
   return (
     <section
@@ -52,17 +55,17 @@ export function ServicesSection() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-3xl lg:text-[40px] font-bold text-navy mb-4">
-            Our Services
+            {t.heading}
           </h2>
           <p className="text-gray-500 text-base lg:text-lg max-w-xl mx-auto">
-            Professional property valuation and consulting services
+            {t.subheading}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {SERVICES.map((service, i) => (
+          {services.map((service, i) => (
             <div
-              key={service.title}
+              key={service.key}
               className={cn(
                 "bg-white border border-gray-100 rounded-xl p-8 lg:p-10",
                 "shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
@@ -95,7 +98,7 @@ export function ServicesSection() {
                 href="#contact"
                 className="inline-flex items-center text-secondary-blue font-medium text-sm mt-auto pt-6 hover:text-accent-orange transition-colors"
               >
-                Learn more
+                {t.learnMore}
                 <span className="ml-1">&rarr;</span>
               </a>
             </div>

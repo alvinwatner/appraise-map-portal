@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useInView } from "@/app/hooks/useInView";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/app/hooks/useLanguage";
 
 export function ContactSection() {
   const { ref, isInView } = useInView({ threshold: 0.2 });
+  const t = useTranslations("contact");
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -44,11 +46,10 @@ export function ContactSection() {
           {/* Left: heading */}
           <div className="lg:pt-8">
             <h2 className="text-3xl lg:text-[40px] font-bold text-white leading-tight mb-4">
-              Contact Us
+              {t.heading}
             </h2>
             <p className="text-white/60 text-base lg:text-lg leading-relaxed">
-              Interested in working together? Fill out some info and we will be
-              in touch shortly. We can&apos;t wait to hear from you!
+              {t.subheading}
             </p>
           </div>
 
@@ -58,7 +59,7 @@ export function ContactSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-white/70 text-sm font-medium mb-1.5">
-                    First Name <span className="text-white/40">(required)</span>
+                    {t.firstName} <span className="text-white/40">{t.required}</span>
                   </label>
                   <input
                     type="text"
@@ -68,12 +69,12 @@ export function ContactSection() {
                       setForm({ ...form, firstName: e.target.value })
                     }
                     className={inputClasses}
-                    placeholder="John"
+                    placeholder={t.firstNamePlaceholder}
                   />
                 </div>
                 <div>
                   <label className="block text-white/70 text-sm font-medium mb-1.5">
-                    Last Name <span className="text-white/40">(required)</span>
+                    {t.lastName} <span className="text-white/40">{t.required}</span>
                   </label>
                   <input
                     type="text"
@@ -83,13 +84,13 @@ export function ContactSection() {
                       setForm({ ...form, lastName: e.target.value })
                     }
                     className={inputClasses}
-                    placeholder="Doe"
+                    placeholder={t.lastNamePlaceholder}
                   />
                 </div>
               </div>
               <div>
                 <label className="block text-white/70 text-sm font-medium mb-1.5">
-                  Email <span className="text-white/40">(required)</span>
+                  {t.email} <span className="text-white/40">{t.required}</span>
                 </label>
                 <input
                   type="email"
@@ -97,12 +98,12 @@ export function ContactSection() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className={inputClasses}
-                  placeholder="john@example.com"
+                  placeholder={t.emailPlaceholder}
                 />
               </div>
               <div>
                 <label className="block text-white/70 text-sm font-medium mb-1.5">
-                  Message <span className="text-white/40">(required)</span>
+                  {t.message} <span className="text-white/40">{t.required}</span>
                 </label>
                 <textarea
                   required
@@ -112,14 +113,14 @@ export function ContactSection() {
                     setForm({ ...form, message: e.target.value })
                   }
                   className={cn(inputClasses, "resize-none")}
-                  placeholder="Tell us about your project..."
+                  placeholder={t.messagePlaceholder}
                 />
               </div>
               <button
                 type="submit"
                 className="w-full bg-accent-orange text-white font-semibold py-3.5 rounded-lg hover:brightness-110 transition-all duration-200 uppercase tracking-wide text-sm"
               >
-                Send
+                {t.send}
               </button>
             </form>
           </div>

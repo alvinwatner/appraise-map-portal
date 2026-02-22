@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { useTranslations } from "@/app/hooks/useLanguage";
 
 export function Footer() {
+  const t = useTranslations("footer");
   return (
     <footer className="bg-charcoal text-white/60">
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16">
@@ -16,14 +20,14 @@ export function Footer() {
               className="h-20  w-auto brightness-0 invert opacity-80"
             />
             <p className="mt-4 text-sm leading-relaxed">
-              &ldquo;Driven by accuracy, Guided by integrity&rdquo;
+              {t.tagline}
             </p>
           </div>
 
           {/* Location */}
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
-              Location
+              {t.location}
             </h4>
             <div className="flex items-start gap-2.5 text-sm leading-relaxed">
               <MapPin size={16} className="mt-0.5 shrink-0 text-accent-orange" />
@@ -40,7 +44,7 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
-              Contact
+              {t.contact}
             </h4>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2.5">
@@ -78,7 +82,7 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10 py-6">
         <p className="text-center text-sm text-white/30">
-          &copy; 2025 PT. Graha Paramita Konsultan. All rights reserved.
+          {t.copyright}
         </p>
       </div>
     </footer>
