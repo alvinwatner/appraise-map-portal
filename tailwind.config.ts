@@ -12,6 +12,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
         mono: ["var(--font-geist-mono)"],
+        inter: ["var(--font-inter)", "sans-serif"],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -24,6 +25,12 @@ const config: Config = {
         "c-golden": "#D1AF65",
         "c-light-blue": "#C7D3E6",
         "c-light-golden": "#E7CA85",
+        navy: "#1B2A4A",
+        "navy-light": "#243656",
+        "secondary-blue": "#2C5F8A",
+        "accent-orange": "#E8792F",
+        "off-white": "#F5F5F0",
+        charcoal: "#13192A",
         teal: {
           50: "hsl(var(--teal-50))",
           100: "hsl(var(--teal-100))",
@@ -96,10 +103,30 @@ const config: Config = {
           "0%": { opacity: "0", transform: "scale(0.95)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+        "slide-in-left": {
+          "0%": { opacity: "0", transform: "translateX(-40px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "slide-in-right": {
+          "0%": { opacity: "0", transform: "translateX(40px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(24px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "bounce-down": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(8px)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.2s ease-out",
         "scale-in": "scale-in 0.15s ease-out",
+        "slide-in-left": "slide-in-left 0.6s ease-out forwards",
+        "slide-in-right": "slide-in-right 0.6s ease-out forwards",
+        "fade-up": "fade-up 0.5s ease-out forwards",
+        "bounce-down": "bounce-down 2s ease-in-out infinite",
       },
     },
   },
