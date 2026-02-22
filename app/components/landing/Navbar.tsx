@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { Menu } from "lucide-react";
+import Image from "next/image";
 import {
   Sheet,
   SheetContent,
@@ -43,18 +43,18 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between h-16 lg:h-20">
         {/* Logo */}
-        <div className="flex items-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-md px-3 py-1.5">
+        <div className="flex items-center gap-3 lg:gap-5">
+          {/* Left: Graha Paramita */}
+          {/* Logo & tagline */}
+          <div>
             <Image
               src="/logo2.png"
               alt="PT. Graha Paramita Konsultan & KJP Kevin Lie, Hartono dan Rekan"
-              width={400}
-              height={70}
-              className="h-14 lg:h-[4.5rem] w-auto"
-              priority
-              quality={100}
-              unoptimized
+              width={230}
+              height={50}
+              className="h-14  w-auto brightness-0 invert opacity-80"
             />
+           
           </div>
         </div>
 
