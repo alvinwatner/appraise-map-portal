@@ -346,7 +346,7 @@ function GoogleMaps(
     markersRef.current = [];
   };
 
-  return <div className="h-full  " ref={mapRef} />;
+  return <div className="isolate h-full" ref={mapRef} />;
 }
 
 export default React.forwardRef(GoogleMaps);
